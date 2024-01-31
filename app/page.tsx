@@ -1,16 +1,9 @@
-"use client";
+
 import Image from "next/image";
-import ClimbingTrackCard from "./components/climbingTrack-card";
-import { useState } from "react";
-import { Track } from "./domain/TrackSchema";
+import Tracks from "./api/tracks";
 
 export default function Home() {
 
-  const [tracks, setTracks] = useState([
-    { id: 1, date: "12/01/2024", imageUrl: "", name: "Test", level: "Beginner" } as Track,
-    { id: 2, date: "20/01/2024", imageUrl: "/bouldering2.jpg", name: "Test for a second track!", level: "Advanced" } as Track,
-    { id: 3, date: "31/01/2024", imageUrl: "/bouldering3.jpg", name: "Third test. It definitly works" } as Track,
-  ]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -42,18 +35,14 @@ export default function Home() {
         <Image
           className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
           src="/room-map.png"
-          alt="Next.js Logo"
+          alt="Bouldering map"
           width={380}
           height={50}
           priority
         />
       </div>
 
-      <div className="space-y-4">
-        {tracks.map((track) => (
-          <ClimbingTrackCard key={track.id} {...track} ></ClimbingTrackCard>
-        ))}
-      </div>
+      <Tracks></Tracks>
 
       <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
         <a

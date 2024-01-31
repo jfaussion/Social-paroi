@@ -1,5 +1,5 @@
 {
-  "name": "my-second-app",
+  "name": "social-paroi",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@vercel/postgres": "^0.7.2",
     "next": "14.1.0",
     "react": "^18",
     "react-dom": "^18",
