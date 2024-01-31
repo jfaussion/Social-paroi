@@ -22,7 +22,7 @@ const ClimbingTrackCard: React.FC<ClimbingTrackCardProps> = ({ ...track }) => { 
         </div>
         <div>
           <h4 className="text-lg font-semibold text-white">{track.name}</h4>
-          <p className="text-sm text-gray-300">{track.date.getDate()}</p>
+          <p className="text-sm text-gray-300">{track.date ? track.date.toLocaleDateString() : '...'}</p>
         </div>
       </div>
       <div>
