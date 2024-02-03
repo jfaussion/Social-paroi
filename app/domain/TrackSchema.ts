@@ -4,7 +4,7 @@ import { z } from 'zod';
 export const TrackSchema = z.object({
   id: z.number(),
   name: z.string(),
-  date: z.string(),
+  date: z.date(),
   imageUrl: z.string().optional(),
   holdColor: z.string().optional(),
   level: z.enum(['Unknown', 'Beginner', 'Easy', 'Intermediate', 'Advanced', 'Difficult', 'FuckingHard', 'Legendary']).default('Unknown'),
@@ -13,20 +13,21 @@ export const TrackSchema = z.object({
 
 export type Track = z.infer<typeof TrackSchema>;
 
-export const getColorForLevel = (level: string): string => {
-  const levelColorMapping = {
-    Unknown: 'gray-500',
-    Beginner: 'white-500',
-    Easy: 'green-500',
-    Intermediate: 'blue-500',
-    Advanced: 'pink-500',
-    Difficult: 'red-500',
-    FuckingHard: 'yellow-500',
-    Legendary: 'black-500',
+export const getBorderColorForLevel = (level: Track['level']): string => {
+  const levelColorMapping: { [K in Track['level']]?: string } = {
+    Unknown: 'border-gray-500',
+    Beginner: 'border-white',
+    Easy: 'border-green-500',
+    Intermediate: 'border-blue-500',
+    Advanced: 'border-pink-500',
+    Difficult: 'border-red-500',
+    FuckingHard: 'border-yellow-500',
+    Legendary: 'border-black',
   };
 
-  return levelColorMapping[level] || 'gray-500'; // default color if level is not found
+  return levelColorMapping[level] ?? 'border-gray-500';
 };
+
 
 
 
