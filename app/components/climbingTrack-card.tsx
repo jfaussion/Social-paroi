@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { CldImage } from 'next-cloudinary';
 import * as z from 'zod';
 import { Track, TrackSchema, getBorderColorForLevel } from '../domain/TrackSchema';
 
@@ -17,7 +18,15 @@ const ClimbingTrackCard: React.FC<ClimbingTrackCardProps> = ({ ...track }) => { 
       <div className="flex items-center space-x-4">
         <div className="flex-shrink-0">
           <div className={`w-16 h-16 relative rounded-full overflow-hidden border-4 ${borderColor}`}>
-            <Image src={track.imageUrl || placeholderImage} alt="Climbing Track" layout="fill" objectFit="cover" />
+            {track.imageUrl ?
+              <CldImage
+                width="400"
+                height="400"
+                src={track.imageUrl}
+                crop="thumb"
+                alt="Climbing Track" />
+              :
+              <Image src={placeholderImage} alt="Climbing Track - place holder" layout="fill" objectFit="cover" />}
           </div>
         </div>
         <div>
@@ -28,7 +37,7 @@ const ClimbingTrackCard: React.FC<ClimbingTrackCardProps> = ({ ...track }) => { 
       <div>
         <select
           value={status}
-            onChange={(e) => setStatus(e.target.value as Track['status'])}
+          onChange={(e) => setStatus(e.target.value as Track['status'])}
           className="form-select appearance-none block w-full px-3 py-1.5 text-base font-normal text-white bg-gray-800 bg-clip-padding bg-no-repeat border border-gray-600 rounded transition ease-in-out m-0 focus:text-white focus:bg-gray-700 focus:border-blue-500 focus:outline-none"
         >
           <option value="ToDo">To do</option>
