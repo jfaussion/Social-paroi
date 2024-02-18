@@ -1,6 +1,6 @@
 import { sql } from "@vercel/postgres";
-import ClimbingTrackCard from "../components/climbingTrack-card";
-import { Track, TrackSchema } from "../domain/TrackSchema";
+import ClimbingTrackCard from "../../components/climbingTrack-card";
+import { Track, TrackSchema } from "../../domain/TrackSchema";
 
 export default async function Tracks(): Promise<JSX.Element> {
   const { rows } = await sql`SELECT * from climbing_track order by date desc`;
