@@ -1,4 +1,4 @@
-
+import SignIn from "@/components/ui/signIn";
 import Image from "next/image";
 
 export const dynamic = 'force-dynamic'
@@ -43,7 +43,7 @@ export default function Home() {
         />
       </div>
 
-      Welcome page !!!
+      <SignIn/>
 
       <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
         <a

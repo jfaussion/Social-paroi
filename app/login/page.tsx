@@ -1,4 +1,4 @@
-import SignInWithProviverButton from '../ui/SignInWithProviderButton';
+import SignInWithProviverButton from '../../components/ui/signInWithProvider.button';
 
 export default function LoginPage() {
 
