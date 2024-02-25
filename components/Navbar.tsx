@@ -4,6 +4,7 @@ import { auth } from '@/auth';
 import Image from 'next/image';
 import UserMenu from './UserMenu';
 import SignIn from './ui/signIn';
+import Logo from '@/public/social-paroi.png';
 
 export default async function NavBar() {
   const session = await auth();
@@ -20,7 +21,7 @@ export default async function NavBar() {
     <SessionProvider session={session}>
       <nav className="sticky flex justify-center border-b">
         <div className="flex items-center justify-between w-full h-16 max-w-3xl px-4 mx-auto sm:px-6">
-          <Image src="/social-paroi.png" alt="Social Paroi app logo" width={40} height={40} />
+          <Image src={Logo} alt="Social Paroi app logo" width={40} height={40} />
           <div>
             {session ? (
               <UserMenu />

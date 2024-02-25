@@ -1,5 +1,11 @@
 import { z } from 'zod';
 
+export enum TrackStatus {
+  TO_DO = 'TO_DO',
+  IN_PROGRESS = 'IN_PROGRESS',
+  DONE = 'DONE',
+}
+
 // Define the schema for a track
 export const TrackSchema = z.object({
   id: z.number(),
@@ -8,7 +14,7 @@ export const TrackSchema = z.object({
   imageUrl: z.string().optional(),
   holdColor: z.string().optional(),
   level: z.enum(['Unknown', 'Beginner', 'Easy', 'Intermediate', 'Advanced', 'Difficult', 'FuckingHard', 'Legendary']).default('Unknown'),
-  status: z.enum(['TO_DO', 'IN_PROGRESS', 'DONE']).nullish().transform(val => val ?? 'TO_DO').default('TO_DO'),
+  status: z.enum([TrackStatus.TO_DO, TrackStatus.IN_PROGRESS, TrackStatus.DONE]).nullish().transform(val => val ?? TrackStatus.TO_DO).default(TrackStatus.TO_DO),
 });
 
 export type Track = z.infer<typeof TrackSchema>;
@@ -27,6 +33,7 @@ export const getBorderColorForLevel = (level: Track['level']): string => {
 
   return levelColorMapping[level] ?? 'border-gray-500';
 };
+
 
 
 
