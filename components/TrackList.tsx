@@ -1,14 +1,14 @@
 'useclient'
-import TrackCard from "../../components/TrackCard";
-import { Track } from "../../domain/TrackSchema";
+import TrackCard from "./TrackCard";
+import { Track } from "../domain/TrackSchema";
 import { useEffect, useState } from "react";
-import { getAllTracksForUser } from "../lib/actions";
+import { getAllTracksForUser } from "../app/lib/actions";
 
 type TracksProps = {
   userId: string;
 };
 
-const Tracks: React.FC<TracksProps> = ({ userId }) => {
+const TrackList: React.FC<TracksProps> = ({ userId }) => {
   const [trackList, setTrackList] = useState<Track[]>([]);
 
   useEffect(() => {
@@ -29,4 +29,4 @@ const Tracks: React.FC<TracksProps> = ({ userId }) => {
   );
 };
 
-export default Tracks;
+export default TrackList;
