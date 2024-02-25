@@ -1,5 +1,5 @@
 "use client";
-import React, { use, useState } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { CldImage } from 'next-cloudinary';
 import * as z from 'zod';
@@ -18,10 +18,8 @@ const ClimbingTrackCard: React.FC<ClimbingTrackCardProps> = ({ ...track }) => {
   const session = useSession();
 
   const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    console.log('handleStatusChange', e.target.value);
     const newStatus = e.target.value as Track['status'];
     setStatus(newStatus);
-    console.log('session', session);
 
     if (!session.data?.user?.id) return;
     const wasSuccessful = await updateTrackStatus(track.id, parseInt(session.data?.user?.id), newStatus);
