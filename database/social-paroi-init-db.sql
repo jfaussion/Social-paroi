@@ -33,18 +33,6 @@ CREATE TABLE IF NOT EXISTS "accounts" (
 
 -- Les données exportées n'étaient pas sélectionnées.
 
--- Listage de la structure de la table public. sessions
-DROP TABLE IF EXISTS "sessions";
-CREATE TABLE IF NOT EXISTS "sessions" (
-	"id" SERIAL NOT NULL,
-	"userId" INTEGER NOT NULL,
-	"expires" TIMESTAMPTZ NOT NULL,
-	"sessionToken" VARCHAR(255) NOT NULL,
-	PRIMARY KEY ("id")
-);
-
--- Les données exportées n'étaient pas sélectionnées.
-
 -- Listage de la structure de la table public. tracks
 DROP TABLE IF EXISTS "tracks";
 CREATE TABLE IF NOT EXISTS "tracks" (
@@ -84,15 +72,6 @@ CREATE INDEX "idx_users_id" ON "users" ("id");
 CREATE INDEX "idx_users_email" ON "users" ("email");
 
 -- Les données exportées n'étaient pas sélectionnées.
-
--- Listage de la structure de la table public. verification_token
-DROP TABLE IF EXISTS "verification_token";
-CREATE TABLE IF NOT EXISTS "verification_token" (
-	"identifier" TEXT NOT NULL,
-	"expires" TIMESTAMPTZ NOT NULL,
-	"token" TEXT NOT NULL,
-	PRIMARY KEY ("identifier", "token")
-);
 
 
 CREATE TABLE IF NOT EXISTS "user_track_progress" (
