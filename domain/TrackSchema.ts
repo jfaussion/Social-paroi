@@ -8,7 +8,7 @@ export const TrackSchema = z.object({
   imageUrl: z.string().optional(),
   holdColor: z.string().optional(),
   level: z.enum(['Unknown', 'Beginner', 'Easy', 'Intermediate', 'Advanced', 'Difficult', 'FuckingHard', 'Legendary']).default('Unknown'),
-  status: z.enum(['ToDo', 'InProgress', 'Done']).default('ToDo'),
+  status: z.enum(['TO_DO', 'IN_PROGRESS', 'DONE']).nullish().transform(val => val ?? 'TO_DO').default('TO_DO'),
 });
 
 export type Track = z.infer<typeof TrackSchema>;

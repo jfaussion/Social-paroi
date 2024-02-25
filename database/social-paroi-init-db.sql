@@ -54,12 +54,20 @@ CREATE TABLE IF NOT EXISTS "tracks" (
 	"level" VARCHAR(50) NULL DEFAULT NULL,
 	"imageUrl" VARCHAR(255) NULL DEFAULT '',
 	"holdColor" VARCHAR(50) NULL DEFAULT NULL::character varying,
-	INDEX "idx_track_name" ("name"),
-	PRIMARY KEY ("id"),
-	INDEX "climbing_track_id_index" ("id")
+	PRIMARY KEY ("id")
 );
+CREATE INDEX "idx_tracks_id" ON tracks("id");
+CREATE INDEX "idx_tracks_name" ON tracks("name");
 
--- Les données exportées n'étaient pas sélectionnées.
+DELETE FROM "tracks";
+INSERT INTO "tracks" ("id", "name", "date", "level", "imageUrl", "holdColor") VALUES
+  (3, 'A third and it''s the one', '2024-01-26', 'Beginner', 'SocialParoiApp/Tracks/hvupvslz92v1x89gvdc2', 'Pink'),
+  (4, 'Legendary Track', '2024-01-31', 'Legendary', 'SocialParoiApp/Tracks/nfkywjbxwqqivo1kmi2s', 'Black'),
+  (2, 'Test second track', '2023-12-31', 'Intermediate', '', 'Green'),
+  (1, 'First track', '2024-01-10', 'Advanced', '', 'Yellow'),
+  (5, 'With a very long name, I just want to see what''s happening', '2024-02-02', 'Difficult', '', 'Blue'),
+  (6, 'Easy track', '2024-01-02', 'Easy', '', 'Not a color'),
+  (7, 'No level', '2023-11-02', 'Unknown', '', 'White');
 
 -- Listage de la structure de la table public. users
 DROP TABLE IF EXISTS "users";
@@ -72,6 +80,9 @@ CREATE TABLE IF NOT EXISTS "users" (
 	PRIMARY KEY ("id")
 );
 
+CREATE INDEX "idx_users_id" ON "users" ("id");
+CREATE INDEX "idx_users_email" ON "users" ("email");
+
 -- Les données exportées n'étaient pas sélectionnées.
 
 -- Listage de la structure de la table public. verification_token
@@ -82,6 +93,23 @@ CREATE TABLE IF NOT EXISTS "verification_token" (
 	"token" TEXT NOT NULL,
 	PRIMARY KEY ("identifier", "token")
 );
+
+
+CREATE TABLE IF NOT EXISTS "user_track_progress" (
+  "id" SERIAL NOT NULL,
+  "user_id" INTEGER NULL DEFAULT NULL,
+  "track_id" INTEGER NULL DEFAULT NULL,
+  "status" TEXT NOT NULL,
+  "date_completed" TIMESTAMPTZ NULL DEFAULT NULL,
+  "created_at" TIMESTAMPTZ NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" TIMESTAMPTZ NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id"),
+  CONSTRAINT "usertrackprogress_track_id_fkey" FOREIGN KEY ("track_id") REFERENCES "tracks" ("id") ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT "usertrackprogress_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON UPDATE NO ACTION ON DELETE NO ACTION,
+	CONSTRAINT "user_track_unique_constraint" UNIQUE (track_id, user_id)
+);
+CREATE INDEX "idx_usertrackprogress_user_id" ON "user_track_progress" ("user_id");
+CREATE INDEX "idx_usertrackprogress_track_id" ON "user_track_progress" ("track_id");
 
 -- Les données exportées n'étaient pas sélectionnées.
 
