@@ -11,15 +11,9 @@ export const dynamic = 'force-dynamic'
 export default async function Home() {
 
   const session = await auth();
-  if (session?.user) {
-    session.user = {
-      id: session.user.id,
-      name: session.user.name,
-      email: session.user.email,
-      image: session.user.image,
-    }
-  }
+
   const userId = session?.user?.id ?? "";
+  // TODO: create hook to hadle states and loading
   const tracks = await getAllTracksForUser(parseInt(userId));
 
   return (
@@ -40,11 +34,17 @@ export default async function Home() {
           />
         </div>
 
-        <div className="space-y-4">
-          {tracks.map((track) => (
-            <TrackCard key={track.id} {...track} />
-          ))}
-        </div>
+        {!!userId ? (
+          <div className="space-y-4">
+            {tracks.map((track) => (
+              <TrackCard key={track.id} {...track} />
+            ))}
+          </div>
+        ) : (
+          <div className="bg-red-900 border border-red-500 rounded p-4">
+            <p className="text-red-300">Error, sign in to see your tracks...</p>
+          </div>
+        )}
 
         <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
           <a
