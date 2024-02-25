@@ -1,29 +1,7 @@
 'use server';
-import { signIn } from '@/auth';
 import { Track, TrackSchema } from '@/domain/TrackSchema';
 import { sql } from '@vercel/postgres';
-import { AuthError } from 'next-auth';
 
-
-export async function authenticate(
-  prevState: string | undefined,
-  formData: FormData,
-) {
-  try {
-    console.log('formData', formData);
-    await signIn('github', formData); // TODO: change to use the github provider
-  } catch (error) {
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case 'CredentialsSignin':
-          return 'Invalid credentials.';
-        default:
-          return 'Something went wrong.';
-      }
-    }
-    throw error;
-  }
-}
 
 export async function updateTrackStatusForUser(
   trackId: number,
@@ -39,7 +17,7 @@ export async function updateTrackStatusForUser(
         `;
     return true;
   } catch (err) {
-    console.log('Error updating the track for user', err)
+    console.error('Error updating the track for user', err)
     return false;
   }
 };
@@ -63,6 +41,11 @@ export async function getAllTracksForUser(
     ORDER BY
       t.date desc;
     `
-  let trackList: Track[] = rows.map((row: any) => TrackSchema.parse(row));
-  return trackList;
+    try{
+      let trackList: Track[] = rows.map((row: any) => TrackSchema.parse(row));
+      return trackList;
+    } catch (err) {
+      console.error('Error parsing tracks', err)
+      return [];
+    }
 }
