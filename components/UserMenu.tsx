@@ -3,14 +3,33 @@
 import { signOut, useSession } from "next-auth/react";
 import { Button } from "./ui/Button";
 import Image from 'next/image';
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import DefaultAvatarImage from '@/public/default-avatar.svg';
 
 export default function UserMenu() {
   const { data: session, status } = useSession()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !(dropdownRef.current as HTMLElement).contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []); 
+
+  function handleSignOut() {
+    signOut()
+  }
 
   return (
-    <div style={{ position: 'relative', cursor: 'pointer' }}>
+    <div ref={dropdownRef} style={{ position: 'relative', cursor: 'pointer' }}>
 
       {session ? (
         <div className="relative">
@@ -42,7 +61,7 @@ export default function UserMenu() {
         </div>
 
       ) : (
-        <Image src={'./default-avatar.svg'}
+        <Image src={DefaultAvatarImage}
               alt="Default avatar"
               width={40}
               height={40}
@@ -52,7 +71,3 @@ export default function UserMenu() {
     </div>
   );
 };
-
-function handleSignOut() {
-  signOut()
-}
