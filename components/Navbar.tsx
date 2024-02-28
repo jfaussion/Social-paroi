@@ -22,6 +22,11 @@ export default async function NavBar() {
       <nav className="sticky flex justify-center border-b">
         <div className="flex items-center justify-between w-full h-16 max-w-3xl px-4 mx-auto sm:px-6">
           <Image src={Logo} alt="Social Paroi app logo" width={40} height={40} />
+          <div className="text-4xl md:text-5xl font-extrabold">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
+              Social Paroi
+            </span>
+          </div>
           <div>
             {session ? (
               <UserMenu />
