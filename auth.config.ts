@@ -1,5 +1,5 @@
 import type { NextAuthConfig } from 'next-auth';
- 
+
 export const authConfig = {
   pages: {
     signIn: '/login',
@@ -9,14 +9,14 @@ export const authConfig = {
       const isLoggedIn = !!auth?.user;
 
       // Protect dashboard routes
-      const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
-      if (isOnDashboard) {
+      const isProtectedRoute = nextUrl.pathname.startsWith('/dashboard') || nextUrl.pathname.startsWith('/track');
+      if (isProtectedRoute) {
         if (isLoggedIn) return true;
         return false; // Redirect unauthenticated users to login page
       } else if (isLoggedIn) {
+        // Default redirect for authenticated users
         return Response.redirect(new URL('/dashboard', nextUrl));
       }
-      
       return true;
     },
   },

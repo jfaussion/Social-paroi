@@ -2,15 +2,13 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { CldImage } from 'next-cloudinary';
-import * as z from 'zod';
-import { Track, TrackSchema, TrackStatus, getBorderColorForLevel } from '../domain/TrackSchema';
+import { Track, TrackStatus, getBorderColorForLevel } from '../domain/TrackSchema';
 import { useUpdateTrackStatus } from '../app/lib/updateTrackUserHook';
 import { useSession } from 'next-auth/react';
 import placeholderImage from '@/public/bouldering-placeholder.jpeg';
 
-type TrackCardProps = z.infer<typeof TrackSchema>;
 
-const TrackCard: React.FC<TrackCardProps> = ({ ...track }) => { 
+const TrackCard: React.FC<Track> = ({ ...track }) => { 
 
   const { updateTrackStatus, isLoading, error } = useUpdateTrackStatus();
   const [status, setStatus] = useState<Track['status']>(track.status);
