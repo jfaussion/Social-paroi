@@ -1,7 +1,6 @@
 import { getTrackDetails } from "@/app/lib/actions";
 import { auth } from "@/auth";
 import { SessionProvider } from "next-auth/react";
-import { CldImage } from "next-cloudinary";
 import Image from 'next/image';
 import placeholderImage from "@/public/bouldering-placeholder.jpeg";
 import TrackDetails from "@/components/TrackDetails";

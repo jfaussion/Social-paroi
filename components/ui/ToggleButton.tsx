@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 interface ToggleProps {
   isActive: boolean;
@@ -9,10 +9,10 @@ interface ToggleProps {
 const ToggleButton = ({isActive, isLoading, onChange}: ToggleProps) => {
 
  // Tailwind classes for button base styling
- const baseClasses = "rounded-full p-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300 ease-in-out";
- const activeClasses = isActive ? 'bg-green-500' : 'bg-gray-500';
+ const baseClasses = "rounded-full p-2 cursor-pointer border border-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300 ease-in-out";
+ const activeClasses = isActive ? 'bg-green-500 border-green-500' : 'bg-transparent border-gray-500';
  const animationClass = isActive ? 'animate-[buttonBounce_0.5s_ease-in-out]' : '';
- const textClass = isActive ? 'text-white' : 'text-gray-900';
+ const textClass = isActive ? 'text-white' : 'text-gray-500';
 
 
  return (

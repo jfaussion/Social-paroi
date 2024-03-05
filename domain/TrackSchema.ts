@@ -15,6 +15,8 @@ export const TrackSchema = z.object({
   holdColor: z.string().optional(),
   level: z.enum(['Unknown', 'Beginner', 'Easy', 'Intermediate', 'Advanced', 'Difficult', 'FuckingHard', 'Legendary']).default('Unknown'),
   status: z.enum([TrackStatus.TO_DO, TrackStatus.IN_PROGRESS, TrackStatus.DONE]).nullish().transform(val => val ?? TrackStatus.TO_DO).default(TrackStatus.TO_DO),
+  zone: z.number(),
+  points: z.number(),
 });
 
 export type Track = z.infer<typeof TrackSchema>;
@@ -32,6 +34,21 @@ export const getBorderColorForLevel = (level: Track['level']): string => {
   };
 
   return levelColorMapping[level] ?? 'border-gray-500';
+};
+
+export const getBgColorForLevel = (level: Track['level']): string => {
+  const levelColorMapping: { [K in Track['level']]?: string } = {
+    Unknown: 'bg-gray-500',
+    Beginner: 'bg-white',
+    Easy: 'bg-green-500',
+    Intermediate: 'bg-blue-500',
+    Advanced: 'bg-pink-500',
+    Difficult: 'bg-red-500',
+    FuckingHard: 'bg-yellow-500',
+    Legendary: 'bg-black',
+  };
+
+  return levelColorMapping[level] ?? 'bg-gray-500';
 };
 
 

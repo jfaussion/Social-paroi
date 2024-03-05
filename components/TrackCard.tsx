@@ -52,9 +52,12 @@ const TrackCard: React.FC<Track> = ({ ...track }) => {
               <Image src={placeholderImage} alt="Climbing Track - place holder" fill sizes='(max-width: 200px)'/>}
           </div>
         </div>
-        <div>
+        <div className='w-full'>
           <h4 className="text-lg font-semibold text-white">{track.name}</h4>
-          <p className="text-sm text-gray-300">{track.date ? track.date.toLocaleDateString() : '...'}</p>
+          <div className="flex justify-between items-center mt-2">
+            <span className="text-sm text-gray-400">{track.date ? track.date.toLocaleDateString() : '...'}</span>
+            <span className="bg-transparent text-xs font-semibold px-2 py-1 rounded border border-gray-200">Zone {track.zone}</span>
+          </div>
         </div>
       </div>
       <div>

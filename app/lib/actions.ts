@@ -33,6 +33,8 @@ export async function getAllTracksForUser(
       t.level,
       t."imageUrl",
       t."holdColor",
+      t."zone",
+      t."points",
       utp.status,
       utp.date_completed
     FROM
@@ -64,6 +66,8 @@ export async function getTrackDetails(
       t.level,
       t."imageUrl",
       t."holdColor",
+      t."zone",
+      t."points",
       utp.status,
       utp.date_completed
     FROM

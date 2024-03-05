@@ -5,16 +5,23 @@
 -- HeidiSQL Version:             12.6.0.6765
 -- --------------------------------------------------------
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET NAMES  */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+-- Drop the everything in the database
+DROP TABLE IF EXISTS "accounts";
+
+DROP TABLE IF EXISTS "user_track_progress";
+DROP INDEX IF EXISTS "idx_usertrackprogress_user_id";
+DROP INDEX IF EXISTS "idx_usertrackprogress_track_id";
+
+DROP TABLE IF EXISTS "tracks";
+DROP INDEX IF EXISTS "idx_tracks_name";
+DROP INDEX IF EXISTS "idx_users_id";
+
+DROP TABLE IF EXISTS "users";
+DROP INDEX IF EXISTS "idx_users_email";
+DROP INDEX IF EXISTS "idx_users_id";
+
 
 -- Listage de la structure de la table public. accounts
-DROP TABLE IF EXISTS "accounts";
 CREATE TABLE IF NOT EXISTS "accounts" (
 	"id" SERIAL NOT NULL,
 	"userId" INTEGER NOT NULL,
@@ -34,11 +41,12 @@ CREATE TABLE IF NOT EXISTS "accounts" (
 -- Les données exportées n'étaient pas sélectionnées.
 
 -- Listage de la structure de la table public. tracks
-DROP TABLE IF EXISTS "tracks";
 CREATE TABLE IF NOT EXISTS "tracks" (
 	"id" INTEGER NOT NULL,
 	"name" VARCHAR(255) NULL DEFAULT NULL,
 	"date" DATE NULL DEFAULT NULL,
+	"zone" INTEGER NOT NULL,
+	"points" INTEGER NOT NULL DEFAULT 0,
 	"level" VARCHAR(50) NULL DEFAULT NULL,
 	"imageUrl" VARCHAR(255) NULL DEFAULT '',
 	"holdColor" VARCHAR(50) NULL DEFAULT NULL::character varying,
@@ -48,17 +56,16 @@ CREATE INDEX "idx_tracks_id" ON tracks("id");
 CREATE INDEX "idx_tracks_name" ON tracks("name");
 
 DELETE FROM "tracks";
-INSERT INTO "tracks" ("id", "name", "date", "level", "imageUrl", "holdColor") VALUES
-  (3, 'A third and it''s the one', '2024-01-26', 'Beginner', 'SocialParoiApp/Tracks/hvupvslz92v1x89gvdc2', 'Pink'),
-  (4, 'Legendary Track', '2024-01-31', 'Legendary', 'SocialParoiApp/Tracks/nfkywjbxwqqivo1kmi2s', 'Black'),
-  (2, 'Test second track', '2023-12-31', 'Intermediate', '', 'Green'),
-  (1, 'First track', '2024-01-10', 'Advanced', '', 'Yellow'),
-  (5, 'With a very long name, I just want to see what''s happening', '2024-02-02', 'Difficult', '', 'Blue'),
-  (6, 'Easy track', '2024-01-02', 'Easy', '', 'Not a color'),
-  (7, 'No level', '2023-11-02', 'Unknown', '', 'White');
+INSERT INTO "tracks" ("id", "name", "date", "level", "imageUrl", "holdColor", "zone") VALUES
+  (3, 'A third and it''s the one', '2024-01-26', 'Beginner', 'SocialParoiApp/Tracks/hvupvslz92v1x89gvdc2', 'Pink', 1),
+  (4, 'Legendary Track', '2024-01-31', 'Legendary', 'SocialParoiApp/Tracks/nfkywjbxwqqivo1kmi2s', 'Black', 1),
+  (2, 'Test second track', '2023-12-31', 'Intermediate', '', 'Green', 4),
+  (1, 'First track', '2024-01-10', 'Advanced', '', 'Yellow', 6),
+  (5, 'With a very long name, I just want to see what''s happening', '2024-02-02', 'Difficult', '', 'Blue', 10),
+  (6, 'Easy track', '2024-01-02', 'Easy', '', 'Not a color', 2),
+  (7, 'No level', '2023-11-02', 'Unknown', '', 'White', 1);
 
 -- Listage de la structure de la table public. users
-DROP TABLE IF EXISTS "users";
 CREATE TABLE IF NOT EXISTS "users" (
 	"id" SERIAL NOT NULL,
 	"name" VARCHAR(255) NULL DEFAULT NULL,
@@ -67,12 +74,10 @@ CREATE TABLE IF NOT EXISTS "users" (
 	"image" TEXT NULL DEFAULT NULL,
 	PRIMARY KEY ("id")
 );
-
 CREATE INDEX "idx_users_id" ON "users" ("id");
 CREATE INDEX "idx_users_email" ON "users" ("email");
 
 -- Les données exportées n'étaient pas sélectionnées.
-
 
 CREATE TABLE IF NOT EXISTS "user_track_progress" (
   "id" SERIAL NOT NULL,

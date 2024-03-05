@@ -3,16 +3,18 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { CldImage } from 'next-cloudinary';
-import { Track, TrackStatus } from '../domain/TrackSchema';
+import { Track, TrackStatus, getBgColorForLevel } from '../domain/TrackSchema';
 import placeholderImage from "@/public/bouldering-placeholder.jpeg";
 import { useSession } from 'next-auth/react';
 import { useUpdateTrackStatus } from '@/app/lib/updateTrackUserHook';
 import ToggleButton from './ui/ToggleButton';
 
-const TrackDetails: React.FC<Track> = ({ ...track}) => {
+const TrackDetails: React.FC<Track> = ({ ...track }) => {
   const [status, setStatus] = useState<TrackStatus>(track.status);
   const { updateTrackStatus, isLoading, error } = useUpdateTrackStatus();
   const session = useSession();
+
+  const levelClass = getBgColorForLevel(track.level);
 
 
   const handleStatusChange = async () => {
@@ -32,7 +34,7 @@ const TrackDetails: React.FC<Track> = ({ ...track}) => {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between sm:p-24 sm:pt-8">
+    <main className="flex flex-col items-center justify-between sm:p-24 sm:pt-8">
       <div className="flex flex-col items-center bg-gray-900 text-white w-full">
         {/* Image container */}
         <div className="w-full bg-black">
@@ -53,20 +55,23 @@ const TrackDetails: React.FC<Track> = ({ ...track}) => {
         <div className="p-4 w-full max-w-md">
           {/* Name and Done button row */}
           <div className="flex justify-between items-center mb-3">
-            <h1 className="text-xl font-bold">{track.name}...{track?.id} </h1>
-              <ToggleButton isActive={status === TrackStatus.DONE} isLoading={isLoading} onChange={handleStatusChange}/>
+            <h1 className="text-xl font-bold">{track.name}</h1>
+            <ToggleButton isActive={status === TrackStatus.DONE} isLoading={isLoading} onChange={handleStatusChange} />
           </div>
 
           {/* Zone and Date row */}
           <div className="flex justify-between items-center mb-3">
-            <span className="bg-green-600 text-xs font-semibold px-2 py-1 rounded">Zone {track.id}</span>
+            <span className="bg-transparent text-xs font-semibold px-2 py-1 rounded border border-gray-200">Zone {track.zone}</span>
             <span className="text-sm text-gray-400">{track.date ? track.date.toLocaleDateString() : '...'}</span>
           </div>
 
           {/* Difficulty and Points row */}
           <div className="flex justify-between items-center mb-3">
-            <span className="inline-block w-14 h-3 bg-red-600 rounded-full"></span>
-            <span className="text-sm font-semibold">200pts</span>
+            <div>
+              <span className="text-sm font-medium mr-2">Difficulty</span>
+              <span className={`inline-block w-14 h-3 rounded-full ${levelClass}`}></span>
+            </div>
+            <span className="text-sm font-semibold">{track.points}pts</span>
           </div>
 
           {/* Hold color row */}
