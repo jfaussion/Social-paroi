@@ -19,7 +19,7 @@ export default async function NavBar() {
 
   return (
     <SessionProvider session={session}>
-      <nav className="sticky flex justify-center border-b">
+      <nav className="sticky flex justify-center border-b border-gray-700">
         <div className="flex items-center justify-between w-full h-16 max-w-3xl px-4 mx-auto sm:px-6">
           <Image src={Logo} alt="Social Paroi app logo" width={40} height={40} />
           <div className="text-4xl md:text-5xl font-extrabold">

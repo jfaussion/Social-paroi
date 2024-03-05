@@ -3,10 +3,33 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { CldImage } from 'next-cloudinary';
-import { Track } from '../domain/TrackSchema';
+import { Track, TrackStatus } from '../domain/TrackSchema';
 import placeholderImage from "@/public/bouldering-placeholder.jpeg";
+import { useSession } from 'next-auth/react';
+import { useUpdateTrackStatus } from '@/app/lib/updateTrackUserHook';
+import ToggleButton from './ui/ToggleButton';
 
 const TrackDetails: React.FC<Track> = ({ ...track}) => {
+  const [status, setStatus] = useState<TrackStatus>(track.status);
+  const { updateTrackStatus, isLoading, error } = useUpdateTrackStatus();
+  const session = useSession();
+
+
+  const handleStatusChange = async () => {
+    const newStatus = status === TrackStatus.TO_DO ? TrackStatus.DONE : TrackStatus.TO_DO;
+
+    if (!session.data?.user?.id) return;
+    const wasSuccessful = await updateTrackStatus(track.id, parseInt(session.data?.user?.id), newStatus);
+  
+    if (wasSuccessful) {
+      // Handle success (e.g., show a success message)
+      setStatus(newStatus);
+      console.log('status updated: ', newStatus);
+    } else {
+      // Handle failure (e.g., revert the status change in the UI, show an error message)
+      console.error(error);
+    }
+  };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between sm:p-24 sm:pt-8">
@@ -30,19 +53,14 @@ const TrackDetails: React.FC<Track> = ({ ...track}) => {
         <div className="p-4 w-full max-w-md">
           {/* Name and Done button row */}
           <div className="flex justify-between items-center mb-3">
-            <h1 className="text-xl font-bold">Name of the tracks...{track?.id} </h1>
-            <button className="bg-green-500 rounded-full p-2">
-              {/* Replace with check icon when done */}
-              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-              </svg>
-            </button>
+            <h1 className="text-xl font-bold">{track.name}...{track?.id} </h1>
+              <ToggleButton isActive={status === TrackStatus.DONE} isLoading={isLoading} onChange={handleStatusChange}/>
           </div>
 
           {/* Zone and Date row */}
           <div className="flex justify-between items-center mb-3">
-            <span className="bg-green-600 text-xs font-semibold px-2 py-1 rounded">Zone 2</span>
-            <span className="text-sm text-gray-400">14.02.2024</span>
+            <span className="bg-green-600 text-xs font-semibold px-2 py-1 rounded">Zone {track.id}</span>
+            <span className="text-sm text-gray-400">{track.date ? track.date.toLocaleDateString() : '...'}</span>
           </div>
 
           {/* Difficulty and Points row */}

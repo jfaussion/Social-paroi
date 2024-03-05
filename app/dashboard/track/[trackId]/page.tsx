@@ -5,6 +5,7 @@ import { CldImage } from "next-cloudinary";
 import Image from 'next/image';
 import placeholderImage from "@/public/bouldering-placeholder.jpeg";
 import TrackDetails from "@/components/TrackDetails";
+import { redirect } from "next/navigation";
 
 export const dynamic = 'force-dynamic'
 
@@ -14,6 +15,10 @@ export default async function TrackDetailsPage({ params }: { params: { trackId: 
 
   const userId = session?.user?.id ?? "";
   const track = await getTrackDetails(params.trackId, parseInt(userId));
+  if (!track) {
+    console.log('No track found, redirecting to dashboard');
+    redirect('/dashboard');
+  }
 
   return (
     <SessionProvider session={session}>
