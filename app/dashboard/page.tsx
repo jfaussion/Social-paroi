@@ -5,6 +5,7 @@ import { SessionProvider } from "next-auth/react";
 import { getAllTracksForUser } from "../lib/actions";
 import TrackCard from "@/components/TrackCard";
 import RoomMapImage from "@/public/room-map.png";
+import TrackList from "@/components/TrackList";
 
 export const dynamic = 'force-dynamic'
 
@@ -32,11 +33,7 @@ export default async function Home() {
         </div>
 
         {userId ? (
-          <div className="space-y-4">
-            {tracks.map((track) => (
-              <TrackCard key={track.id} {...track} />
-            ))}
-          </div>
+          <TrackList userId={userId}/>
         ) : (
           <div className="bg-red-900 border border-red-500 rounded p-4">
             <p className="text-red-300">Error, sign in to see your tracks...</p>
