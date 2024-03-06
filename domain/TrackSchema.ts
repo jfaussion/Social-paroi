@@ -21,33 +21,48 @@ export const TrackSchema = z.object({
 
 export type Track = z.infer<typeof TrackSchema>;
 
-export const getColorClassForLevel = (property: 'bg' | 'border', level: Track['level']): string => {
+export const getBorderColorForLevel = (level: Track['level']): string => {
   const levelColorMapping: { [K in Track['level']]?: string } = {
-    Unknown: `${property}-gray-500`,
-    Beginner: `${property}-white`,
-    Easy: `${property}-green-500`,
-    Intermediate: `${property}-blue-500`,
-    Advanced: `${property}-pink-500`,
-    Difficult: `${property}-red-500`,
-    FuckingHard: `${property}-yellow-500`,
-    Legendary: `${property}-black`,
+    Unknown: 'border-gray-500',
+    Beginner: 'border-white',
+    Easy: 'border-green-500',
+    Intermediate: 'border-blue-500',
+    Advanced: 'border-pink-500',
+    Difficult: 'border-red-500',
+    FuckingHard: 'border-yellow-500',
+    Legendary: 'border-black',
   };
 
-  return levelColorMapping[level] ?? `${property}-gray-500`;
+  return levelColorMapping[level] ?? 'border-gray-500';
 };
 
-export const getColorClassForHold = (property: 'bg' | 'border', level: Track['holdColor']): string => {
+export const getBgColorForLevel = (level: Track['level']): string => {
+  const levelColorMapping: { [K in Track['level']]?: string } = {
+    Unknown: 'bg-gray-500',
+    Beginner: 'bg-white',
+    Easy: 'bg-green-500',
+    Intermediate: 'bg-blue-500',
+    Advanced: 'bg-pink-500',
+    Difficult: 'bg-red-500',
+    FuckingHard: 'bg-yellow-500',
+    Legendary: 'bg-black',
+  };
+
+  return levelColorMapping[level] ?? 'bg-gray-500';
+};
+
+export const getBgColorForHold = (level: Track['holdColor']): string => {
   const holdColorMapping: { [K in Track['holdColor']]?: string } = {
-    Unknown: `${property}-gray-500`,
+    Unknown: 'bg-gray-600',
     Red: 'bg-red-500',
-    Green: `${property}-green-500`,
-    Blue: `${property}-blue-500`,
-    Yellow: `${property}-yellow-500`,
-    White: `${property}-white`, 
-    Black: `${property}-black`, 
-    Orange: `${property}-orange-500`, 
-    Pink: `${property}-pink-500`,
-    Purple: `${property}-purple-500`
+    Green: 'bg-green-500',
+    Blue: 'bg-blue-500',
+    Yellow: 'bg-yellow-500',
+    White: 'bg-white', 
+    Black: 'bg-black', 
+    Orange: 'bg-orange-500', 
+    Pink: 'bg-pink-500',
+    Purple: 'bg-purple-500'
   };
 
   return holdColorMapping[level] ?? 'bg-gray-500';

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { CldImage } from 'next-cloudinary';
-import { Track, TrackStatus, getColorClassForHold, getColorClassForLevel } from '../domain/TrackSchema';
+import { Track, TrackStatus, getBgColorForHold, getBgColorForLevel } from '../domain/TrackSchema';
 import placeholderImage from "@/public/bouldering-placeholder.jpeg";
 import { useSession } from 'next-auth/react';
 import { useUpdateTrackStatus } from '@/app/lib/updateTrackUserHook';
@@ -14,8 +14,8 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
   const { updateTrackStatus, isLoading, error } = useUpdateTrackStatus();
   const session = useSession();
 
-  const levelClass = getColorClassForLevel('bg', track.level);
-  const holdClass = getColorClassForHold('bg', track.holdColor);
+  const levelClass = getBgColorForLevel(track.level);
+  const holdClass = getBgColorForHold(track.holdColor);
 
 
   const handleStatusChange = async () => {
@@ -36,7 +36,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
 
   return (
     <main className="flex flex-col items-center justify-between sm:p-24 sm:pt-0">
-      <div className="flex flex-col items-center bg-gray-900 text-white w-full max-w-3xl">
+      <div className="flex flex-col items-center text-white w-full max-w-3xl">
         {/* Image container */}
         <div className="w-full bg-black">
           {/* Replace with an img tag or background-image style as needed */}
@@ -53,7 +53,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
         </div>
 
         {/* Track details container */}
-        <div className="p-4 w-full">
+        <div className="p-4 w-full sm:border sm:border-gray-600 sm:rounded-lg bg-gray-900 sm:m-4">
           {/* Name and Done button row */}
           <div className="flex justify-between items-center mb-3">
             <h1 className="text-xl font-bold">{track.name}</h1>
