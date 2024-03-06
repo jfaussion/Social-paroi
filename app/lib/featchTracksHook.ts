@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { getAllTracksForUser } from './actions';
 
-export const usefetchTracks = () => {
+export const useFetchTracks = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

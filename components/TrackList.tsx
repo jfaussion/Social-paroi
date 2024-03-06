@@ -2,7 +2,7 @@
 import TrackCard from "./TrackCard";
 import { Track } from "../domain/TrackSchema";
 import { useEffect, useState } from "react";
-import { usefetchTracks } from "@/app/lib/featchTracksHook";
+import { useFetchTracks } from "@/app/lib/featchTracksHook";
 import { CardPlaceHolder } from "./ui/CardPlacehorlder";
 
 type TracksProps = {
@@ -11,7 +11,7 @@ type TracksProps = {
 
 const TrackList: React.FC<TracksProps> = ({ userId }) => {
   const [trackList, setTrackList] = useState<Track[]>([]);
-  const { fetchTracks, isLoading, error } = usefetchTracks();
+  const { fetchTracks, isLoading, error } = useFetchTracks();
 
   useEffect(() => {
     const getTracks = async () => {
