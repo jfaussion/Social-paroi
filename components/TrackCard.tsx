@@ -53,7 +53,7 @@ const TrackCard: React.FC<Track> = ({ ...track }) => {
           </div>
         </div>
         <div className='w-full'>
-          <h4 className="text-lg font-semibold text-white">{track.name}</h4>
+          <h4 className="text-md font-semibold text-white">{track.name}</h4>
           <div className="flex justify-between items-center mt-2">
             <span className="text-sm text-gray-400">{track.date ? track.date.toLocaleDateString() : '...'}</span>
             <span className="bg-transparent text-xs font-semibold px-2 py-1 rounded border border-gray-200">Zone {track.zone}</span>

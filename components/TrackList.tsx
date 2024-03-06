@@ -1,8 +1,9 @@
-'useclient'
+'use client'
 import TrackCard from "./TrackCard";
 import { Track } from "../domain/TrackSchema";
 import { useEffect, useState } from "react";
-import { getAllTracksForUser } from "../app/lib/actions";
+import { usefetchTracks } from "@/app/lib/featchTracksHook";
+import { CardPlaceHolder } from "./ui/CardPlacehorlder";
 
 type TracksProps = {
   userId: string;
@@ -10,21 +11,30 @@ type TracksProps = {
 
 const TrackList: React.FC<TracksProps> = ({ userId }) => {
   const [trackList, setTrackList] = useState<Track[]>([]);
+  const { fetchTracks, isLoading, error } = usefetchTracks();
 
   useEffect(() => {
-    const fetchTracks = async () => {
-      const tracks = await getAllTracksForUser(parseInt(userId));
+    const getTracks = async () => {
+      const tracks = await fetchTracks(parseInt(userId));
       setTrackList(tracks);
     };
 
-    fetchTracks();
-  }, [userId]); // Re-fetch when userId changes
+    getTracks();
+  }, [userId]);
 
   return (
-    <div className="space-y-4">
-      {trackList.map((track) => (
-        <TrackCard key={track.id} {...track} />
-      ))}
+    <div className="space-y-4 w-full max-w-3xl">
+      {isLoading ? (
+        <>
+          <CardPlaceHolder />
+          <CardPlaceHolder />
+          <CardPlaceHolder />
+        </>
+      ) : (
+        trackList.map((track: Track) => (
+          <TrackCard key={track.id} {...track} />
+        ))
+      )}
     </div>
   );
 };

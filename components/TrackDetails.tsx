@@ -9,8 +9,8 @@ import { useSession } from 'next-auth/react';
 import { useUpdateTrackStatus } from '@/app/lib/updateTrackUserHook';
 import ToggleButton from './ui/ToggleButton';
 
-const TrackDetails: React.FC<Track> = ({ ...track }) => {
-  const [status, setStatus] = useState<TrackStatus>(track.status);
+const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
+  const [track, setTrack] = useState<Track>(propTrack);
   const { updateTrackStatus, isLoading, error } = useUpdateTrackStatus();
   const session = useSession();
 
@@ -18,14 +18,15 @@ const TrackDetails: React.FC<Track> = ({ ...track }) => {
 
 
   const handleStatusChange = async () => {
-    const newStatus = status === TrackStatus.TO_DO ? TrackStatus.DONE : TrackStatus.TO_DO;
+    const newStatus = track.status === TrackStatus.TO_DO ? TrackStatus.DONE : TrackStatus.TO_DO;
 
     if (!session.data?.user?.id) return;
     const wasSuccessful = await updateTrackStatus(track.id, parseInt(session.data?.user?.id), newStatus);
   
     if (wasSuccessful) {
       // Handle success (e.g., show a success message)
-      setStatus(newStatus);
+      const updatedTrack = {...track, status: newStatus};
+      setTrack(updatedTrack);
       console.log('status updated: ', newStatus);
     } else {
       // Handle failure (e.g., revert the status change in the UI, show an error message)
@@ -34,8 +35,8 @@ const TrackDetails: React.FC<Track> = ({ ...track }) => {
   };
 
   return (
-    <main className="flex flex-col items-center justify-between sm:p-24 sm:pt-8">
-      <div className="flex flex-col items-center bg-gray-900 text-white w-full">
+    <main className="flex flex-col items-center justify-between sm:p-24 sm:pt-0">
+      <div className="flex flex-col items-center bg-gray-900 text-white w-full max-w-3xl">
         {/* Image container */}
         <div className="w-full bg-black">
           {/* Replace with an img tag or background-image style as needed */}
@@ -52,11 +53,11 @@ const TrackDetails: React.FC<Track> = ({ ...track }) => {
         </div>
 
         {/* Track details container */}
-        <div className="p-4 w-full max-w-md">
+        <div className="p-4 w-full">
           {/* Name and Done button row */}
           <div className="flex justify-between items-center mb-3">
             <h1 className="text-xl font-bold">{track.name}</h1>
-            <ToggleButton isActive={status === TrackStatus.DONE} isLoading={isLoading} onChange={handleStatusChange} />
+            <ToggleButton isActive={track.status === TrackStatus.DONE} isLoading={isLoading} onChange={handleStatusChange} />
           </div>
 
           {/* Zone and Date row */}
