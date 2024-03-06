@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { CldImage } from 'next-cloudinary';
-import { Track, TrackStatus, getBgColorForLevel } from '../domain/TrackSchema';
+import { Track, TrackStatus, getColorClassForHold, getColorClassForLevel } from '../domain/TrackSchema';
 import placeholderImage from "@/public/bouldering-placeholder.jpeg";
 import { useSession } from 'next-auth/react';
 import { useUpdateTrackStatus } from '@/app/lib/updateTrackUserHook';
@@ -14,7 +14,8 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
   const { updateTrackStatus, isLoading, error } = useUpdateTrackStatus();
   const session = useSession();
 
-  const levelClass = getBgColorForLevel(track.level);
+  const levelClass = getColorClassForLevel('bg', track.level);
+  const holdClass = getColorClassForHold('bg', track.holdColor);
 
 
   const handleStatusChange = async () => {
@@ -27,7 +28,6 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
       // Handle success (e.g., show a success message)
       const updatedTrack = {...track, status: newStatus};
       setTrack(updatedTrack);
-      console.log('status updated: ', newStatus);
     } else {
       // Handle failure (e.g., revert the status change in the UI, show an error message)
       console.error(error);
@@ -70,7 +70,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
           <div className="flex justify-between items-center mb-3">
             <div>
               <span className="text-sm font-medium mr-2">Difficulty</span>
-              <span className={`inline-block w-14 h-3 rounded-full ${levelClass}`}></span>
+              <span className={`inline-block w-14 h-3 rounded ${levelClass}`}></span>
             </div>
             <span className="text-sm font-semibold">{track.points}pts</span>
           </div>
@@ -78,7 +78,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
           {/* Hold color row */}
           <div className="flex items-center mb-3">
             <span className="text-sm font-medium mr-2">Hold color</span>
-            <span className="inline-block w-14 h-3 bg-pink-500 rounded-full"></span>
+            <span className={`inline-block w-14 h-3 ${holdClass} rounded`}></span>
           </div>
         </div>
       </div>

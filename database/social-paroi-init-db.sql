@@ -62,7 +62,7 @@ INSERT INTO "tracks" ("id", "name", "date", "level", "imageUrl", "holdColor", "z
   (2, 'Test second track', '2023-12-31', 'Intermediate', '', 'Green', 4),
   (1, 'First track', '2024-01-10', 'Advanced', '', 'Yellow', 6),
   (5, 'With a very long name, I just want to see what''s happening', '2024-02-02', 'Difficult', '', 'Blue', 10),
-  (6, 'Easy track', '2024-01-02', 'Easy', '', 'Not a color', 2),
+  (6, 'Easy track', '2024-01-02', 'Easy', '', 'Purple', 2),
   (7, 'No level', '2023-11-02', 'Unknown', '', 'White', 1);
 
 -- Listage de la structure de la table public. users
