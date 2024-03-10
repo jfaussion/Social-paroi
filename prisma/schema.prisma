@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model User {
+  id                String              @id @default(cuid())
+  name              String?
+  email             String?             @unique
+  emailVerified     DateTime?           @map("email_verified")
+  image             String?
+  accounts          Account[]
+  sessions          Session[]
+  Authenticator     Authenticator[]
+  UserTrackProgress UserTrackProgress[]
+
+  @@map("users")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verificationtokens")
+}
+
+model Authenticator {
+  id                   String  @id @default(cuid())
+  credentialID         String  @unique
+  userId               String
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Track {
+  id            Int                 @id
+  name          String?
+  date          DateTime?
+  zone          Int
+  points        Int                 @default(0)
+  level         String?
+  imageUrl      String?             @map(name: "imageUrl")
+  holdColor     String?             @default("Unknown") @map(name: "holdColor")
+  trackProgress UserTrackProgress[]
+
+  @@index([id], name: "idx_tracks_id")
+  @@index([name], name: "idx_tracks_name")
+}
+
+model UserTrackProgress {
+  id            Int       @id @default(autoincrement())
+  userId        String?   @map(name: "user_id")
+  trackId       Int?      @map(name: "track_id")
+  status        String
+  dateCompleted DateTime? @default(now()) @map(name: "date_completed")
+  createdAt     DateTime? @default(now()) @map(name: "created_at")
+  updatedAt     DateTime? @default(now()) @map(name: "updated_at")
+  liked         Boolean?  @default(false)
+  track         Track?    @relation(fields: [trackId], references: [id])
+  user          User?     @relation(fields: [userId], references: [id])
+
+  @@unique([trackId, userId], name: "user_track_unique_constraint")
+  @@index([userId], name: "idx_usertrackprogress_user_id")
+  @@index([trackId], name: "idx_usertrackprogress_track_id")
+}

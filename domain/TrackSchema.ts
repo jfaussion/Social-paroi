@@ -6,6 +6,15 @@ export enum TrackStatus {
   DONE = 'DONE',
 }
 
+export const UserTrackProgressSchema = z.object({
+  status: z.enum([TrackStatus.TO_DO, TrackStatus.IN_PROGRESS, TrackStatus.DONE]),
+  dateCompleted: z.date().optional(),
+  updatedAt: z.date().optional(),
+  liked: z.boolean().default(false),
+});
+
+export const DifficultyEnum = z.enum(['Unknown', 'Beginner', 'Easy', 'Intermediate', 'Advanced', 'Difficult', 'FuckingHard', 'Legendary']);
+
 // Define the schema for a track
 export const TrackSchema = z.object({
   id: z.number(),
@@ -13,10 +22,10 @@ export const TrackSchema = z.object({
   date: z.date(),
   imageUrl: z.string().optional(),
   holdColor: z.enum(['Unknown', 'Green', 'Red', 'Blue', 'Yellow', 'White', 'Black', 'Orange', 'Pink', 'Purple']).nullish().transform(val => val ?? 'Unknown').default('Unknown'),
-  level: z.enum(['Unknown', 'Beginner', 'Easy', 'Intermediate', 'Advanced', 'Difficult', 'FuckingHard', 'Legendary']).default('Unknown'),
-  status: z.enum([TrackStatus.TO_DO, TrackStatus.IN_PROGRESS, TrackStatus.DONE]).nullish().transform(val => val ?? TrackStatus.TO_DO).default(TrackStatus.TO_DO),
+  level: DifficultyEnum.default('Unknown'),
   zone: z.number(),
   points: z.number(),
+  trackProgress: UserTrackProgressSchema.optional(),
 });
 
 export type Track = z.infer<typeof TrackSchema>;

@@ -1,4 +1,4 @@
-import { getTrackDetails } from "@/app/lib/actions";
+import { getTrackDetails } from "@/lib/actions";
 import { auth } from "@/auth";
 import { SessionProvider } from "next-auth/react";
 import Image from 'next/image';
@@ -8,12 +8,12 @@ import { redirect } from "next/navigation";
 
 export const dynamic = 'force-dynamic'
 
-export default async function TrackDetailsPage({ params }: { params: { trackId: number } }) {
+export default async function TrackDetailsPage({ params }: { params: { trackId: string } }) {
 
   const session = await auth();
 
   const userId = session?.user?.id ?? "";
-  const track = await getTrackDetails(params.trackId, parseInt(userId));
+  const track = await getTrackDetails(parseInt(params.trackId), userId);
   if (!track) {
     console.log('No track found, redirecting to dashboard');
     redirect('/dashboard');
