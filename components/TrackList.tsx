@@ -28,6 +28,12 @@ const TrackList: React.FC<TracksProps> = ({ userId }) => {
 
   return (
     <div className="space-y-4 w-full max-w-3xl">
+      <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mt-2">
+        <ZoneFilter selectedFilters={selectedZones}
+          onChange={(selectedOptions: any[]) => setSelectedZones(selectedOptions.map((option: { value: any; }) => option.value))} />
+        <DifficultyFilter selectedFilters={selectedDifficulties}
+          onChange={(selectedOptions: any[]) => setSelectedDifficulties(selectedOptions.map((option: { value: any; }) => option.value))} />
+      </div>
       {isLoading ? (
         <>
           <CardPlaceHolder />
