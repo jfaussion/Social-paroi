@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { CldImage } from 'next-cloudinary';
 import { Track, TrackStatus, getBorderColorForLevel } from '../domain/TrackSchema';
-import { useUpdateTrackStatus } from '../app/lib/updateTrackUserHook';
+import { useUpdateTrackProgress } from '../lib/useUpdateTrackProgress';
 import { useSession } from 'next-auth/react';
 import placeholderImage from '@/public/bouldering-placeholder.jpeg';
 import { useRouter } from 'next/navigation';
@@ -12,25 +12,41 @@ import ToggleButton from './ui/ToggleButton';
 
 const TrackCard: React.FC<Track> = ({ ...propTrack }) => {
 
-  const { updateTrackStatus, isLoading, error } = useUpdateTrackStatus();
+  const { updateTrackStatus, isLoading, error } = useUpdateTrackProgress();
   const [track, setTrack] = useState<Track>(propTrack);
   const levelBorderColor = getBorderColorForLevel(track.level);
   const session = useSession();
   const router = useRouter();
 
   const handleStatusChange = async () => {
-    const newStatus = track.status === TrackStatus.DONE ? TrackStatus.TO_DO : TrackStatus.DONE;
+    const previousStatus = track.trackProgress?.status ?? TrackStatus.TO_DO;
+    const newStatus = track.trackProgress?.status === TrackStatus.DONE ? TrackStatus.TO_DO : TrackStatus.DONE;
+
+    setTrack({
+      ...track, trackProgress: {
+        ...track.trackProgress,
+        status: newStatus,
+        liked: track.trackProgress?.liked ?? false,
+        dateCompleted: new Date()
+      }
+    })
 
     if (!session.data?.user?.id) return;
-    const wasSuccessful = await updateTrackStatus(track.id, parseInt(session.data.user.id), newStatus);
+    const wasSuccessful = await updateTrackStatus(track.id, session.data.user.id, newStatus);
 
     if (wasSuccessful) {
       // Handle success (e.g., show a success message)
       console.log('Track status updated successfully', newStatus);
-      setTrack({ ...track, status: newStatus })
     } else {
       // Handle failure (e.g., revert the status change in the UI, show an error message)
       console.error(error);
+      setTrack({
+        ...track, trackProgress: {
+          ...track.trackProgress,
+          status: previousStatus,
+          liked: track.trackProgress?.liked ?? false
+        }
+      });
     }
   };
 
@@ -59,7 +75,7 @@ const TrackCard: React.FC<Track> = ({ ...propTrack }) => {
           <div className="flex justify-between items-center mt-2">
             <span className="bg-transparent text-xs font-semibold px-2 py-1 rounded border border-gray-200">Zone {track.zone}</span>
             <span onClick={(e) => e.stopPropagation()}>
-              <ToggleButton isActive={track.status === TrackStatus.DONE} isLoading={isLoading} onChange={handleStatusChange} style='small'/>
+              <ToggleButton isActive={track.trackProgress?.status === TrackStatus.DONE} isLoading={isLoading} onChange={handleStatusChange} style='small' />
             </span>
           </div>
         </div>
