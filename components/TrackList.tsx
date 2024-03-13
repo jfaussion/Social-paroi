@@ -2,7 +2,7 @@
 import TrackCard from "./TrackCard";
 import { Track } from "../domain/TrackSchema";
 import { useEffect, useState } from "react";
-import { useFetchTracks } from "@/lib/featchTracksHook";
+import { useFetchTracks } from "@/lib/useFetchTracks";
 import { CardPlaceHolder } from "./ui/CardPlacehorlder";
 import DifficultyFilter from "./DifficultyFilter";
 import ZoneFilter from "./ZoneFilter";

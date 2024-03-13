@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { CldImage } from 'next-cloudinary';
 import { Track, TrackStatus, getBorderColorForLevel } from '../domain/TrackSchema';
-import { useUpdateTrackStatus } from '../lib/updateTrackUserHook';
+import { useUpdateTrackProgress } from '../lib/useUpdateTrackProgress';
 import { useSession } from 'next-auth/react';
 import placeholderImage from '@/public/bouldering-placeholder.jpeg';
 import { useRouter } from 'next/navigation';
@@ -12,7 +12,7 @@ import ToggleButton from './ui/ToggleButton';
 
 const TrackCard: React.FC<Track> = ({ ...propTrack }) => {
 
-  const { updateTrackStatus, isLoading, error } = useUpdateTrackStatus();
+  const { updateTrackStatus, isLoading, error } = useUpdateTrackProgress();
   const [track, setTrack] = useState<Track>(propTrack);
   const levelBorderColor = getBorderColorForLevel(track.level);
   const session = useSession();

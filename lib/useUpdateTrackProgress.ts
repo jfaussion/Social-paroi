@@ -2,7 +2,7 @@ import { TrackStatus } from '@/domain/TrackSchema';
 import { useState } from 'react';
 import { updateTrackStatusForUser } from './actions';
 
-export const useUpdateTrackStatus = () => {
+export const useUpdateTrackProgress = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
