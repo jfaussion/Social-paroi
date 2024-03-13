@@ -1,6 +1,6 @@
 import React from 'react';
 import Select, { ActionMeta, MultiValue } from 'react-select';
-import customStyles from './ui/customSelectStyle';
+import customSelectClassName from './ui/customSelectClassName';
 
 type FilterProps = {
   selectedFilters: number[];
@@ -23,7 +23,8 @@ const ZoneFilter: React.FC<FilterProps> = ({ selectedFilters, onChange }) => {
       className="basic-multi-select"
       classNamePrefix="select"
       onChange={onChange as (newValue: MultiValue<{ value: number; label: string; }>, actionMeta: ActionMeta<{ value: number; label: string; }>) => void}
-      styles={customStyles}
+      classNames={customSelectClassName}
+      unstyled={true}
       placeholder="Filter by Zone"
     />
   );
