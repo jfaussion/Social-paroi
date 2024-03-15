@@ -40,3 +40,27 @@ body {
     transform: scale(1.1);
   }
 }
+
+/* Custom scrollbar styles */
+.scrollbar-custom {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(107 114 128) rgb(17 24 39); /* thumb and track color */
+}
+
+.scrollbar-custom::-webkit-scrollbar {
+  width: 8px; /* scrollbar width */
+  border-radius: 9999px
+
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: rgb(75 85 99); /* track color */
+  border-radius: 9999px
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background-color: #4B5563; /* thumb color */
+  border-radius: 9999px; /* fully rounded corners */
+  border: 3px solid transparent; /* Adjust or remove border as needed */
+}
+

@@ -49,21 +49,30 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
   return (
     <main className="flex flex-col items-center justify-between sm:pr-24 sm:pl-24 sm:pt-0">
       <div className="flex flex-col items-center text-white w-full max-w-3xl">
-        {/* Image container */}
-        <div className="w-full bg-black">
-          {/* Replace with an img tag or background-image style as needed */}
-          {track?.imageUrl ?
-            <CldImage
-              width={800}
-              height={800}
-              crop='fill'
-              gravity="center"
-              src={track.imageUrl}
-              alt="Climbing Track"
+        <div className="flex w-full bg-black snap-x snap-mandatory overflow-x-auto scrollbar-custom">
+          {track?.imageUrl ? (
+            track.imageUrl.split(' ').map((url, index) => (
+              <div key={index} className="snap-center w-full shrink-0">
+                <CldImage
+                  width={800}
+                  height={800}
+                  crop="fill"
+                  gravity="center"
+                  improve="indoor"
+                  src={url}
+                  alt="Climbing Track"
+                  className="mx-auto sm:rounded" />
+              </div>
+            ))
+          ) : (
+            <Image
+              src={placeholderImage}
+              alt="Climbing Track - place holder"
+              sizes="(max-width: 200px)"
               className="mx-auto" />
-            :
-            <Image src={placeholderImage} alt="Climbing Track - place holder" sizes='(max-width: 200px)' className="mx-auto" />}
+          )}
         </div>
+
 
         {/* Track details container */}
         <div className="p-4 w-full sm:border sm:border-gray-600 sm:rounded-lg bg-gray-900 sm:m-4">
