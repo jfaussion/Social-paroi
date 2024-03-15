@@ -59,12 +59,13 @@ const TrackCard: React.FC<Track> = ({ ...propTrack }) => {
       <div className="flex items-center space-x-4">
         <div className="flex-shrink-0">
           <div className={`w-16 h-16 relative rounded-full overflow-hidden border-4 ${levelBorderColor}`}>
-            {track.imageUrl ?
+            {track.imageUrl?.split(' ')[0] ?
               <CldImage
                 width="400"
                 height="400"
-                src={track.imageUrl}
+                src={track.imageUrl?.split(' ')[0]}
                 crop="thumb"
+                improve="indoor"
                 gravity='center'
                 alt="Climbing Track" />
               :
