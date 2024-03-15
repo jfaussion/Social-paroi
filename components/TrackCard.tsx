@@ -65,6 +65,7 @@ const TrackCard: React.FC<Track> = ({ ...propTrack }) => {
                 height="400"
                 src={track.imageUrl}
                 crop="thumb"
+                gravity='center'
                 alt="Climbing Track" />
               :
               <Image src={placeholderImage} alt="Climbing Track - place holder" fill sizes='(max-width: 200px)' />}
