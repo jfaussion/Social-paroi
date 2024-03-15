@@ -2,11 +2,11 @@ import { TrackStatus } from '@/domain/TrackSchema';
 import { useState } from 'react';
 import { updateTrackStatusForUser } from './actions';
 
-export const useUpdateTrackStatus = () => {
+export const useUpdateTrackProgress = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const updateTrackStatus = async (trackId: number, userId: number, newStatus: TrackStatus) => {
+  const updateTrackStatus = async (trackId: number, userId: string, newStatus: TrackStatus) => {
     setIsLoading(true);
     try {
       await updateTrackStatusForUser(trackId, userId, newStatus);

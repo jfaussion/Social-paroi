@@ -6,36 +6,48 @@ import { CldImage } from 'next-cloudinary';
 import { Track, TrackStatus, getBgColorForHold, getBgColorForLevel } from '../domain/TrackSchema';
 import placeholderImage from "@/public/bouldering-placeholder.jpeg";
 import { useSession } from 'next-auth/react';
-import { useUpdateTrackStatus } from '@/app/lib/updateTrackUserHook';
+import { useUpdateTrackProgress } from '@/lib/useUpdateTrackProgress';
 import ToggleButton from './ui/ToggleButton';
 
 const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
   const [track, setTrack] = useState<Track>(propTrack);
-  const { updateTrackStatus, isLoading, error } = useUpdateTrackStatus();
+  const { updateTrackStatus, isLoading, error } = useUpdateTrackProgress();
   const session = useSession();
-
   const levelClass = getBgColorForLevel(track.level);
   const holdClass = getBgColorForHold(track.holdColor);
 
-
   const handleStatusChange = async () => {
-    const newStatus = track.status === TrackStatus.TO_DO ? TrackStatus.DONE : TrackStatus.TO_DO;
+    const previousStatus = track.trackProgress?.status ?? TrackStatus.TO_DO;
+    const newStatus = track.trackProgress?.status === TrackStatus.TO_DO ? TrackStatus.DONE : TrackStatus.TO_DO;
+    setTrack({
+      ...track, trackProgress: {
+        ...track.trackProgress,
+        status: newStatus,
+        dateCompleted: new Date(),
+        liked: track.trackProgress?.liked ?? false
+      }
+    });
 
     if (!session.data?.user?.id) return;
-    const wasSuccessful = await updateTrackStatus(track.id, parseInt(session.data?.user?.id), newStatus);
-  
+    const wasSuccessful = await updateTrackStatus(track.id, session.data?.user?.id, newStatus);
+
     if (wasSuccessful) {
       // Handle success (e.g., show a success message)
-      const updatedTrack = {...track, status: newStatus};
-      setTrack(updatedTrack);
     } else {
       // Handle failure (e.g., revert the status change in the UI, show an error message)
       console.error(error);
+      setTrack({
+        ...track, trackProgress: {
+          ...track.trackProgress,
+          status: previousStatus,
+          liked: track.trackProgress?.liked ?? false
+        }
+      });
     }
   };
 
   return (
-    <main className="flex flex-col items-center justify-between sm:p-24 sm:pt-0">
+    <main className="flex flex-col items-center justify-between sm:pr-24 sm:pl-24 sm:pt-0">
       <div className="flex flex-col items-center text-white w-full max-w-3xl">
         {/* Image container */}
         <div className="w-full bg-black">
@@ -57,7 +69,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
           {/* Name and Done button row */}
           <div className="flex justify-between items-center mb-3">
             <h1 className="text-xl font-bold">{track.name}</h1>
-            <ToggleButton isActive={track.status === TrackStatus.DONE} isLoading={isLoading} onChange={handleStatusChange} />
+            <ToggleButton isActive={track.trackProgress?.status === TrackStatus.DONE} isLoading={false} onChange={handleStatusChange} />
           </div>
 
           {/* Zone and Date row */}

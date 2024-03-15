@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { auth } from "@/auth";
 import { SessionProvider } from "next-auth/react";
-import { getAllTracksForUser } from "../lib/actions";
+import { getAllTracksForUser } from "../../lib/actions";
 import TrackCard from "@/components/TrackCard";
 import RoomMapImage from "@/public/room-map.png";
 import TrackList from "@/components/TrackList";
@@ -15,7 +15,6 @@ export default async function Home() {
 
   const userId = session?.user?.id ?? "";
   // TODO: create hook to hadle states and loading
-  const tracks = await getAllTracksForUser(parseInt(userId));
 
   return (
     <SessionProvider session={session}>
