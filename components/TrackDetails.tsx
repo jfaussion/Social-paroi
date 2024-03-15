@@ -54,10 +54,11 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
           {/* Replace with an img tag or background-image style as needed */}
           {track?.imageUrl ?
             <CldImage
-              width="400"
-              height="400"
+              width={800}
+              height={800}
+              crop='fill'
+              gravity="center"
               src={track.imageUrl}
-              crop="thumb"
               alt="Climbing Track"
               className="mx-auto" />
             :
