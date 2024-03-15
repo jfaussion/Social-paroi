@@ -28,8 +28,10 @@ const TrackList: React.FC<TracksProps> = ({ userId }) => {
       setTrackList(tracks);
     };
     // Parse URL query parameters to get filter
-    const zones = searchParams.has('zones') ? searchParams.get('zones')?.split(',').map(Number) : [];
-    const difficulties = searchParams.has('difficulties') ? searchParams.get('difficulties')?.split(',') : [];
+    const zones = searchParams.has('zones') ? searchParams.get('zones')?.split(',').map(Number) as number[] : [] as number[];
+    const difficulties = searchParams.has('difficulties') ? searchParams.get('difficulties')?.split(',') as string[] : [] as string[];
+    setSelectedZones(zones);
+    setSelectedDifficulties(difficulties);
     getTracks(zones, difficulties);
   }, [userId, searchParams]);
 
