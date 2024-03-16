@@ -1,10 +1,10 @@
+import MarkdownComponent from "@/components/ui/MarkdownComponent";
+
 export default function PrivacyPage() {
 
   return (
-    <main className="flex items-center justify-center md:h-screen">
-      <div className="max-w-sm mx-auto my-8 p-6 bg-gray-900 rounded-lg shadow-md space-y-4">
-        Comming soon...
-      </div>
+    <main className="p-4 sm:p-24 sm:pt-8 sm:pb-8 w-full mx-auto max-w-7xl">
+      <MarkdownComponent mdUrl="/privacy.md" />
     </main>
   );
 }
