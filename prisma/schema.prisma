@@ -99,8 +99,8 @@ model UserTrackProgress {
   createdAt     DateTime? @default(now()) @map(name: "created_at")
   updatedAt     DateTime? @default(now()) @map(name: "updated_at")
   liked         Boolean?  @default(false)
-  track         Track?    @relation(fields: [trackId], references: [id])
-  user          User?     @relation(fields: [userId], references: [id])
+  track         Track?    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  user          User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([trackId, userId], name: "user_track_unique_constraint")
   @@index([userId], name: "idx_usertrackprogress_user_id")
