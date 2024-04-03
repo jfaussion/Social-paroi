@@ -48,8 +48,8 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
 
   return (
     <main className="flex flex-col items-center justify-between sm:pr-24 sm:pl-24 sm:pt-0">
-      <div className="flex flex-col items-center text-white w-full max-w-3xl">
-        <div className="flex w-full bg-black snap-x snap-mandatory overflow-x-auto scrollbar-custom">
+      <div className="flex flex-col items-center dark:text-white w-full max-w-3xl">
+        <div className="flex w-full dark:bg-black snap-x snap-mandatory overflow-x-auto scrollbar-custom">
           {track?.imageUrl ? (
             track.imageUrl.split(' ').map((url, index) => (
               <div key={index} className="snap-center w-full shrink-0">
@@ -75,7 +75,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
 
 
         {/* Track details container */}
-        <div className="p-4 w-full sm:border sm:border-gray-600 sm:rounded-lg bg-gray-900 sm:m-4">
+        <div className="p-4 w-full sm:border sm:border-gray-600 sm:rounded-lg dark:bg-gray-900 sm:m-4">
           {/* Name and Done button row */}
           <div className="flex justify-between items-center mb-3">
             <h1 className="text-xl font-bold">{track.name}</h1>
@@ -84,8 +84,8 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
 
           {/* Zone and Date row */}
           <div className="flex justify-between items-center mb-3">
-            <span className="bg-transparent text-xs font-semibold px-2 py-1 rounded border border-gray-200">Zone {track.zone}</span>
-            <span className="text-sm text-gray-400">{track.date ? track.date.toLocaleDateString() : '...'}</span>
+            <span className="bg-transparent text-xs font-semibold px-2 py-1 rounded border border-gray-800 dark:border-gray-200">Zone {track.zone}</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">{track.date ? track.date.toLocaleDateString() : '...'}</span>
           </div>
 
           {/* Difficulty and Points row */}
