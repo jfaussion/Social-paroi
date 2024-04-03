@@ -48,13 +48,13 @@ export const getBorderColorForLevel = (level: Track['level']): string => {
 export const getBgColorForLevel = (level: Track['level']): string => {
   const levelColorMapping: { [K in Track['level']]?: string } = {
     Unknown: 'bg-gray-500',
-    Beginner: 'bg-white',
+    Beginner: 'bg-white border dark:border-none border-black',
     Easy: 'bg-green-500',
     Intermediate: 'bg-blue-500',
     Advanced: 'bg-pink-500',
     Difficult: 'bg-red-500',
     FuckingHard: 'bg-yellow-500',
-    Legendary: 'bg-black',
+    Legendary: 'bg-black dark:border dark:border-white',
   };
 
   return levelColorMapping[level] ?? 'bg-gray-500';
@@ -67,8 +67,8 @@ export const getBgColorForHold = (level: Track['holdColor']): string => {
     Green: 'bg-green-500',
     Blue: 'bg-blue-500',
     Yellow: 'bg-yellow-500',
-    White: 'bg-white', 
-    Black: 'bg-black', 
+    White: 'bg-white border dark:border-none border-black', 
+    Black: 'bg-black dark:border dark:border-white', 
     Orange: 'bg-orange-500', 
     Pink: 'bg-pink-500',
     Purple: 'bg-purple-500'
