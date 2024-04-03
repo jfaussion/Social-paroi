@@ -48,13 +48,13 @@ export default function UserMenu() {
 
           {/* Dropdown menu */}
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 py-2 w-max bg-gray-700 rounded-lg shadow-xl" style={{ maxWidth: 'max-content' }}>
-              <div className="block px-4 py-2 text-sm text-white">
+            <div className="absolute right-0 mt-2 py-2 w-max bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-xl" style={{ maxWidth: 'max-content' }}>
+              <div className="block px-4 py-2 text-sm">
                 {session.user?.name}
-                <div className="text-gray-400">{session.user?.email}</div>
+                <div className="text-gray-600 dark:text-gray-400">{session.user?.email}</div>
               </div>
               <div className="flex justify-center mt-2 w-full px-4 py-2">
-                <Button className="bg-gray-500 text-white rounded hover:bg-gray-400 focus:outline-none focus:bg-gray-400 w-full" onClick={handleSignOut}>Sign Out</Button>
+                <Button className="bg-gray-700 text-white dark:text-black dark:bg-gray-100 rounded bg-gray-600 hover:bg-gray-600 hover:dark:bg-gray-300 focus:outline-none focus:bg-gray-600 dark:focus:bg-gray-300 w-full" onClick={handleSignOut}>Sign Out</Button>
               </div>
             </div>
           )}
