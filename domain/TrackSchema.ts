@@ -33,13 +33,13 @@ export type Track = z.infer<typeof TrackSchema>;
 export const getBorderColorForLevel = (level: Track['level']): string => {
   const levelColorMapping: { [K in Track['level']]?: string } = {
     Unknown: 'border-gray-500',
-    Beginner: 'border-white',
+    Beginner: 'border-white dark:border-none border-black',
     Easy: 'border-green-500',
     Intermediate: 'border-blue-500',
     Advanced: 'border-pink-500',
     Difficult: 'border-red-500',
     FuckingHard: 'border-yellow-500',
-    Legendary: 'border-black',
+    Legendary: 'border-black dark:border dark:border-white',
   };
 
   return levelColorMapping[level] ?? 'border-gray-500';
@@ -67,8 +67,8 @@ export const getBgColorForHold = (level: Track['holdColor']): string => {
     Green: 'bg-green-500',
     Blue: 'bg-blue-500',
     Yellow: 'bg-yellow-500',
-    White: 'bg-white', 
-    Black: 'bg-black', 
+    White: 'bg-white border dark:border-none border-black', 
+    Black: 'bg-black dark:border dark:border-white', 
     Orange: 'bg-orange-500', 
     Pink: 'bg-pink-500',
     Purple: 'bg-purple-500'
