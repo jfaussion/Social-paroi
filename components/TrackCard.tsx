@@ -75,7 +75,16 @@ const TrackCard: React.FC<Track> = ({ ...propTrack }) => {
         <div className='w-full'>
           <h4 className="text-md font-semibold dark:text-white">{track.name}</h4>
           <div className="flex justify-between items-center mt-2">
-            <span className="bg-transparent text-xs font-semibold px-2 py-1 rounded border border-gray-900 dark:border-gray-200">Zone {track.zone}</span>
+            <div className="inline-flex items-center space-x-2">
+              <span className="bg-transparent text-xs font-semibold px-2 py-1 rounded border border-gray-900 dark:border-gray-200">Zone {track.zone}</span>
+              {track.removed && (
+                <span className="inline-flex items-center text-xs font-semibold pr-2 p-1 border border-gray-600 dark:border-gray-400 rounded text-gray-600 dark:text-gray-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>Removed
+                </span>
+              )}
+            </div>
             <span onClick={(e) => e.stopPropagation()}>
               <ToggleButton isActive={track.trackProgress?.status === TrackStatus.DONE} isLoading={isLoading} onChange={handleStatusChange} style='small' />
             </span>

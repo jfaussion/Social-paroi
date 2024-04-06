@@ -97,10 +97,18 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
             <span className="text-sm font-semibold">{track.points}pts</span>
           </div>
 
-          {/* Hold color row */}
-          <div className="flex items-center mb-3">
-            <span className="text-sm font-medium mr-2">Hold color</span>
-            <span className={`inline-block w-14 h-3 ${holdClass} rounded`}></span>
+          <div className="flex justify-between items-center mb-3">
+            <div>
+              <span className="text-sm font-medium mr-2">Hold color</span>
+              <span className={`inline-block w-14 h-3 ${holdClass} rounded`}></span>
+            </div>
+            {track.removed && (
+              <span className="inline-flex items-center text-xs font-semibold pr-2 p-1 border border-red-600 dark:border-red-400 rounded-md text-red-600 dark:text-red-400">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>Removed
+              </span>
+            )}
           </div>
         </div>
       </div>
