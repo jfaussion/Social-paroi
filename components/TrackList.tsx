@@ -4,10 +4,8 @@ import { Track } from "../domain/TrackSchema";
 import { useEffect, useState } from "react";
 import { useFetchTracks } from "@/lib/useFetchTracks";
 import { CardPlaceHolder } from "./ui/CardPlacehorlder";
-import DifficultyFilter from "./DifficultyFilter";
-import ZoneFilter from "./ZoneFilter";
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
-import ShowRemovedFilter from "./ShowRemovedFilter";
+import TrackFilters from "./filters/TrackFilters";
 
 type TracksProps = {
   userId: string;
@@ -22,7 +20,7 @@ const TrackList: React.FC<TracksProps> = ({ userId }) => {
   const [selectedZones, setSelectedZones] = useState<number[]>([]);
   const [selectedShowRemoved, setSelectedShowRemoved] = useState<string>();
   const { fetchTracks, isLoading, error } = useFetchTracks();
-  const current = new URLSearchParams(Array.from(searchParams.entries())); // -> has to use this form
+  const currentUrlParams = new URLSearchParams(Array.from(searchParams.entries())); // -> has to use this form
 
   useEffect(() => {
     const getTracks = async (zones: number[] | undefined, difficulties: string[] | undefined, showRemoved: string | undefined) => {
@@ -40,20 +38,20 @@ const TrackList: React.FC<TracksProps> = ({ userId }) => {
   }, [userId, searchParams]);
 
   const updateFiltersInURL = (zones: any[], difficulties: any[], showRemoved: string | undefined) => {
-    current.delete('zones');
-    current.delete('difficulties');
-    current.delete('showRemoved');
+    currentUrlParams.delete('zones');
+    currentUrlParams.delete('difficulties');
+    currentUrlParams.delete('showRemoved');
     if (zones.length > 0) {
-      current.set('zones', zones.join(','));
+      currentUrlParams.set('zones', zones.join(','));
     }
     if (difficulties.length > 0) {
-      current.set('difficulties', difficulties.join(','));
+      currentUrlParams.set('difficulties', difficulties.join(','));
     }
     if (showRemoved) {
-      current.set('showRemoved', showRemoved);
+      currentUrlParams.set('showRemoved', showRemoved);
     }
 
-    const search = current.toString();
+    const search = currentUrlParams.toString();
     const query = search ? `?${search}` : "";
     router.push(`${pathname}${query}`);
   };
@@ -79,14 +77,14 @@ const TrackList: React.FC<TracksProps> = ({ userId }) => {
 
   return (
     <div className="space-y-4 w-full max-w-3xl">
-      <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mt-2">
-        <ZoneFilter selectedFilters={selectedZones}
-          onChange={handleZoneChange} />
-        <DifficultyFilter selectedFilters={selectedDifficulties}
-          onChange={handleDifficultyChange} />
-        <ShowRemovedFilter selectedFilters={selectedShowRemoved}
-          onChange={handleShowRemovedChange} />
-      </div>
+      <TrackFilters
+        selectedZones={selectedZones}
+        selectedDifficulties={selectedDifficulties}
+        selectedShowRemoved={selectedShowRemoved}
+        onZoneChange={handleZoneChange}
+        onDifficultyChange={handleDifficultyChange}
+        onShowRemovedChange={handleShowRemovedChange}
+      />
       {isLoading ? (
         <>
           <CardPlaceHolder />

@@ -1,7 +1,7 @@
 import { DifficultyEnum } from '@/domain/TrackSchema';
 import React from 'react';
 import Select, { ActionMeta, MultiValue } from 'react-select';
-import customSelectClassName from './ui/customSelectClassName';
+import customSelectClassName from '../ui/customSelectClassName';
 
 type FilterProps = {
   selectedFilters: string[];
