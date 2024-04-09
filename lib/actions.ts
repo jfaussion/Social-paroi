@@ -34,7 +34,7 @@ export async function updateTrackStatusForUser(
 }
 
 
-export async function getAllTracksForUser(userId: string, zones?: number[], levels?: string[]): Promise<Track[]> {
+export async function getAllTracksForUser(userId: string, zones?: number[], levels?: string[], showRemoved?: string): Promise<Track[]> {
   // Initialize an empty array for dynamic AND conditions
   let andConditions = [];
   // If zones are provided and not empty, add zone condition
@@ -53,6 +53,21 @@ export async function getAllTracksForUser(userId: string, zones?: number[], leve
       },
     });
   }
+  // If showRemoved is provided, add removed condition
+  if (!showRemoved || showRemoved === 'NO') {
+    // Default to not showing removed tracks
+    andConditions.push({ 
+      removed: false,
+    });
+  } else if (showRemoved === 'ONLY') {
+    andConditions.push({
+      removed: true,
+    });
+  } else {
+    // showRemoved === 'YES'
+    // No filter needed
+  }
+
   let whereCondition = andConditions.length > 0 ? { AND: andConditions } : {};
 
   const tracks = await prisma.track.findMany({

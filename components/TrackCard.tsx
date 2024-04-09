@@ -8,6 +8,7 @@ import { useSession } from 'next-auth/react';
 import placeholderImage from '@/public/bouldering-placeholder.jpeg';
 import { useRouter } from 'next/navigation';
 import ToggleButton from './ui/ToggleButton';
+import RemovedLabel from './ui/RemovedLabel';
 
 
 const TrackCard: React.FC<Track> = ({ ...propTrack }) => {
@@ -75,7 +76,12 @@ const TrackCard: React.FC<Track> = ({ ...propTrack }) => {
         <div className='w-full'>
           <h4 className="text-md font-semibold dark:text-white">{track.name}</h4>
           <div className="flex justify-between items-center mt-2">
-            <span className="bg-transparent text-xs font-semibold px-2 py-1 rounded border border-gray-900 dark:border-gray-200">Zone {track.zone}</span>
+            <div className="inline-flex items-center space-x-2">
+              <span className="bg-transparent text-xs font-semibold px-2 py-1 rounded border border-gray-900 dark:border-gray-200">Zone {track.zone}</span>
+              {track.removed && (
+                <RemovedLabel/>
+              )}
+            </div>
             <span onClick={(e) => e.stopPropagation()}>
               <ToggleButton isActive={track.trackProgress?.status === TrackStatus.DONE} isLoading={isLoading} onChange={handleStatusChange} style='small' />
             </span>

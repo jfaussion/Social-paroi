@@ -1,7 +1,7 @@
 import { DifficultyEnum } from '@/domain/TrackSchema';
 import React from 'react';
 import Select, { ActionMeta, MultiValue } from 'react-select';
-import customSelectClassName from './ui/customSelectClassName';
+import customSelectClassName from '../ui/customSelectClassName';
 
 type FilterProps = {
   selectedFilters: string[];
@@ -22,7 +22,7 @@ const DifficultyFilter: React.FC<FilterProps> = ({ selectedFilters, onChange }) 
         focused: 'bg-gray-500 text-white'
       },
       Beginner: {
-        default: 'text-black dark:text-gray-50',
+        default: 'text-black dark:text-gray-500',
         focused: 'bg-gray-100 text-gray-900 hover:bg-gray-200'
       },
       Easy: {
