@@ -8,6 +8,7 @@ import placeholderImage from "@/public/bouldering-placeholder.jpeg";
 import { useSession } from 'next-auth/react';
 import { useUpdateTrackProgress } from '@/lib/useUpdateTrackProgress';
 import ToggleButton from './ui/ToggleButton';
+import RemovedLabel from './ui/RemovedLabel';
 
 const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
   const [track, setTrack] = useState<Track>(propTrack);
@@ -97,10 +98,14 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
             <span className="text-sm font-semibold">{track.points}pts</span>
           </div>
 
-          {/* Hold color row */}
-          <div className="flex items-center mb-3">
-            <span className="text-sm font-medium mr-2">Hold color</span>
-            <span className={`inline-block w-14 h-3 ${holdClass} rounded`}></span>
+          <div className="flex justify-between items-center mb-3">
+            <div>
+              <span className="text-sm font-medium mr-2">Hold color</span>
+              <span className={`inline-block w-14 h-3 ${holdClass} rounded`}></span>
+            </div>
+            {track.removed && (
+              <RemovedLabel color={'red'}></RemovedLabel>
+            )}
           </div>
         </div>
       </div>

@@ -76,7 +76,7 @@ model Authenticator {
 }
 
 model Track {
-  id            Int                 @id
+  id            Int                 @id @default(autoincrement())
   name          String?
   date          DateTime?
   zone          Int
@@ -84,6 +84,7 @@ model Track {
   level         String?
   imageUrl      String?             @map(name: "imageUrl")
   holdColor     String?             @default("Unknown") @map(name: "holdColor")
+  removed       Boolean?            @default(false)
   trackProgress UserTrackProgress[]
 
   @@index([id], name: "idx_tracks_id")

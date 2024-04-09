@@ -94,7 +94,7 @@ const customSelectClassName = {
   ].join(' '),
   placeholder: () => 'text-gray-600 dark:text-gray-400 mx-0.5',
   singleValue: ({ isDisabled }: { isDisabled: boolean }) => [
-    isDisabled ? 'text-neutral-600 dark:text-neutral-400' : 'text-neutral-200 dark:text-neutral-800',
+    isDisabled ? 'text-neutral-600 dark:text-neutral-400' : 'text-neutral-800 dark:text-neutral-200',
     'mx-0.5'
   ].join(' '), valueContainer: () => ['py-0.5', 'px-2'].join(' '),
 }
