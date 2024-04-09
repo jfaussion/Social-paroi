@@ -8,16 +8,20 @@ type FilterProps = {
 };
 
 const ShowRemovedFilter: React.FC<FilterProps> = ({ selectedFilters, onChange }) => {
+  const removedOnlyLabel = 'Removed Only';
+  const mountedOnlyLabel = 'Mounted Only';
+  const allLabel = 'All';
+
   const showRemovedOptions = [
     {
       value: 'YES',
-      label: `Yes`
+      label: allLabel
     }, {
       value: 'NO',
-      label: `No`
+      label: mountedOnlyLabel
     }, {
       value: 'ONLY',
-      label: `Only`
+      label: removedOnlyLabel
     }
   ];
 
@@ -25,7 +29,7 @@ const ShowRemovedFilter: React.FC<FilterProps> = ({ selectedFilters, onChange })
     <Select
       name="showRemoved"
       options={showRemovedOptions}
-      value={selectedFilters ? { value: selectedFilters, label: selectedFilters === 'YES' ? 'Yes' : selectedFilters === 'NO' ? 'No' : 'Only' } : undefined}
+      value={selectedFilters ? { value: selectedFilters, label: selectedFilters === 'YES' ? allLabel : selectedFilters === 'NO' ? mountedOnlyLabel : removedOnlyLabel } : undefined}
       className="basic-single"
       classNamePrefix="select"
       isClearable={true}
