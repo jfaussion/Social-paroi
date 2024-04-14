@@ -1,6 +1,6 @@
-import { TrackStatus } from '@/domain/TrackSchema';
 import { useState } from 'react';
 import { updateTrackStatusForUser } from './actions';
+import { TrackStatus } from '@/domain/TrackStatus.enum';
 
 export const useUpdateTrackProgress = () => {
   const [isLoading, setIsLoading] = useState(false);

@@ -1,5 +1,5 @@
 'use server';
-import { Track } from '@/domain/TrackSchema';
+import { Track } from '@/domain/Track.schema';
 import { PrismaClient } from '@prisma/client/edge';
 
 const prisma = new PrismaClient()

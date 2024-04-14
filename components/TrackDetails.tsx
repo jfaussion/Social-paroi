@@ -3,18 +3,21 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { CldImage } from 'next-cloudinary';
-import { Track, TrackStatus, getBgColorForHold, getBgColorForLevel } from '../domain/TrackSchema';
+import { Track } from '../domain/Track.schema';
 import placeholderImage from "@/public/bouldering-placeholder.jpeg";
 import { useSession } from 'next-auth/react';
 import { useUpdateTrackProgress } from '@/lib/useUpdateTrackProgress';
 import ToggleButton from './ui/ToggleButton';
 import RemovedLabel from './ui/RemovedLabel';
+import { getBgColorForHold } from '@/domain/HoldColor.enum';
+import { TrackStatus } from '@/domain/TrackStatus.enum';
+import { getBgColorForDifficulty } from '@/utils/difficulty.utils';
 
 const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
   const [track, setTrack] = useState<Track>(propTrack);
   const { updateTrackStatus, isLoading, error } = useUpdateTrackProgress();
   const session = useSession();
-  const levelClass = getBgColorForLevel(track.level);
+  const levelClass = getBgColorForDifficulty(track.level);
   const holdClass = getBgColorForHold(track.holdColor);
 
   const handleStatusChange = async () => {
