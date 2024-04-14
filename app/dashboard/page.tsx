@@ -2,8 +2,6 @@
 import Image from "next/image";
 import { auth } from "@/auth";
 import { SessionProvider } from "next-auth/react";
-import { getAllTracksForUser } from "../../lib/actions";
-import TrackCard from "@/components/TrackCard";
 import RoomMapImage from "@/public/room-map.png";
 import TrackList from "@/components/TrackList";
 
