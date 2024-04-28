@@ -1,6 +1,10 @@
 'use client'
 import { useState } from "react";
 import Image from 'next/image';
+import { usePostTracks } from "@/lib/usePostTrack";
+import { Track } from "@/domain/Track.schema";
+import { DifficultyEnum } from "@/domain/Difficulty.enum";
+import { HoldColorEnum } from "@/domain/HoldColor.enum";
 
 
 type TrackFromProps = {
@@ -11,26 +15,42 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
 
   const [track, setTrack] = useState({
     name: '',
-    difficulty: '',
-    holdColor: '',
-    zone: '',
-    points: '',
+    difficulty: DifficultyEnum.Enum.Unknown,
+    holdColor: HoldColorEnum.Enum.Unknown,
+    zone: 1,
+    points: 0,
     photo: null,
   });
 
-  const handleInputChange = (e) => {
+  const { postTrack, isLoading, error } = usePostTracks();
+
+
+  const handleInputChange = (e: { target: { name: any; value: any; }; }) => {
     const { name, value } = e.target;
     setTrack(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = (e: { target: { files: any[]; }; }) => {
     setTrack(prev => ({ ...prev, photo: e.target.files[0] }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     // Handle form submission, e.g., via API call
-    console.log(track);
+    console.log('handle submit ', track);
+    const trackToPost = {
+      name: track.name,
+      level: track.difficulty,
+      holdColor: track.holdColor,
+      zone: track.zone,
+      points: track.points,
+      removed: false,
+      date: new Date(),
+      imageUrl: '',
+    } as unknown as Track;
+    console.log('trackToPost:', trackToPost);
+    const newTrack = await postTrack(trackToPost, track.photo);
+    console.log(newTrack);
   };
 
   return (
@@ -50,9 +70,9 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
         className="p-2 bg-gray-700">
         {/* Enum options should be dynamically generated */}
         <option value="">Select Difficulty</option>
-        <option value="EASY">Easy</option>
-        <option value="MEDIUM">Medium</option>
-        <option value="HARD">Hard</option>
+        {Object.values(DifficultyEnum.Enum).map((difficulty) => (
+          <option key={difficulty} value={difficulty}>{difficulty}</option>
+        ))}
       </select>
       <select
         name="holdColor"
@@ -60,9 +80,9 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
         onChange={handleInputChange}
         className="p-2 bg-gray-700">
         <option value="">Select Hold Color</option>
-        <option value="red">Red</option>
-        <option value="blue">Blue</option>
-        <option value="green">Green</option>
+        {Object.values(HoldColorEnum.Enum).map((holdColor) => (
+          <option key={holdColor} value={holdColor}>{holdColor}</option>
+        ))}
       </select>
       <select
         name="zone"
@@ -70,8 +90,9 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
         onChange={handleInputChange}
         className="p-2 bg-gray-700">
         <option value="">Select Zone</option>
-        <option value="north">North</option>
-        <option value="south">South</option>
+        {Array.from({ length: 11 }, (_, i) => i + 1).map((zone) => (
+          <option key={zone} value={zone}>Zone {zone}</option>
+        ))}
       </select>
       <input
         type="number"

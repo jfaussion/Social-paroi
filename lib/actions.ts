@@ -1,6 +1,12 @@
 'use server';
 import { Track } from '@/domain/Track.schema';
 import { PrismaClient } from '@prisma/client/edge';
+import cloudinary from './cloudinary';
+import { auth } from '@/auth';
+import { UploadApiOptions } from 'cloudinary';
+import { mkdir, unlink, writeFile } from 'fs/promises';
+import fs from 'fs';
+
 
 const prisma = new PrismaClient()
 
@@ -56,7 +62,7 @@ export async function getAllTracksForUser(userId: string, zones?: number[], leve
   // If showRemoved is provided, add removed condition
   if (!showRemoved || showRemoved === 'NO') {
     // Default to not showing removed tracks
-    andConditions.push({ 
+    andConditions.push({
       removed: false,
     });
   } else if (showRemoved === 'ONLY') {
@@ -124,7 +130,77 @@ const mergeTrackWithProgress = (track: any): Track => {
   const userProgress = track.trackProgress[0] || undefined;
   const result = {
     ...track,
-    trackProgress: {...userProgress},
+    trackProgress: { ...userProgress },
   };
   return result;
+}
+
+
+export async function postNewTrack(
+  track: FormData
+) {
+
+  const user = await auth();
+  if (!user) {
+    throw new Error('You must be signed in to perform this action');
+  }
+
+  try {
+    let uploadedImageUrl = '';
+
+    if (track.get('photo')) {
+      const file: File | null = track.get('photo') as unknown as File
+      uploadedImageUrl = await uploadImageToCloudinary(file);
+    }
+
+    const newTrack = await prisma.track.create({
+      data: {
+        name: track.get('name') as string,
+        zone: parseInt(track.get('zone') as string),
+        level: track.get('level') as string,
+        holdColor: track.get('holdColor') as string,
+        points: parseInt(track.get('points') as string),
+        date: new Date(),
+        imageUrl: uploadedImageUrl,
+        removed: false,
+      },
+    });
+    return newTrack;
+  } catch (err) {
+    console.error('Error creating new track', err);
+    return null;
+  }
+}
+
+
+async function uploadImageToCloudinary(file: File): Promise<string> {
+  if (!file) {
+    console.log('No File');
+    return '';
+  }
+
+  // Create tmp folder if it doesn't exist
+  if (!fs.existsSync('/tmp')) {
+    console.log('createdir path');
+    await mkdir('/tmp');
+  }
+
+  // Write file to tmp folder
+  const path = `/tmp/${file.name}`;
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+  await writeFile(path, buffer);
+
+  // Upload image to Cloudinary
+  const result = await cloudinary.uploader.upload(path, {
+    folder: 'SocialParoiApp/Tracks/',
+  } as UploadApiOptions);
+  const uploadedImageUrl = result.public_id;
+  console.log('Uploaded image to Cloudinary:', uploadedImageUrl);
+
+  // Delete the file after it has been uploaded
+  await unlink(path);
+  console.log('Deleted file:', path);
+
+  return uploadedImageUrl;
 }
