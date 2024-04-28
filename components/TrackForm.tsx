@@ -1,5 +1,5 @@
 'use client'
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import Image from 'next/image';
 import { usePostTracks } from "@/lib/usePostTrack";
 import { Track } from "@/domain/Track.schema";
@@ -19,7 +19,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
     holdColor: HoldColorEnum.Enum.Unknown,
     zone: 1,
     points: 0,
-    photo: null,
+    photo: null as File | null,
   });
 
   const { postTrack, isLoading, error } = usePostTracks();
@@ -30,8 +30,11 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
     setTrack(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = (e: { target: { files: any[]; }; }) => {
-    setTrack(prev => ({ ...prev, photo: e.target.files[0] }));
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      setTrack(prev => ({ ...prev, photo: files[0] }));
+    }
   };
 
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
