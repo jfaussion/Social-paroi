@@ -9,6 +9,7 @@ export default async function AdminPage() {
     <>
       <SessionProvider session={session}>
         <main className="flex flex-col items-center justify-between p-4 sm:p-24 sm:pt-8 sm:pb-8">
+          {/*@ts-ignore*/}
           {session?.user?.role === 'admin' ? (
             <div>
               <p>You are an admin, welcome!</p>
