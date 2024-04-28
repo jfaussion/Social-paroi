@@ -4,6 +4,7 @@ import GithubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaClient } from '@prisma/client/edge';
 import { PrismaAdapter } from '@auth/prisma-adapter';
+import { AdapterUserCustom } from './lib/AdapterUserCustom';
 
 const prisma = new PrismaClient()
 
@@ -28,13 +29,15 @@ export const {
         async jwt({ token, user }) {
           if (user?.id) {
             token.id = user.id
-            token.role = user.role;
+            token.role = (user as { role: string }).role;
           }
           return token
         },
         async session({ session, token }) {
-          session.user.id = token.id as string;
-          session.user.role = token.role as string;
+          session.user = {
+            id: token.id as string,
+            role: token.role as string
+          } as AdapterUserCustom;
           return session
         }
       },
