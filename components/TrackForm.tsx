@@ -5,6 +5,7 @@ import { usePostTracks } from "@/lib/usePostTrack";
 import { Track } from "@/domain/Track.schema";
 import { DifficultyEnum } from "@/domain/Difficulty.enum";
 import { HoldColorEnum } from "@/domain/HoldColor.enum";
+import { Button } from "./ui/Button";
 
 
 type TrackFromProps = {
@@ -116,7 +117,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
           <Image src={track.photo ? URL.createObjectURL(track.photo) : ''} alt="Track Preview" fill sizes='(max-width: 40px)' />
         </div>
       }
-      <button type="submit" className="px-4 py-2 bg-blue-500 hover:bg-blue-700">Submit</button>
+      <Button type="submit" className="py-2" btnStyle='secondary'>Submit</Button>
     </form>
   );
 

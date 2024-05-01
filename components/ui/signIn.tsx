@@ -10,6 +10,6 @@ export default function SignIn() {
   };
 
   return (
-    <Button onClick={navigateToLoginPage}>Sign In</Button>
+    <Button onClick={navigateToLoginPage} btnStyle='primary'>Sign In</Button>
   );
 };
