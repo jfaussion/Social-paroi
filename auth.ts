@@ -35,6 +35,7 @@ export const {
         },
         async session({ session, token }) {
           session.user = {
+            ...session.user,
             id: token.id as string,
             role: token.role as string
           } as AdapterUserCustom;
