@@ -8,14 +8,18 @@ export default async function AdminPage() {
 
   return (
     <SessionProvider session={session}>
-      <main className="flex flex-col items-center justify-between p-4 sm:p-24 sm:pt-8 sm:pb-8">
+      <main className="flex flex-col items-center justify-between p-4 sm:p-24 sm:pt-4 sm:pb-4">
         {(session?.user as AdapterUserCustom)?.role === 'admin' ? (
-          <div className="w-full lg:w-[60%] xl:w-[40%]">
-            <p>You are an admin, welcome!</p>
-            <TrackForm userId={session?.user?.id} />
+          <div className="w-full max-w-2xl items-center ">
+            <div className="flex flex-col items-center">
+              <span className="text-xl font-semibold w-full p-4 pt-0">
+                Create a new block
+              </span>
+              <TrackForm userId={session?.user?.id} />
+            </div>
           </div>
         ) : (
-          <p>You are not an admin.</p>
+          <p>This page is restricted to admin only.</p>
         )}
       </main>
     </SessionProvider>

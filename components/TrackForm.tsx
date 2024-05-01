@@ -1,5 +1,5 @@
 'use client'
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 import Image from 'next/image';
 import { usePostTracks } from "@/lib/usePostTrack";
 import { Track } from "@/domain/Track.schema";
@@ -25,9 +25,9 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
     points: 0,
     photo: null as File | null,
   });
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { postTrack, isLoading, error } = usePostTracks();
-
 
   const handleInputChange = (name: string, value: any) => {
     setTrack(prev => ({ ...prev, [name]: value }));
@@ -39,6 +39,25 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
       setTrack(prev => ({ ...prev, photo: files[0] }));
     }
   };
+
+  const clearFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+      setTrack({ ...track, photo: null });
+    }
+  };
+
+  const clearForm = () => {
+    clearFileInput();
+    setTrack({
+      name: '',
+      difficulty: null as unknown as string,
+      holdColor: '',
+      zone: 1,
+      points: 0,
+      photo: null as File | null,
+    });
+  }
 
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
@@ -57,6 +76,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
     console.log('trackToPost:', trackToPost);
     const newTrack = await postTrack(trackToPost, track.photo);
     console.log(newTrack);
+    clearForm();
   };
 
   // Preparing options for react-select
@@ -83,6 +103,8 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
         placeholder="Block's name..."
         value={track.name}
         onChange={e => handleInputChange('name', e.target.value)}
+        maxLength={100}
+        required
         className="p-2 text-black dark:text-white bg-gray-200 dark:bg-gray-800 rounded-md border border-gray-800 dark:border-gray-600"
       />
       <Select
@@ -93,6 +115,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
         classNames={difficultyCustomSelectClass}
         unstyled={true}
         placeholder="Select a difficulty"
+        required
       />
       <Select
         name="holdColor"
@@ -102,6 +125,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
         classNames={customSelectClassName}
         unstyled={true}
         placeholder="Select a hold color"
+        required
       />
       <Select
         name="zone"
@@ -111,6 +135,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
         classNames={customSelectClassName}
         unstyled={true}
         placeholder="Select a zone"
+        required
       />
       <input
         type="number"
@@ -119,8 +144,10 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
         value={track.points}
         onChange={e => handleInputChange('points', e.target.value)}
         className="p-2 text-black dark:text-white bg-gray-200 dark:bg-gray-800 rounded-md border border-gray-800 dark:border-gray-600"
+        required
       />
       <input
+        ref={fileInputRef}
         type="file"
         name="photo"
         onChange={handleFileChange}
@@ -130,13 +157,24 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
         file:text-sm file:font-semibold
         file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100
         dark:file:bg-slate-900 dark:file:text-violet-300 dark:hover:file:bg-slate-950"
+        required
       />
       {track.photo &&
         <div className="relative w-32 h-32">
           <Image src={track.photo ? URL.createObjectURL(track.photo) : ''} alt="Track Preview" fill sizes='(max-width: 40px)' />
         </div>
       }
-      <Button type="submit" className="py-2" btnStyle='secondary'>Submit</Button>
+
+      <Button type="submit" className="py-2" btnStyle='secondary' disabled={isLoading}>Submit</Button>
+
+      {isLoading && 
+        <div className="animate-pulse text-gradient-to-r from-slate-300 to-slate-200 dark:from-gray-700 dark:to-gray-900">
+          Loading...
+        </div>
+      }
+
+      {error && <p className="text-red-500">Error: {error}</p>}
+
     </form>
   );
 

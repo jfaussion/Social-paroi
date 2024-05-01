@@ -11,13 +11,20 @@ export function Button({ children, btnStyle, className, ...rest }: ButtonProps, 
 
   const primaryClasses = 'text-black dark:text-white bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 active:bg-zinc-300 dark:active:bg-zinc-700 border-black dark:border-white';
   const secondaryClasses = 'text-white dark:text-black bg-gray-800 dark:bg-gray-100 hover:bg-gray-700 dark:hover:bg-gray-300 active:bg-zinc-700 dark:active:bg-zinc-300 border-white dark:border-black';
+  const disabledClasses = 'text-gray-800 dark:text-gray-200 bg-gray-500 dark:bg-gray-500 border-gray-800 dark:border-gray-200 opacity-50 cursor-not-allowed';
 
-  const btnTypeClasses = btnStyle === 'secondary' ? secondaryClasses: primaryClasses;
+  let btnTypeClasses = btnStyle === 'secondary' ? secondaryClasses: primaryClasses;
+
+  if (rest.disabled) {
+    btnTypeClasses = disabledClasses;
+  }
+
+
 
   return (
     <button
       {...rest}
-      className={`${baseClasses} ${btnTypeClasses} ${className}`}
+      className={`${baseClasses} ${btnTypeClasses} ${className} `}
     >
       {children}
     </button>
