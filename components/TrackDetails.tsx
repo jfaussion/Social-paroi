@@ -9,16 +9,16 @@ import { useSession } from 'next-auth/react';
 import { useUpdateTrackProgress } from '@/lib/useUpdateTrackProgress';
 import ToggleButton from './ui/ToggleButton';
 import RemovedLabel from './ui/RemovedLabel';
-import { getBgColorForHold } from '@/domain/HoldColor.enum';
 import { TrackStatus } from '@/domain/TrackStatus.enum';
 import { getBgColorForDifficulty } from '@/utils/difficulty.utils';
+import { getBgColor } from '@/utils/color.utils';
 
 const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
   const [track, setTrack] = useState<Track>(propTrack);
   const { updateTrackStatus, isLoading, error } = useUpdateTrackProgress();
   const session = useSession();
   const levelClass = getBgColorForDifficulty(track.level);
-  const holdClass = getBgColorForHold(track.holdColor);
+  const holdClass = getBgColor(track.holdColor);
 
   const handleStatusChange = async () => {
     const previousStatus = track.trackProgress?.status ?? TrackStatus.TO_DO;

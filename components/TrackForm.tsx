@@ -11,6 +11,7 @@ import customSelectClassName from "./ui/customSelectClassName";
 import { Button } from "./ui/Button";
 import Loader from "./ui/Loader";
 import { useRouter } from "next/navigation";
+import { holdColorCustomSelectClass } from "@/utils/hold.utils";
 
 
 type TrackFromProps = {
@@ -65,8 +66,6 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
 
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
-    // Handle form submission, e.g., via API call
-    console.log('handle submit ', track);
     setNewTrack(null);
     const trackToPost = {
       name: track.name,
@@ -78,10 +77,8 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
       date: new Date(),
       imageUrl: '',
     } as unknown as Track;
-    console.log('trackToPost:', trackToPost);
     const uploadedTrack = await postTrack(trackToPost, track.photo);
     setNewTrack(uploadedTrack);
-    console.log(uploadedTrack);
     clearForm();
   };
 
@@ -128,7 +125,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
         value={holdColorOptions.find(option => option.value === track.holdColor)}
         onChange={option => handleInputChange('holdColor', option?.value)}
         options={holdColorOptions}
-        classNames={customSelectClassName}
+        classNames={holdColorCustomSelectClass}
         unstyled={true}
         placeholder="Select a hold color"
         required

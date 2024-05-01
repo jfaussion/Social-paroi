@@ -9,7 +9,6 @@ export const usePostTracks = () => {
   async function postTrack(track: Track, photo: any): Promise<Track | null> {
     setIsLoading(true);
     setError(null);
-    console.log('postTrack track:', track);
     try {
       const formData = new FormData();
       formData.append('photo', photo);
