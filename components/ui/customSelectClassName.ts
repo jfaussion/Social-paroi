@@ -13,11 +13,11 @@ const customSelectClassName = {
         : isFocused
           ? 'border-gray-600'
           : 'border-gray-600',
-      'rounded',
+      'rounded-md',
       'border-solid',
       'border',
       isFocused && 'shadow-[0_0_0_1px] shadow-gray-800',
-      isFocused ? 'hover:border-gray-300' : 'hover:border-gray-400'
+      isFocused ? 'border-gray-200 hover:border-gray-300' : 'hover:border-gray-400'
     ].join(' '),
   dropdownIndicator: ({ isFocused }: { isFocused: boolean }) =>
     [isFocused ? 'text-neutral-600 hover:text-neutral-400 dark:hover:text-neutral-800'
@@ -39,7 +39,7 @@ const customSelectClassName = {
     'my-2'
   ].join(' '),
   input: () => [
-    'm-0.5', 'py-0.5', 'dark:text-neutral-800'
+    'm-0.5', 'py-0.5', 'text-neutral-200 dark:text-neutral-800'
   ].join(' '),
   loadingIndicator: ({ isFocused }: { isFocused: boolean }) =>
     [
@@ -83,9 +83,7 @@ const customSelectClassName = {
         : 'bg-gray-100 dark:bg-gray-900', // bg color default
     isDisabled
       ? 'text-neutral-200 dark:text-neutral-800'
-      : isSelected
-        ? 'text-black dark:text-white'
-        : 'text-inherit',
+      : 'text-black dark:text-white',
     'hover:bg-gray-400 dark:hover:bg-gray-600', // hover bg color
     'py-2',
     'px-3',
@@ -96,7 +94,8 @@ const customSelectClassName = {
   singleValue: ({ isDisabled }: { isDisabled: boolean }) => [
     isDisabled ? 'text-neutral-600 dark:text-neutral-400' : 'text-neutral-800 dark:text-neutral-200',
     'mx-0.5'
-  ].join(' '), valueContainer: () => ['py-0.5', 'px-2'].join(' '),
+  ].join(' '),
+  valueContainer: () => ['py-0.5', 'px-2'].join(' '),
 }
 
 export default customSelectClassName;
