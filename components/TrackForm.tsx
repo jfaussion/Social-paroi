@@ -6,9 +6,11 @@ import { Track } from "@/domain/Track.schema";
 import { DifficultyEnum } from "@/domain/Difficulty.enum";
 import { HoldColorEnum } from "@/domain/HoldColor.enum";
 import { difficultyCustomSelectClass } from "@/utils/difficulty.utils";
-import Select, { ActionMeta, MultiValue } from 'react-select';
+import Select from 'react-select';
 import customSelectClassName from "./ui/customSelectClassName";
 import { Button } from "./ui/Button";
+import Loader from "./ui/Loader";
+import { useRouter } from "next/navigation";
 
 
 type TrackFromProps = {
@@ -26,8 +28,10 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
     photo: null as File | null,
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   const { postTrack, isLoading, error } = usePostTracks();
+  const [newTrack, setNewTrack] = useState<Track | null>(null);
 
   const handleInputChange = (name: string, value: any) => {
     setTrack(prev => ({ ...prev, [name]: value }));
@@ -51,8 +55,8 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
     clearFileInput();
     setTrack({
       name: '',
-      difficulty: null as unknown as string,
-      holdColor: '',
+      difficulty: DifficultyEnum.Enum.Unknown as string,
+      holdColor: HoldColorEnum.Enum.Unknown as string,
       zone: 1,
       points: 0,
       photo: null as File | null,
@@ -63,6 +67,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
     e.preventDefault();
     // Handle form submission, e.g., via API call
     console.log('handle submit ', track);
+    setNewTrack(null);
     const trackToPost = {
       name: track.name,
       level: track.difficulty,
@@ -74,8 +79,9 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
       imageUrl: '',
     } as unknown as Track;
     console.log('trackToPost:', trackToPost);
-    const newTrack = await postTrack(trackToPost, track.photo);
-    console.log(newTrack);
+    const uploadedTrack = await postTrack(trackToPost, track.photo);
+    setNewTrack(uploadedTrack);
+    console.log(uploadedTrack);
     clearForm();
   };
 
@@ -167,11 +173,13 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
 
       <Button type="submit" className="py-2" btnStyle='secondary' disabled={isLoading}>Submit</Button>
 
-      {isLoading && 
-        <div className="animate-pulse text-gradient-to-r from-slate-300 to-slate-200 dark:from-gray-700 dark:to-gray-900">
-          Loading...
-        </div>
-      }
+      {!isLoading && newTrack && (
+        <Button className="py-2" btnStyle='primary'
+          onClick={() => router.push(`dashboard/track/${newTrack.id}`)}>View new block
+        </Button>
+      )}
+
+      <Loader isLoading={isLoading} text="Posting new block..." />
 
       {error && <p className="text-red-500">Error: {error}</p>}
 
