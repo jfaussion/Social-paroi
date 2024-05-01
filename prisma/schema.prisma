@@ -48,6 +48,7 @@ model User {
   sessions          Session[]
   Authenticator     Authenticator[]
   UserTrackProgress UserTrackProgress[]
+  role              String?             @default("user")
 
   @@map("users")
 }

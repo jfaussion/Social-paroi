@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { getAllTracksForUser } from './actions';
-import { Track } from '@/domain/TrackSchema';
+import { Track } from '@/domain/Track.schema';
 
 export const useFetchTracks = () => {
   const [isLoading, setIsLoading] = useState(false);

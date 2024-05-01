@@ -1,6 +1,6 @@
 'use client'
 import TrackCard from "./TrackCard";
-import { Track } from "../domain/TrackSchema";
+import { Track } from "../domain/Track.schema";
 import { useEffect, useState } from "react";
 import { useFetchTracks } from "@/lib/useFetchTracks";
 import { CardPlaceHolder } from "./ui/CardPlacehorlder";
