@@ -9,7 +9,9 @@ export const authConfig = {
       const isLoggedIn = !!auth?.user;
 
       // Protect dashboard routes
-      const isProtectedRoute = nextUrl.pathname.startsWith('/dashboard') || nextUrl.pathname.startsWith('/track');
+      const isProtectedRoute = nextUrl.pathname.startsWith('/dashboard') || 
+                               nextUrl.pathname.startsWith('/track') || 
+                               nextUrl.pathname.startsWith('/admin');
       if (isProtectedRoute) {
         if (isLoggedIn) return true;
         return false; // Redirect unauthenticated users to login page

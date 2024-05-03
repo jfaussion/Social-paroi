@@ -2,20 +2,22 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { CldImage } from 'next-cloudinary';
-import { Track, TrackStatus, getBorderColorForLevel } from '../domain/TrackSchema';
+import { Track } from '../domain/Track.schema';
 import { useUpdateTrackProgress } from '../lib/useUpdateTrackProgress';
 import { useSession } from 'next-auth/react';
 import placeholderImage from '@/public/bouldering-placeholder.jpeg';
 import { useRouter } from 'next/navigation';
 import ToggleButton from './ui/ToggleButton';
 import RemovedLabel from './ui/RemovedLabel';
+import { getBorderColorForDifficulty } from '@/utils/difficulty.utils';
+import { TrackStatus } from '@/domain/TrackStatus.enum';
 
 
 const TrackCard: React.FC<Track> = ({ ...propTrack }) => {
 
   const { updateTrackStatus, isLoading, error } = useUpdateTrackProgress();
   const [track, setTrack] = useState<Track>(propTrack);
-  const levelBorderColor = getBorderColorForLevel(track.level);
+  const levelBorderColor = getBorderColorForDifficulty(track.level);
   const session = useSession();
   const router = useRouter();
 
