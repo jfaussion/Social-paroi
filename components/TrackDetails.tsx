@@ -12,10 +12,14 @@ import RemovedLabel from './ui/RemovedLabel';
 import { TrackStatus } from '@/domain/TrackStatus.enum';
 import { getBgColorForDifficulty } from '@/utils/difficulty.utils';
 import { getBgColor } from '@/utils/color.utils';
+import { Button } from './ui/Button';
+import { isOpener } from '@/utils/session.utils';
+import { useChangeMountedTrackStatus } from '@/lib/useChangeMountedTrackStatus';
 
 const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
   const [track, setTrack] = useState<Track>(propTrack);
-  const { updateTrackStatus, isLoading, error } = useUpdateTrackProgress();
+  const { updateTrackStatus, isLoading: isLoadingTrackStatus, error: errorTrackStatus } = useUpdateTrackProgress();
+  const { changeMountedTrackStatus, isLoading: isLoadingRemove, error: errorRemove } = useChangeMountedTrackStatus();
   const session = useSession();
   const levelClass = getBgColorForDifficulty(track.level);
   const holdClass = getBgColor(track.holdColor);
@@ -39,7 +43,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
       // Handle success (e.g., show a success message)
     } else {
       // Handle failure (e.g., revert the status change in the UI, show an error message)
-      console.error(error);
+      console.error(errorTrackStatus);
       setTrack({
         ...track, trackProgress: {
           ...track.trackProgress,
@@ -49,6 +53,25 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
       });
     }
   };
+
+  const changeMountedStatus = async (removeTrack: boolean) => {
+    const previousStatus = track.removed;
+    setTrack({
+      ...track, 
+      removed: removeTrack
+    });
+    const wasSuccessful = await changeMountedTrackStatus(track.id, removeTrack);
+
+    if (!wasSuccessful) {
+      // Handle failure (e.g., revert the status change in the UI, show an error message)
+      console.error(errorRemove);
+      setTrack({
+        ...track,
+        removed: previousStatus        
+      });
+    }
+  }
+
 
   return (
     <main className="flex flex-col items-center justify-between sm:pr-24 sm:pl-24 sm:pt-0">
@@ -111,6 +134,16 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
             )}
           </div>
         </div>
+
+        {isOpener(session.data) && (
+        <div className='p-4 w-full sm:border sm:border-gray-600 sm:rounded-lg dark:bg-gray-900 sm:m-4 sm:mtb-0'>
+          <h2 className="text-lg font-bold mb-3">Editor zone</h2>
+            <Button btnStyle={track.removed ? 'primary': 'secondary'} disabled={isLoadingRemove}
+              onClick={() => changeMountedStatus(!track.removed)} >
+                Mark as {track.removed ? 'mounted': 'removed'}
+            </Button>
+        </div>
+        )}
       </div>
     </main>
   )
