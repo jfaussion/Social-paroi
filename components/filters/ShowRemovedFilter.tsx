@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import Select, { ActionMeta, SingleValue } from 'react-select';
 import customSelectClassName from '../ui/customSelectClassName';
 
@@ -27,6 +27,7 @@ const ShowRemovedFilter: React.FC<FilterProps> = ({ selectedFilters, onChange })
 
   return (
     <Select
+      instanceId={useId()}
       name="showRemoved"
       options={showRemovedOptions}
       value={selectedFilters ? { value: selectedFilters, label: selectedFilters === 'YES' ? allLabel : selectedFilters === 'NO' ? mountedOnlyLabel : removedOnlyLabel } : undefined}
