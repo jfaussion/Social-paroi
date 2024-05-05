@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import Select, { ActionMeta, MultiValue } from 'react-select';
 import { DifficultyEnum } from '@/domain/Difficulty.enum';
 import { difficultyCustomSelectClass } from '@/utils/difficulty.utils';
@@ -18,6 +18,7 @@ const DifficultyFilter: React.FC<FilterProps> = ({ selectedFilters, onChange }) 
   return (
     <Select
       isMulti
+      instanceId={useId()}
       name="difficulties"
       value={selectedFilters.map(filter => ({ value: filter, label: filter }))}
       options={difficultyOptions}

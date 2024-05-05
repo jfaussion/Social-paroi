@@ -1,5 +1,5 @@
 'use client'
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useId, useRef, useState } from "react";
 import Image from 'next/image';
 import { usePostTracks } from "@/lib/usePostTrack";
 import { Track } from "@/domain/Track.schema";
@@ -111,6 +111,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
         className="p-2 text-black dark:text-white bg-gray-200 dark:bg-gray-800 rounded-md border border-gray-800 dark:border-gray-600"
       />
       <Select
+        instanceId={useId()}
         name="difficulty"
         value={difficultyOptions.find(option => option.value === track.difficulty)}
         onChange={option => handleInputChange('difficulty', option?.value)}
@@ -121,6 +122,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
         required
       />
       <Select
+        instanceId={useId()}
         name="holdColor"
         value={holdColorOptions.find(option => option.value === track.holdColor)}
         onChange={option => handleInputChange('holdColor', option?.value)}
@@ -131,6 +133,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
         required
       />
       <Select
+        instanceId={useId()}
         name="zone"
         value={zoneOptions.find(option => option.value === track.zone)}
         onChange={option => handleInputChange('zone', option?.value)}
