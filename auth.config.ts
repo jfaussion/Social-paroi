@@ -10,7 +10,7 @@ export const authConfig = {
 
       // Protect dashboard routes
       const isProtectedRoute = nextUrl.pathname.startsWith('/dashboard') || 
-                               nextUrl.pathname.startsWith('/track') || 
+                               nextUrl.pathname.startsWith('/opener') || 
                                nextUrl.pathname.startsWith('/admin');
       if (isProtectedRoute) {
         if (isLoggedIn) return true;
