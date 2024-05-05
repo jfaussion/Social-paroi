@@ -15,6 +15,8 @@ import { getBgColor } from '@/utils/color.utils';
 import { Button } from './ui/Button';
 import { isOpener } from '@/utils/session.utils';
 import { useChangeMountedTrackStatus } from '@/lib/useChangeMountedTrackStatus';
+import { useRouter } from "next/navigation";
+
 
 const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
   const [track, setTrack] = useState<Track>(propTrack);
@@ -23,6 +25,8 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
   const session = useSession();
   const levelClass = getBgColorForDifficulty(track.level);
   const holdClass = getBgColor(track.holdColor);
+  const router = useRouter();
+
 
   const handleStatusChange = async () => {
     const previousStatus = track.trackProgress?.status ?? TrackStatus.TO_DO;
@@ -57,7 +61,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
   const changeMountedStatus = async (removeTrack: boolean) => {
     const previousStatus = track.removed;
     setTrack({
-      ...track, 
+      ...track,
       removed: removeTrack
     });
     const wasSuccessful = await changeMountedTrackStatus(track.id, removeTrack);
@@ -67,7 +71,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
       console.error(errorRemove);
       setTrack({
         ...track,
-        removed: previousStatus        
+        removed: previousStatus
       });
     }
   }
@@ -136,13 +140,18 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
         </div>
 
         {isOpener(session.data) && (
-        <div className='p-4 w-full sm:border sm:border-gray-600 sm:rounded-lg dark:bg-gray-900 sm:m-4 sm:mtb-0'>
-          <h2 className="text-lg font-bold mb-3">Editor zone</h2>
-            <Button btnStyle={track.removed ? 'primary': 'secondary'} disabled={isLoadingRemove}
+          <div className='p-4 w-full sm:border sm:border-gray-600 sm:rounded-lg dark:bg-gray-900 sm:m-4 sm:mtb-0 space-y-2'>
+            <h2 className="text-lg font-bold mb-3">Editor zone</h2>
+            <Button btnStyle={track.removed ? 'primary' : 'secondary'} disabled={isLoadingRemove}
               onClick={() => changeMountedStatus(!track.removed)} >
-                Mark as {track.removed ? 'mounted': 'removed'}
+              Mark as {track.removed ? 'mounted' : 'removed'}
             </Button>
-        </div>
+
+            <Button btnStyle='primary'
+              onClick={() => router.push(`${track.id}/edit`)} >
+              Edit Block
+            </Button>
+          </div>
         )}
       </div>
     </main>

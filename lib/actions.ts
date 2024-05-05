@@ -138,6 +138,7 @@ const mergeTrackWithProgress = (track: any): Track => {
 
 
 export async function postNewTrack(
+  trackId: number | undefined,
   track: FormData
 ) {
 
@@ -147,22 +148,27 @@ export async function postNewTrack(
   }
 
   try {
-    let uploadedImageUrl = '';
-
-    if (track.get('photo')) {
-      const file: File | null = track.get('photo') as unknown as File
-      uploadedImageUrl = await uploadImageToCloudinary(file);
-    }
-
-    const newTrack = await prisma.track.create({
-      data: {
+    const newTrack = await prisma.track.upsert({
+      where: {
+        id: trackId ?? -1,
+      },
+      update: {
+        name: track.get('name') as string,
+        zone: parseInt(track.get('zone') as string),
+        level: track.get('level') as string,
+        holdColor: track.get('holdColor') as string,
+        points: parseInt(track.get('points') as string),
+        imageUrl: track.get('imageUrl') as string,
+        removed: track.get('removed') === 'true' ? true : false,
+      },
+      create: {
         name: track.get('name') as string,
         zone: parseInt(track.get('zone') as string),
         level: track.get('level') as string,
         holdColor: track.get('holdColor') as string,
         points: parseInt(track.get('points') as string),
         date: new Date(),
-        imageUrl: uploadedImageUrl,
+        imageUrl: track.get('imageUrl') as string,
         removed: false,
       },
     });
@@ -173,6 +179,43 @@ export async function postNewTrack(
   }
 }
 
+export async function postPhoto(
+  track: FormData
+) {
+  const user = await auth();
+  if (isOpener(user) === false){
+    throw new Error('You must be Admin or Opener in to perform this action. User: \n' + user);
+  }
+
+  try {
+    let uploadedImageUrl = '';
+
+    // Delete previous image
+    const oldImageUrl = track.get('imageUrl') as string;
+    if (oldImageUrl && track.get('photo')) {
+      await deleteImageFromCloudinary(oldImageUrl);
+    }
+
+    // Upload new image
+    if (track.get('photo')) {
+      const file: File | null = track.get('photo') as unknown as File
+      uploadedImageUrl = await uploadImageToCloudinary(file);
+    }
+    return uploadedImageUrl;
+  } catch (err) {
+    console.error('Error uploading image', err);
+    return '';
+  }
+}
+
+async function deleteImageFromCloudinary(imageUrl: string) {
+  if (!imageUrl) {
+    console.log('No Image URL');
+    return;
+  }
+  await cloudinary.uploader.destroy(imageUrl);
+  console.log('Deleted image from Cloudinary:', imageUrl);
+}
 
 async function uploadImageToCloudinary(file: File): Promise<string> {
   if (!file) {
