@@ -6,7 +6,7 @@ import { auth } from '@/auth';
 import { UploadApiOptions } from 'cloudinary';
 import { mkdir, unlink, writeFile } from 'fs/promises';
 import fs from 'fs';
-import { isOpener } from '@/utils/session.utils';
+import { isAdmin, isOpener } from '@/utils/session.utils';
 
 
 const prisma = new PrismaClient()
@@ -269,4 +269,24 @@ export async function MountOrUnmountTrack(
     console.error('Error updating the track', err);
     return false;
   }
+}
+
+export async function deleteTrackAndImage(track: Track) {
+  const session = await auth();
+  if (isOpener(session) === false) {
+    throw new Error('You must be Admin or Opener in to perform this action. User id: ' + session?.user?.id);
+  }
+  try {
+    if (track?.imageUrl) {
+      await deleteImageFromCloudinary(track.imageUrl);
+    }
+    await prisma.track.delete({
+      where: { id: track.id },
+    });
+    console.log('Track deleted, id:', track.id, 'name:', track.name);
+  } catch (err) {
+    console.error('Error deleting the track', err);
+  }
+
+
 }

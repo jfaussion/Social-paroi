@@ -16,11 +16,15 @@ import { Button } from './ui/Button';
 import { isOpener } from '@/utils/session.utils';
 import { useChangeMountedTrackStatus } from '@/lib/useChangeMountedTrackStatus';
 import { useRouter } from "next/navigation";
+import ConfirmationDialog from './ui/ConfirmDialog';
+import { useDeleteTrack } from '@/lib/useDeleteTrack';
 
 
 const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
   const [track, setTrack] = useState<Track>(propTrack);
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
   const { updateTrackStatus, isLoading: isLoadingTrackStatus, error: errorTrackStatus } = useUpdateTrackProgress();
+  const { deleteTrack, isLoading: isLoadingDelete, error: errorDelete } = useDeleteTrack();
   const { changeMountedTrackStatus, isLoading: isLoadingRemove, error: errorRemove } = useChangeMountedTrackStatus();
   const session = useSession();
   const levelClass = getBgColorForDifficulty(track.level);
@@ -73,6 +77,17 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
         ...track,
         removed: previousStatus
       });
+    }
+  }
+
+  const handleDeleteTrack = async () => {
+    const wasSuccessful = await deleteTrack(track);
+    if (!wasSuccessful) {
+      // Handle failure (e.g., show an error message)
+      console.error(errorDelete);
+    } else {
+      setDeleteDialogOpen(false);
+      router.back();
     }
   }
 
@@ -151,9 +166,17 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
               onClick={() => router.push(`${track.id}/edit`)} >
               Edit Block
             </Button>
+
+            <Button btnStyle='primary'
+              onClick={() => setDeleteDialogOpen(true)} >
+              Delete Block
+            </Button>
           </div>
         )}
       </div>
+      <ConfirmationDialog isOpen={isDeleteDialogOpen} title='Delete block' text='Are you sure you want to delete this block ?'
+        onCancel={() => setDeleteDialogOpen(false)} onConfirm={handleDeleteTrack} 
+        error={errorDelete ?? undefined} isLoading={isLoadingDelete}></ConfirmationDialog>
     </main>
   )
 

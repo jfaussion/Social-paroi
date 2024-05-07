@@ -29,7 +29,7 @@ export default function UserMenu() {
   }
 
   return (
-    <div ref={dropdownRef} style={{ position: 'relative', cursor: 'pointer' }}>
+    <div ref={dropdownRef} className="relative cursor-pointer">
 
       {session ? (
         <div className="relative">
@@ -48,7 +48,7 @@ export default function UserMenu() {
 
           {/* Dropdown menu */}
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 py-2 w-max bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-xl" style={{ maxWidth: 'max-content' }}>
+            <div className="absolute right-0 mt-2 py-2 w-max bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-xl max-w-max-content">
               <div className="block px-4 py-2 text-sm">
                 {session.user?.name}
                 <div className="text-gray-600 dark:text-gray-400">{session.user?.email}</div>
