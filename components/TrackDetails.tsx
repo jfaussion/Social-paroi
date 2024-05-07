@@ -24,7 +24,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
   const [track, setTrack] = useState<Track>(propTrack);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
   const { updateTrackStatus, isLoading: isLoadingTrackStatus, error: errorTrackStatus } = useUpdateTrackProgress();
-  const { deleteTrack, isLoading: isLoadingDelete, error: errorDelete } = useDeleteTrack();
+  const { deleteTrack, isLoading: isLoadingDelete, error: errorDelete, reset: resetDelete } = useDeleteTrack();
   const { changeMountedTrackStatus, isLoading: isLoadingRemove, error: errorRemove } = useChangeMountedTrackStatus();
   const session = useSession();
   const levelClass = getBgColorForDifficulty(track.level);
@@ -89,6 +89,11 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
       setDeleteDialogOpen(false);
       router.back();
     }
+  }
+
+  const handleCancelDelete = async () => {
+    setDeleteDialogOpen(false);
+    resetDelete();
   }
 
 
@@ -175,7 +180,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
         )}
       </div>
       <ConfirmationDialog isOpen={isDeleteDialogOpen} title='Delete block' text='Are you sure you want to delete this block ?'
-        onCancel={() => setDeleteDialogOpen(false)} onConfirm={handleDeleteTrack} 
+        onCancel={handleCancelDelete} onConfirm={handleDeleteTrack} 
         error={errorDelete ?? undefined} isLoading={isLoadingDelete}></ConfirmationDialog>
     </main>
   )

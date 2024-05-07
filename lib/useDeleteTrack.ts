@@ -6,6 +6,11 @@ export const useDeleteTrack = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const reset = () => {
+    setIsLoading(false);
+    setError(null);
+  }
+
   async function deleteTrack(track: Track): Promise<Boolean> {
     setIsLoading(true);
     setError(null);
@@ -21,5 +26,5 @@ export const useDeleteTrack = () => {
     }
   };
 
-  return { deleteTrack, isLoading, error };
+  return { deleteTrack, isLoading, error, reset };
 };
