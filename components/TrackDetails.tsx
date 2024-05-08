@@ -172,7 +172,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
               Edit Block
             </Button>
 
-            <Button btnStyle='primary'
+            <Button btnStyle='danger'
               onClick={() => setDeleteDialogOpen(true)} >
               Delete Block
             </Button>
