@@ -64,3 +64,7 @@ body {
   border: 3px solid transparent; /* Adjust or remove border as needed */
 }
 
+.bg-smoke-light {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+

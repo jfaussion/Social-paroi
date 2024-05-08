@@ -15,7 +15,7 @@ export default async function OpenerPage() {
               <span className="text-xl font-semibold w-full p-4 pt-0">
                 Create a new block
               </span>
-              <TrackForm userId={session?.user?.id} />
+              <TrackForm />
             </div>
           </div>
         ) : (
