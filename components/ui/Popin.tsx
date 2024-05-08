@@ -9,7 +9,6 @@ type PopinProps = {
 };
 
 const Popin: React.FC<PopinProps> = ({ isOpen, onClose, title, children }) => {
-  if (!isOpen) return null;
 
   // Close if click outside
   const popinRef = useRef(null);
@@ -24,6 +23,8 @@ const Popin: React.FC<PopinProps> = ({ isOpen, onClose, title, children }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []); 
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 overflow-auto bg-smoke-light flex">
