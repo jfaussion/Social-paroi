@@ -1,5 +1,5 @@
 'use client'
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useId, useRef, useState } from "react";
 import Image from 'next/image';
 import { usePostTracks } from "@/lib/usePostTrack";
 import { Track } from "@/domain/Track.schema";
@@ -12,26 +12,39 @@ import { Button } from "./ui/Button";
 import Loader from "./ui/Loader";
 import { useRouter } from "next/navigation";
 import { holdColorCustomSelectClass } from "@/utils/hold.utils";
+import { CldImage } from "next-cloudinary";
 
 
 type TrackFromProps = {
-  userId: string | undefined;
+  initialTrack?: Track; // Optional prop for editing
 };
 
-const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
-
+const TrackForm: React.FC<TrackFromProps> = ({ initialTrack }) => {
+  const isEditMode = Boolean(initialTrack);
   const [track, setTrack] = useState({
-    name: '',
-    difficulty: '',
-    holdColor: '',
-    zone: 1,
-    points: 0,
+    ...initialTrack,
+    name: initialTrack?.name || '',
+    difficulty: initialTrack?.level || '',
+    holdColor: initialTrack?.holdColor || '',
+    zone: initialTrack?.zone || 1,
+    points: initialTrack?.points || 0,
     photo: null as File | null,
   });
+
+  useEffect(() => {
+    if (initialTrack) {
+      setTrack({
+        ...initialTrack,
+        difficulty: initialTrack.level,
+        photo: null  // Reset photo state on initial load in edit mode
+      });
+    }
+  }, [initialTrack]);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  const { postTrack, isLoading, error } = usePostTracks();
+  const { postTrack, isLoading, error, loadingMessage } = usePostTracks();
   const [newTrack, setNewTrack] = useState<Track | null>(null);
 
   const handleInputChange = (name: string, value: any) => {
@@ -66,20 +79,39 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
 
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
-    setNewTrack(null);
-    const trackToPost = {
-      name: track.name,
-      level: track.difficulty,
-      holdColor: track.holdColor,
-      zone: track.zone,
-      points: track.points,
-      removed: false,
-      date: new Date(),
-      imageUrl: '',
-    } as unknown as Track;
-    const uploadedTrack = await postTrack(trackToPost, track.photo);
-    setNewTrack(uploadedTrack);
-    clearForm();
+
+    if (isEditMode && initialTrack) {
+      // Update logic
+      const trackToPost = {
+        ...initialTrack,
+        name: track.name,
+        level: track.difficulty,
+        holdColor: track.holdColor,
+        zone: track.zone,
+        points: track.points,
+      } as unknown as Track;
+      const uploadedTrack = await postTrack(trackToPost, track.photo);
+      router.back();
+      router.refresh();
+    } else {
+      // Create logic
+      setNewTrack(null);
+      const trackToPost = {
+        name: track.name,
+        level: track.difficulty,
+        holdColor: track.holdColor,
+        zone: track.zone,
+        points: track.points,
+        removed: false,
+        date: new Date(),
+        imageUrl: '',
+      } as unknown as Track;
+      const uploadedTrack = await postTrack(trackToPost, track.photo);
+      setNewTrack(uploadedTrack);
+      clearForm();
+    }
+
+
   };
 
   // Preparing options for react-select
@@ -111,6 +143,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
         className="p-2 text-black dark:text-white bg-gray-200 dark:bg-gray-800 rounded-md border border-gray-800 dark:border-gray-600"
       />
       <Select
+        instanceId={useId()}
         name="difficulty"
         value={difficultyOptions.find(option => option.value === track.difficulty)}
         onChange={option => handleInputChange('difficulty', option?.value)}
@@ -121,6 +154,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
         required
       />
       <Select
+        instanceId={useId()}
         name="holdColor"
         value={holdColorOptions.find(option => option.value === track.holdColor)}
         onChange={option => handleInputChange('holdColor', option?.value)}
@@ -131,6 +165,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
         required
       />
       <Select
+        instanceId={useId()}
         name="zone"
         value={zoneOptions.find(option => option.value === track.zone)}
         onChange={option => handleInputChange('zone', option?.value)}
@@ -160,13 +195,28 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
         file:text-sm file:font-semibold
         file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100
         dark:file:bg-slate-900 dark:file:text-violet-300 dark:hover:file:bg-slate-950"
-        required
       />
       {track.photo &&
         <div className="relative w-32 h-32">
           <Image src={track.photo ? URL.createObjectURL(track.photo) : ''} alt="Track Preview" fill sizes='(max-width: 40px)' />
         </div>
       }
+
+      {track?.imageUrl && !track.photo && (
+        track.imageUrl.split(' ').map((url, index) => (
+          <div key={index} className="snap-center w-full shrink-0">
+            <CldImage
+              width={800}
+              height={800}
+              crop="fill"
+              gravity="center"
+              improve="indoor"
+              src={url}
+              alt="Climbing Track"
+              className="mx-auto sm:rounded" />
+          </div>
+        ))
+      )}
 
       <Button type="submit" className="py-2" btnStyle='secondary' disabled={isLoading}>Submit</Button>
 
@@ -176,7 +226,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ userId }) => {
         </Button>
       )}
 
-      <Loader isLoading={isLoading} text="Posting new block..." />
+      <Loader isLoading={isLoading} text={loadingMessage} />
 
       {error && <p className="text-red-500">Error: {error}</p>}
 

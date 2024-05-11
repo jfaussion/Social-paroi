@@ -12,13 +12,25 @@ import RemovedLabel from './ui/RemovedLabel';
 import { TrackStatus } from '@/domain/TrackStatus.enum';
 import { getBgColorForDifficulty } from '@/utils/difficulty.utils';
 import { getBgColor } from '@/utils/color.utils';
+import { Button } from './ui/Button';
+import { isOpener } from '@/utils/session.utils';
+import { useChangeMountedTrackStatus } from '@/lib/useChangeMountedTrackStatus';
+import { useRouter } from "next/navigation";
+import ConfirmationDialog from './ui/ConfirmDialog';
+import { useDeleteTrack } from '@/lib/useDeleteTrack';
+
 
 const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
   const [track, setTrack] = useState<Track>(propTrack);
-  const { updateTrackStatus, isLoading, error } = useUpdateTrackProgress();
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
+  const { updateTrackStatus, isLoading: isLoadingTrackStatus, error: errorTrackStatus } = useUpdateTrackProgress();
+  const { deleteTrack, isLoading: isLoadingDelete, error: errorDelete, reset: resetDelete } = useDeleteTrack();
+  const { changeMountedTrackStatus, isLoading: isLoadingRemove, error: errorRemove } = useChangeMountedTrackStatus();
   const session = useSession();
   const levelClass = getBgColorForDifficulty(track.level);
   const holdClass = getBgColor(track.holdColor);
+  const router = useRouter();
+
 
   const handleStatusChange = async () => {
     const previousStatus = track.trackProgress?.status ?? TrackStatus.TO_DO;
@@ -39,7 +51,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
       // Handle success (e.g., show a success message)
     } else {
       // Handle failure (e.g., revert the status change in the UI, show an error message)
-      console.error(error);
+      console.error(errorTrackStatus);
       setTrack({
         ...track, trackProgress: {
           ...track.trackProgress,
@@ -49,6 +61,41 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
       });
     }
   };
+
+  const changeMountedStatus = async (removeTrack: boolean) => {
+    const previousStatus = track.removed;
+    setTrack({
+      ...track,
+      removed: removeTrack
+    });
+    const wasSuccessful = await changeMountedTrackStatus(track.id, removeTrack);
+
+    if (!wasSuccessful) {
+      // Handle failure (e.g., revert the status change in the UI, show an error message)
+      console.error(errorRemove);
+      setTrack({
+        ...track,
+        removed: previousStatus
+      });
+    }
+  }
+
+  const handleDeleteTrack = async () => {
+    const wasSuccessful = await deleteTrack(track);
+    if (!wasSuccessful) {
+      // Handle failure (e.g., show an error message)
+      console.error(errorDelete);
+    } else {
+      setDeleteDialogOpen(false);
+      router.back();
+    }
+  }
+
+  const handleCancelDelete = async () => {
+    setDeleteDialogOpen(false);
+    resetDelete();
+  }
+
 
   return (
     <main className="flex flex-col items-center justify-between sm:pr-24 sm:pl-24 sm:pt-0">
@@ -111,7 +158,34 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
             )}
           </div>
         </div>
+
+        {isOpener(session.data) && (
+          <div className='p-4 w-full border-t-2 border-gray-600 sm:border sm:border-gray-600 sm:rounded-lg dark:bg-gray-900 sm:m-4 sm:mt-0 space-y-2'>
+            
+            <h2 className="text-lg font-bold mb-3">Editor zone</h2>
+            
+            <div className='flex flex-wrap justify-between gap-2'>
+              <Button btnStyle={track.removed ? 'primary' : 'secondary'} className='grow' 
+                disabled={isLoadingRemove} onClick={() => changeMountedStatus(!track.removed)} >
+                Mark as {track.removed ? 'mounted' : 'removed'}
+              </Button>
+
+              <Button btnStyle='primary' className='grow'
+                onClick={() => router.push(`${track.id}/edit`)} >
+                Edit Block
+              </Button>
+
+              <Button btnStyle='danger' className='grow'
+                onClick={() => setDeleteDialogOpen(true)} >
+                Delete Block
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
+      <ConfirmationDialog isOpen={isDeleteDialogOpen} title='Delete block' text='Are you sure you want to delete this block ?'
+        onCancel={handleCancelDelete} onConfirm={handleDeleteTrack}
+        error={errorDelete ?? undefined} isLoading={isLoadingDelete}></ConfirmationDialog>
     </main>
   )
 

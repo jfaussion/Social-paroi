@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import Select, { ActionMeta, MultiValue } from 'react-select';
 import customSelectClassName from '../ui/customSelectClassName';
 
@@ -16,6 +16,7 @@ const ZoneFilter: React.FC<FilterProps> = ({ selectedFilters, onChange }) => {
 
   return (
     <Select
+      instanceId={useId()}
       isMulti
       name="zones"
       value={selectedFilters.map(zone => ({ value: zone, label: `Zone ${zone}` }))}

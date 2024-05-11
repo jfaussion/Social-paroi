@@ -1,6 +1,6 @@
 import NavBar from "@/components/Navbar";
 
-export default function AdminLayout({
+export default function OpenerLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
