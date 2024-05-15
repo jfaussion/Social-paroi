@@ -2,34 +2,42 @@
 
 import { isOpener } from '@/utils/session.utils';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { IoClose } from 'react-icons/io5';
 import { LuMenu } from 'react-icons/lu';
 import Image from 'next/image';
 import Logo from '@/public/social-paroi.png';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { FaArrowLeft } from 'react-icons/fa6';
 
 const Drawer = () => {
   const [isOpen, setIsOpen] = useState(false);
   const toggleDrawer = () => setIsOpen(!isOpen);
-
-  const router = useRouter();
+  const pathname = usePathname()
   const session = useSession();
+  const router = useRouter();
 
-  const navigate = (path: string) => {
-    router.push(path);
-    toggleDrawer();
-  };
-
+  const showBackButtonInsteadOfMenu = () => pathname.startsWith('/dashboard/track/');
 
   return (
     <div>
-      {/* Toggle button */}
-      <button onClick={toggleDrawer} className='mt-2 active:border-0'>
-        {isOpen ? <IoClose className="h-6 w-6 hover:bg-gray-300 hover:dark:bg-gray-700 rounded-md" />
-          : <LuMenu className="h-6 w-6 hover:bg-gray-300 hover:dark:bg-gray-700 rounded-md" />
-        }
-      </button>
+      {showBackButtonInsteadOfMenu() ?
+        <>
+          { /* Back button */}
+          <FaArrowLeft className="h-6 w-6 hover:bg-gray-300 hover:dark:bg-gray-700 rounded-md" onClick={router.back} />
+        </>
+        :
+        <>
+          {/* Toggle button */}
+          <button onClick={toggleDrawer} className='mt-2 active:border-0'>
+            {isOpen ? <IoClose className="h-6 w-6 hover:bg-gray-300 hover:dark:bg-gray-700 rounded-md" />
+              : <LuMenu className="h-6 w-6 hover:bg-gray-300 hover:dark:bg-gray-700 rounded-md" />
+            }
+          </button>
+        </>
+      }
+
       {/* Drawer */}
       <div className={`fixed z-30 top-0 left-0 h-full w-full sm:w-[15rem] bg-gray-200 dark:bg-gray-800  border-r border-gray-400 dark:border-gray-600 rounded-md transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className='flex flex-col'>
@@ -43,15 +51,19 @@ const Drawer = () => {
           </div>
 
           {/* Navigation links */}
-          <div className="p-5 space-y-3">
-            <div className="cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" onClick={() => navigate('/dashboard')}>Dashboard</div>
+          <ul className="p-5 space-y-3">
+            <li>
+              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href="/dashboard">Dashboard</Link>
+            </li>
             {isOpener(session.data) && (
               <>
                 <hr className="border-t border-gray-400 dark:border-gray-600" />
-                <div className="cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" onClick={() => navigate('/opener')}>Create new bloc</div>
+                <li>
+                  <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href="/opener">Create new block</Link>
+                </li>
               </>
             )}
-          </div>
+          </ul>
         </div>
       </div>
     </div>
