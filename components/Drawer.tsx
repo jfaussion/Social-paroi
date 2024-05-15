@@ -45,7 +45,7 @@ const Drawer = () => {
           {/* Drawer header */}
           <div className='flex justify-between px-5 pt-5'>
             <Image src={Logo} alt="Social Paroi app logo" width={40} height={40} />
-            <button onClick={toggleDrawer}>
+            <button onClick={toggleDrawer} className="mb-5">
               {isOpen && <IoClose className="h-6 w-6 hover:bg-gray-300 hover:dark:bg-gray-700 rounded-md" />}
             </button>
           </div>
