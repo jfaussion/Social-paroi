@@ -18,7 +18,7 @@ export default async function NavBar() {
 
   return (
     <SessionProvider session={session}>
-      <nav className="sticky flex justify-center border-b border-gray-700">
+      <nav className="sticky z-20 flex justify-center border-b border-gray-400 dark:border-gray-700">
         <div className="flex items-center justify-between w-full h-16 px-4 mx-auto sm:px-6">
           <Drawer />
           <div className="text-4xl md:text-5xl font-extrabold">
