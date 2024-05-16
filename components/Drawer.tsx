@@ -64,6 +64,8 @@ const Drawer = () => {
               </>
             )}
           </ul>
+
+          {/* Footer links */}
           <div className="mt-auto p-5 flex flex-wrap justify-start text-xs text-blue-500 font-mono space-x-1">
             <Link className="hover:underline" href="/privacy">Privacy policy</Link><span>|</span>
             <Link className="hover:underline" href="https://github.com/jfaussion/Social-paroi">Contribute</Link><span>|</span>
