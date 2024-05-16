@@ -12,9 +12,12 @@ export const authConfig = {
       const isProtectedRoute = nextUrl.pathname.startsWith('/dashboard') || 
                                nextUrl.pathname.startsWith('/opener') || 
                                nextUrl.pathname.startsWith('/admin');
+      const isOpenRoute = nextUrl.pathname.startsWith('/privacy')
       if (isProtectedRoute) {
         if (isLoggedIn) return true;
         return false; // Redirect unauthenticated users to login page
+      } else if (isOpenRoute) {
+        return true;
       } else if (isLoggedIn) {
         // Default redirect for authenticated users
         return Response.redirect(new URL('/dashboard', nextUrl));
