@@ -7,6 +7,7 @@ import { UploadApiOptions } from 'cloudinary';
 import { mkdir, unlink, writeFile } from 'fs/promises';
 import fs from 'fs';
 import { isAdmin, isOpener } from '@/utils/session.utils';
+import processTrackStats from './userStatsProcessor';
 
 
 const prisma = new PrismaClient()
@@ -287,6 +288,34 @@ export async function deleteTrackAndImage(track: Track) {
   } catch (err) {
     console.error('Error deleting the track', err);
   }
-
-
 }
+
+
+export async function getUserStats(userId: string) {
+  // Query to get tracks and done by the user, and total done by the user
+  const userTrackStats = await prisma.userTrackProgress.findMany({
+    where: {
+      userId,
+      status: 'DONE',
+    },
+    select: {
+      track: {
+        select: {
+          level: true,
+          removed: true,
+        },
+      },
+    },
+  });
+
+  // Query to get total number of tracks mounted by difficulty
+  const totalMountedTracksByDifficulty = await prisma.track.groupBy({
+    by: ['level'],
+    _count: {
+      _all: true,
+    },
+  });
+  const processStats = processTrackStats(userTrackStats as { track: Track }[], totalMountedTracksByDifficulty as { _count: { _all: number }, level: string }[]);
+
+  return processStats;
+};

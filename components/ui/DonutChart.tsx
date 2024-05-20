@@ -1,22 +1,31 @@
 "use client"
 import { useEffect, useRef } from "react";
 
-const DonutChart = ({ percentage, bgColorClass = 'bg-gray-200', donutColor = '#22C55E' }) => {
+
+interface DonutChartProps {
+  percentage: number;
+  bgColorClass?: string;
+  donutColor?: string;
+}
+
+const DonutChart = ({ percentage, bgColorClass = 'bg-gray-200', donutColor = '#22C55E' }: DonutChartProps) => {
   const chartRef = useRef(null);
 
   useEffect(() => {
-    const chart = chartRef.current;
+    const chart = chartRef.current as HTMLElement | null;
     let start = 0;
     const duration = 1000; // animation duration in ms
     const startTime = performance.now();
 
-    const animate = (currentTime) => {
+    const animate = (currentTime: number) => {
       const elapsedTime = currentTime - startTime;
       const progress = Math.min(elapsedTime / duration, 1);
       const currentPercentage = start + progress * (percentage - start);
-      chart.style.setProperty('--percentage', currentPercentage);
-      if (progress < 1) {
-        requestAnimationFrame(animate);
+      if (chart && chart.style) {
+        chart.style.setProperty('--percentage', currentPercentage as unknown as string);
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
       }
     };
 
