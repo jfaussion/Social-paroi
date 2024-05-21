@@ -22,7 +22,6 @@ const UserStats = () => {
     const getStats = async () => {
       const stats = await fetchStats(userId);
       setUserStats(stats);
-      console.log(stats);
     };
     getStats();
   }, [userId]);
@@ -36,7 +35,7 @@ const UserStats = () => {
       )}
       {!isLoading && userStats?.length > 0 && (
         <>
-          <div className='p-4 w-full border border-gray-600 rounded-lg bg-slate-200 dark:bg-gray-900 sm:m-4 sm:mt-0 space-y-2'>
+          <div className='p-4 w-full border border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-900 sm:m-4 sm:mt-0 space-y-2'>
             <div className="flex flex-col p-2 sm:p-4 space-y-2">
               <span className="text-xl w-full pt-0 font-medium">By difficulty</span>
               <div className="flex justify-between mb-3">
@@ -56,7 +55,7 @@ const UserStats = () => {
                     <div className="flex justify-self-end space-x-2">
                       <div className="flex flex-col justify-items-center text-sm w-[4rem] sm:w-[8rem] text-center">
                         <div className="mx-auto">
-                          <DonutChart percentage={totalMounted ? 100 * mountedDone / totalMounted : 0} bgColorClass="bg-slate-200 dark:bg-gray-900" />
+                          <DonutChart percentage={totalMounted ? 100 * mountedDone / totalMounted : 0} bgColorClass="bg-gray-100 dark:bg-gray-900" />
                         </div>
                         <span className="text-sm ">
                           {totalMounted ? (100 * mountedDone / totalMounted).toFixed(0) : '0'}%
