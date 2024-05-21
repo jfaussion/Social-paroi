@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useRef } from "react";
+import { CSSProperties, useEffect, useRef } from "react";
 
 
 interface DonutChartProps {
@@ -37,9 +37,9 @@ const DonutChart = ({ percentage, bgColorClass = 'bg-gray-200', donutColor = '#2
       ref={chartRef}
       className={`donut-chart ${bgColorClass}`}
       style={{
-        '--target-percentage': percentage,
-        '--donut-color': donutColor,
-      }}
+        '--target-percentage': percentage as any,
+        '--donut-color': donutColor as any,
+      } as CSSProperties}
     >
       <div className={`donut-chart-center ${bgColorClass}`}></div>
     </div>
