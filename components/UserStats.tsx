@@ -14,22 +14,22 @@ const UserStats = () => {
   const [userStats, setUserStats] = useState<TrackStats[]>([]);
 
 
-  if (!session.data?.user?.id) return null;
-  const userId = session.data.user.id;
-
-
   useEffect(() => {
+    if (!session.data?.user?.id) return;
+
     const getStats = async () => {
-      const stats = await fetchStats(userId);
+      const stats = await fetchStats(session.data.user?.id ?? '');
       setUserStats(stats);
     };
     getStats();
-  }, [userId]);
+  }, [session]);
+
+  if (!session.data?.user?.id) return null;
 
   return (
     <>
       {isLoading && (
-        <div className='w-full sm:m-4 sm:mt-0 space-y-2'>
+        <div className='h-full w-full sm:m-4 sm:mt-0 space-y-2'>
           <StatsPlaceHolder />
         </div>
       )}
