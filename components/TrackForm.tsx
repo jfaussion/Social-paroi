@@ -131,7 +131,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack }) => {
   }));
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 space-y-4 bg-slate-300 dark:bg-gray-800 text-white flex flex-col w-full rounded">
+    <form onSubmit={handleSubmit} className="p-4 space-y-4 bg-gray-100 dark:bg-gray-800 text-white flex flex-col w-full rounded">
       <input
         type="text"
         name="name"
