@@ -68,3 +68,39 @@ body {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
+@keyframes fill {
+  from {
+    --percentage: 0;
+  }
+  to {
+    --percentage: var(--target-percentage);
+  }
+}
+
+.donut-chart {
+  --size: 60px;
+  --border-width: 20px;
+  --percentage: 0; /* Initial percentage */
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: conic-gradient(
+    #22C55E calc(var(--percentage) * 1%),
+    #22C55E33 0
+  );
+  position: relative;
+  transition: --percentage 1s;
+
+}
+
+.donut-chart-center {
+  position: absolute;
+  top: calc(var(--border-width) / 2);
+  left: calc(var(--border-width) / 2);
+  width: calc(var(--size) - var(--border-width));
+  height: calc(var(--size) - var(--border-width));
+  border-radius: 50%;
+}
+
+
+
