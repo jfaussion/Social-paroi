@@ -15,14 +15,23 @@ const UserStats = () => {
 
 
   useEffect(() => {
-    if (!session.data?.user?.id) return;
+    let isMounted = true;
 
     const getStats = async () => {
-      const stats = await fetchStats(session.data.user?.id ?? '');
-      setUserStats(stats);
+      if (session.data?.user?.id) {
+        const stats = await fetchStats(session.data.user.id);
+        if (isMounted) {
+          setUserStats(stats);
+        }
+      }
     };
+
     getStats();
-  }, [session]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [session.data?.user?.id]);
 
   if (!session.data?.user?.id) return null;
 
