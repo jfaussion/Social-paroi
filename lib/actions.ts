@@ -311,6 +311,9 @@ export async function getUserStats(userId: string) {
   // Query to get total number of tracks mounted by difficulty
   const totalMountedTracksByDifficulty = await prisma.track.groupBy({
     by: ['level'],
+    where: {
+      removed: false,
+    },
     _count: {
       _all: true,
     },
