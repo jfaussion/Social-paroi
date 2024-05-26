@@ -18,6 +18,7 @@ import { useChangeMountedTrackStatus } from '@/lib/useChangeMountedTrackStatus';
 import { useRouter } from "next/navigation";
 import ConfirmationDialog from './ui/ConfirmDialog';
 import { useDeleteTrack } from '@/lib/useDeleteTrack';
+import { Zone } from './Zone';
 
 
 const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
@@ -135,26 +136,28 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
 
           {/* Zone and Date row */}
           <div className="flex justify-between items-center mb-3">
-            <span className="bg-transparent text-xs font-semibold px-2 py-1 rounded border border-gray-800 dark:border-gray-200">Zone {track.zone}</span>
+          <div>
+              <span className="text-sm font-medium mr-2">Difficulty</span>
+              <span className={`inline-block w-14 h-3 rounded ${levelClass}`}></span>
+            </div>
             <span className="text-sm text-gray-600 dark:text-gray-400">{track.date ? track.date.toLocaleDateString() : '...'}</span>
           </div>
 
           {/* Difficulty and Points row */}
           <div className="flex justify-between items-center mb-3">
-            <div>
-              <span className="text-sm font-medium mr-2">Difficulty</span>
-              <span className={`inline-block w-14 h-3 rounded ${levelClass}`}></span>
+          <div>
+              <span className="text-sm font-medium mr-2">Hold color</span>
+              <span className={`inline-block w-14 h-3 ${holdClass} rounded`}></span>
             </div>
             <span className="text-sm font-semibold">{track.points}pts</span>
           </div>
 
           <div className="flex justify-between items-center mb-3">
-            <div>
-              <span className="text-sm font-medium mr-2">Hold color</span>
-              <span className={`inline-block w-14 h-3 ${holdClass} rounded`}></span>
-            </div>
+            <Zone zone={track.zone} width={200} height={100}/>
             {track.removed && (
-              <RemovedLabel color={'red'}></RemovedLabel>
+              <div className="flex self-start space-x-2">
+                <RemovedLabel color={'red'}></RemovedLabel>
+              </div>
             )}
           </div>
         </div>
