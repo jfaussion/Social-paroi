@@ -13,6 +13,7 @@ import Loader from "./ui/Loader";
 import { useRouter } from "next/navigation";
 import { holdColorCustomSelectClass } from "@/utils/hold.utils";
 import { CldImage } from "next-cloudinary";
+import { Zone } from "./Zone";
 
 
 type TrackFromProps = {
@@ -175,6 +176,12 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack }) => {
         placeholder="Select a zone"
         required
       />
+      {!!track.zone && (
+        <div className="flex justify-center sm:justify-start items-center p-2 mb-3">
+          <Zone zone={track.zone} width={200} height={100}/>
+        </div>
+      )}
+
       <input
         type="number"
         name="points"

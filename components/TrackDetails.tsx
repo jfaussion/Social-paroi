@@ -153,13 +153,17 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
           </div>
 
           <div className="flex justify-between items-center mb-3">
-            <Zone zone={track.zone} width={200} height={100}/>
             {track.removed && (
               <div className="flex self-start space-x-2">
                 <RemovedLabel color={'red'}></RemovedLabel>
               </div>
             )}
           </div>
+          
+          <div className="flex justify-center sm:justify-between items-center pt-3 mb-3">
+            <Zone zone={track.zone} width={200} height={100}/>
+          </div>
+
         </div>
 
         {isOpener(session.data) && (
