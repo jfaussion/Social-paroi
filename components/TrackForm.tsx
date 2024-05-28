@@ -146,6 +146,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack }) => {
       <Select
         instanceId={useId()}
         name="difficulty"
+        isSearchable={false}
         value={difficultyOptions.find(option => option.value === track.difficulty)}
         onChange={option => handleInputChange('difficulty', option?.value)}
         options={difficultyOptions}
@@ -157,6 +158,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack }) => {
       <Select
         instanceId={useId()}
         name="holdColor"
+        isSearchable={false}
         value={holdColorOptions.find(option => option.value === track.holdColor)}
         onChange={option => handleInputChange('holdColor', option?.value)}
         options={holdColorOptions}
@@ -168,6 +170,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack }) => {
       <Select
         instanceId={useId()}
         name="zone"
+        isSearchable={false}
         value={zoneOptions.find(option => option.value === track.zone)}
         onChange={option => handleInputChange('zone', option?.value)}
         options={zoneOptions}
