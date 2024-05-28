@@ -18,6 +18,7 @@ const ZoneFilter: React.FC<FilterProps> = ({ selectedFilters, onChange }) => {
     <Select
       instanceId={useId()}
       isMulti
+      isSearchable={false}
       name="zones"
       value={selectedFilters.map(zone => ({ value: zone, label: `Zone ${zone}` }))}
       options={zoneOptions}
