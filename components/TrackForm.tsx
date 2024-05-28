@@ -13,6 +13,7 @@ import Loader from "./ui/Loader";
 import { useRouter } from "next/navigation";
 import { holdColorCustomSelectClass } from "@/utils/hold.utils";
 import { CldImage } from "next-cloudinary";
+import { Zone } from "./Zone";
 
 
 type TrackFromProps = {
@@ -145,6 +146,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack }) => {
       <Select
         instanceId={useId()}
         name="difficulty"
+        isSearchable={false}
         value={difficultyOptions.find(option => option.value === track.difficulty)}
         onChange={option => handleInputChange('difficulty', option?.value)}
         options={difficultyOptions}
@@ -156,6 +158,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack }) => {
       <Select
         instanceId={useId()}
         name="holdColor"
+        isSearchable={false}
         value={holdColorOptions.find(option => option.value === track.holdColor)}
         onChange={option => handleInputChange('holdColor', option?.value)}
         options={holdColorOptions}
@@ -167,6 +170,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack }) => {
       <Select
         instanceId={useId()}
         name="zone"
+        isSearchable={false}
         value={zoneOptions.find(option => option.value === track.zone)}
         onChange={option => handleInputChange('zone', option?.value)}
         options={zoneOptions}
@@ -175,6 +179,12 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack }) => {
         placeholder="Select a zone"
         required
       />
+      {!!track.zone && (
+        <div className="flex justify-center sm:justify-start items-center p-2 mb-3">
+          <Zone zone={track.zone} width={200} height={100}/>
+        </div>
+      )}
+
       <input
         type="number"
         name="points"

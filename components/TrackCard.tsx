@@ -11,6 +11,7 @@ import ToggleButton from './ui/ToggleButton';
 import RemovedLabel from './ui/RemovedLabel';
 import { getBorderColorForDifficulty } from '@/utils/difficulty.utils';
 import { TrackStatus } from '@/domain/TrackStatus.enum';
+import { Zone } from './Zone';
 
 
 const TrackCard: React.FC<Track> = ({ ...propTrack }) => {
@@ -72,14 +73,14 @@ const TrackCard: React.FC<Track> = ({ ...propTrack }) => {
                 gravity='center'
                 alt="Climbing Track" />
               :
-              <Image src={placeholderImage} alt="Climbing Track - place holder" fill sizes='(max-width: 200px)' />}
+              <Image src={placeholderImage} alt="Climbing Track - place holder" width={10} height={5} />}
           </div>
         </div>
         <div className='w-full'>
           <h4 className="text-md font-semibold dark:text-white">{track.name}</h4>
           <div className="flex justify-between items-center mt-2">
             <div className="inline-flex items-center space-x-2">
-              <span className="bg-transparent text-xs font-semibold px-2 py-1 rounded border border-gray-900 dark:border-gray-200">Zone {track.zone}</span>
+              <Zone zone={track.zone} width={60} height={50}/>
               {track.removed && (
                 <RemovedLabel/>
               )}

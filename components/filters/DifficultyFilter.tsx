@@ -18,6 +18,7 @@ const DifficultyFilter: React.FC<FilterProps> = ({ selectedFilters, onChange }) 
   return (
     <Select
       isMulti
+      isSearchable={false}
       instanceId={useId()}
       name="difficulties"
       value={selectedFilters.map(filter => ({ value: filter, label: filter }))}

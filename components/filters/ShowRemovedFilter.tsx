@@ -28,6 +28,7 @@ const ShowRemovedFilter: React.FC<FilterProps> = ({ selectedFilters, onChange })
   return (
     <Select
       instanceId={useId()}
+      isSearchable={false}
       name="showRemoved"
       options={showRemovedOptions}
       value={selectedFilters ? { value: selectedFilters, label: selectedFilters === 'YES' ? allLabel : selectedFilters === 'NO' ? mountedOnlyLabel : removedOnlyLabel } : undefined}
