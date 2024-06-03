@@ -126,7 +126,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack }) => {
     label: holdColor
   }));
 
-  const zoneOptions = Array.from({ length: 11 }, (_, i) => i + 1).map(zone => ({
+  const zoneOptions = Array.from({ length: 10 }, (_, i) => i + 1).map(zone => ({
     value: zone,
     label: `Zone ${zone}`
   }));
@@ -228,6 +228,9 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack }) => {
         ))
       )}
 
+      <Loader isLoading={isLoading} text={loadingMessage} />
+      {error && <p className="text-red-500">Error: {error}</p>}
+
       <Button type="submit" className="py-2" btnStyle='secondary' disabled={isLoading}>Submit</Button>
 
       {!isLoading && newTrack && (
@@ -235,10 +238,6 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack }) => {
           onClick={() => router.push(`dashboard/track/${newTrack.id}`)}>View new block
         </Button>
       )}
-
-      <Loader isLoading={isLoading} text={loadingMessage} />
-
-      {error && <p className="text-red-500">Error: {error}</p>}
 
     </form>
   );
