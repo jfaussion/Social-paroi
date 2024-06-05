@@ -8,7 +8,7 @@ type FilterProps = {
 };
 
 const ZoneFilter: React.FC<FilterProps> = ({ selectedFilters, onChange }) => {
-  const zones = Array.from({ length: 11 }, (_, i) => i + 1);
+  const zones = Array.from({ length: 10 }, (_, i) => i + 1);
   const zoneOptions = zones.map(zone => ({
     value: zone,
     label: `Zone ${zone}`
