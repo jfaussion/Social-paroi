@@ -1,15 +1,18 @@
 import ZoneFilter from "./ZoneFilter";
 import DifficultyFilter from "./DifficultyFilter";
 import ShowRemovedFilter from "./ShowRemovedFilter";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
+import HoldColorFilter from "./HoldColorFilter";
 
 type TrackFiltersProps = {
   selectedZones: number[];
   selectedDifficulties: string[];
   selectedShowRemoved: string | undefined;
+  selectedHoldColor: string | undefined;
   onZoneChange: (selectedOptions: { value: any }[]) => void;
   onDifficultyChange: (selectedOptions: { value: any }[]) => void;
+  onHoldColorChange: (selectedOption: { value: any }) => void;
   onShowRemovedChange: (selectedOptions: any) => void;
 };
 
@@ -17,12 +20,22 @@ const TrackFilters: React.FC<TrackFiltersProps> = ({
   selectedZones,
   selectedDifficulties,
   selectedShowRemoved,
+  selectedHoldColor,
   onZoneChange,
   onDifficultyChange,
   onShowRemovedChange,
+  onHoldColorChange
 }) => {
 
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+
+  useEffect(() => {
+    if (selectedShowRemoved !== undefined || selectedHoldColor !== undefined) {
+      setShowAdvancedFilters(true);
+    } else {
+      setShowAdvancedFilters(false);
+    }
+  }, [selectedShowRemoved, selectedHoldColor]);
 
   const toggleFilters = () => {
     setShowAdvancedFilters(!showAdvancedFilters);
@@ -51,6 +64,7 @@ const TrackFilters: React.FC<TrackFiltersProps> = ({
       {showAdvancedFilters && (
         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mt-2">
           <ShowRemovedFilter selectedFilters={selectedShowRemoved} onChange={onShowRemovedChange} />
+          <HoldColorFilter selectedFilter={selectedHoldColor} onChange={onHoldColorChange} />
         </div>
       )}
 

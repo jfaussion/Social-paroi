@@ -6,11 +6,11 @@ export const useFetchTracks = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function fetchTracks(userId: string, zones?: number[], levels?: string[], showRemoved?: string): Promise<Track[]> {
+  async function fetchTracks(userId: string, zones?: number[], levels?: string[], showRemoved?: string, holdColor?:string | undefined): Promise<Track[]> {
     setIsLoading(true);
     setError(null);
     try {
-      const trackList = await getAllTracksForUser(userId, zones, levels, showRemoved);
+      const trackList = await getAllTracksForUser(userId, zones, levels, showRemoved, holdColor);
       setIsLoading(false);
       return trackList;
     } catch (err) {

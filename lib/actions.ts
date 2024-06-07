@@ -42,7 +42,7 @@ export async function updateTrackStatusForUser(
 }
 
 
-export async function getAllTracksForUser(userId: string, zones?: number[], levels?: string[], showRemoved?: string): Promise<Track[]> {
+export async function getAllTracksForUser(userId: string, zones?: number[], levels?: string[], showRemoved?: string, holdColor?: string): Promise<Track[]> {
   // Initialize an empty array for dynamic AND conditions
   let andConditions = [];
   // If zones are provided and not empty, add zone condition
@@ -59,6 +59,12 @@ export async function getAllTracksForUser(userId: string, zones?: number[], leve
       level: {
         in: levels,
       },
+    });
+  }
+  // If holdColor is provided and not empty, add holdColor condition
+  if (holdColor) {
+    andConditions.push({
+      holdColor: holdColor,
     });
   }
   // If showRemoved is provided, add removed condition
