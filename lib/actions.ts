@@ -6,8 +6,10 @@ import { auth } from '@/auth';
 import { UploadApiOptions } from 'cloudinary';
 import { mkdir, unlink, writeFile } from 'fs/promises';
 import fs from 'fs';
-import { isAdmin, isOpener } from '@/utils/session.utils';
+import { isOpener } from '@/utils/session.utils';
 import processTrackStats from './userStatsProcessor';
+import { Filters } from '@/domain/Filters';
+import { RemovedEnum } from '@/domain/Removed.enum';
 
 
 const prisma = new PrismaClient()
@@ -42,38 +44,38 @@ export async function updateTrackStatusForUser(
 }
 
 
-export async function getAllTracksForUser(userId: string, zones?: number[], levels?: string[], showRemoved?: string, holdColor?: string): Promise<Track[]> {
+export async function getAllTracksForUser(userId: string, filters: Filters): Promise<Track[]> {
   // Initialize an empty array for dynamic AND conditions
   let andConditions = [];
   // If zones are provided and not empty, add zone condition
-  if (zones && zones.length > 0) {
+  if (filters.zones && filters.zones.length > 0) {
     andConditions.push({
       zone: {
-        in: zones,
+        in: filters.zones,
       },
     });
   }
   // If levels are provided and not empty, add level condition
-  if (levels && levels.length > 0) {
+  if (filters.difficulties && filters.difficulties.length > 0) {
     andConditions.push({
       level: {
-        in: levels,
+        in: filters.difficulties,
       },
     });
   }
   // If holdColor is provided and not empty, add holdColor condition
-  if (holdColor) {
+  if (filters.holdColor) {
     andConditions.push({
-      holdColor: holdColor,
+      holdColor: filters.holdColor,
     });
   }
   // If showRemoved is provided, add removed condition
-  if (!showRemoved || showRemoved === 'NO') {
+  if (!filters.showRemoved || filters.showRemoved === RemovedEnum.Enum.NO) {
     // Default to not showing removed tracks
     andConditions.push({
       removed: false,
     });
-  } else if (showRemoved === 'ONLY') {
+  } else if (filters.showRemoved === RemovedEnum.Enum.ONLY) {
     andConditions.push({
       removed: true,
     });

@@ -1,6 +1,7 @@
 import React, { useId } from 'react';
 import Select, { ActionMeta, SingleValue } from 'react-select';
 import customSelectClassName from '../ui/customSelectClassName';
+import { RemovedEnum } from '@/domain/Removed.enum';
 
 type FilterProps = {
   selectedFilters: string | undefined;
@@ -14,16 +15,29 @@ const ShowRemovedFilter: React.FC<FilterProps> = ({ selectedFilters, onChange })
 
   const showRemovedOptions = [
     {
-      value: 'YES',
+      value: RemovedEnum.Enum.YES,
       label: allLabel
     }, {
-      value: 'NO',
+      value: RemovedEnum.Enum.NO,
       label: mountedOnlyLabel
     }, {
-      value: 'ONLY',
+      value: RemovedEnum.Enum.ONLY,
       label: removedOnlyLabel
     }
   ];
+
+  const getFilterValue = (selectedFilters: string | undefined) => {
+    if (!selectedFilters) return undefined;
+    return {
+      value: selectedFilters,
+      label: getFilterLabel(selectedFilters)
+    }
+  }
+
+  const getFilterLabel = (selectedFilters: string | undefined) => {
+    const filter = showRemovedOptions.find(option => option.value === selectedFilters);
+    return filter ? filter.label : 'Error: Filter not found';
+  }
 
   return (
     <Select
@@ -31,7 +45,7 @@ const ShowRemovedFilter: React.FC<FilterProps> = ({ selectedFilters, onChange })
       isSearchable={false}
       name="showRemoved"
       options={showRemovedOptions}
-      value={selectedFilters ? { value: selectedFilters, label: selectedFilters === 'YES' ? allLabel : selectedFilters === 'NO' ? mountedOnlyLabel : removedOnlyLabel } : undefined}
+      value={getFilterValue(selectedFilters)}
       className="basic-single"
       classNamePrefix="select"
       isClearable={true}

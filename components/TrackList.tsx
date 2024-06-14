@@ -6,6 +6,7 @@ import { useFetchTracks } from "@/lib/useFetchTracks";
 import { CardPlaceHolder } from "./ui/CardPlacehorlder";
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import TrackFilters from "./filters/TrackFilters";
+import { Filters } from "@/domain/Filters";
 
 type TracksProps = {
   userId: string;
@@ -24,8 +25,8 @@ const TrackList: React.FC<TracksProps> = ({ userId }) => {
   const currentUrlParams = new URLSearchParams(Array.from(searchParams.entries())); // -> has to use this form
 
   useEffect(() => {
-    const getTracks = async (zones: number[] | undefined, difficulties: string[] | undefined, showRemoved: string | undefined, holdColor: string | undefined) => {
-      const tracks = await fetchTracks(userId, zones, difficulties, showRemoved, holdColor);
+    const getTracks = async (filters: Filters) => {
+      const tracks = await fetchTracks(userId, filters);
       setTrackList(tracks);
     };
     // Parse URL query parameters to get filter
@@ -33,11 +34,12 @@ const TrackList: React.FC<TracksProps> = ({ userId }) => {
     const difficulties = searchParams.has('difficulties') ? searchParams.get('difficulties')?.split(',') as string[] : [] as string[];
     const showRemoved = searchParams.has('showRemoved') ? searchParams.get('showRemoved') as string : undefined;
     const holdColor = searchParams.has('holdColor') ? searchParams.get('holdColor') as string : undefined;
+    const filters = { zones, difficulties, showRemoved, holdColor };
     setSelectedZones(zones);
     setSelectedDifficulties(difficulties);
     setSelectedShowRemoved(showRemoved);
     setSelectedHoldColor(holdColor);
-    getTracks(zones, difficulties, showRemoved, holdColor);
+    getTracks(filters);
   }, [userId, searchParams]);
 
   const updateFiltersInURL = (zones: any[], difficulties: any[], showRemoved: string | undefined, holdColor: string | undefined) => {
