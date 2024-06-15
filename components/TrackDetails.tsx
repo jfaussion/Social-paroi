@@ -158,6 +158,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
                 <RemovedLabel color={'red'}></RemovedLabel>
               </div>
             )}
+            <span className="text-sm font-medium mr-2">Done x{track.countDone ?? 0}</span>
           </div>
           
           <div className="flex justify-center sm:justify-between items-center pt-3 mb-3">

@@ -10,6 +10,7 @@ import { isOpener } from '@/utils/session.utils';
 import processTrackStats from './userStatsProcessor';
 import { Filters } from '@/domain/Filters';
 import { RemovedEnum } from '@/domain/Removed.enum';
+import { TrackStatus } from '@/domain/TrackStatus.enum';
 
 
 const prisma = new PrismaClient()
@@ -126,8 +127,15 @@ export async function getTrackDetails(
       },
     });
 
+    const countDone = await prisma.userTrackProgress.count({
+      where: {
+        trackId: trackId,
+        status: TrackStatus.DONE,
+      },
+    });
+
     if (track) {
-      return mergeTrackWithProgress(track);
+      return mergeTrackWithProgress(track, countDone);
     }
     return null;
   } catch (err) {
@@ -136,11 +144,12 @@ export async function getTrackDetails(
   }
 }
 
-const mergeTrackWithProgress = (track: any): Track => {
+const mergeTrackWithProgress = (track: any, count: number): Track => {
   const userProgress = track.trackProgress[0] || undefined;
   const result = {
     ...track,
     trackProgress: { ...userProgress },
+    countDone: count ?? 0,
   };
   return result;
 }
@@ -304,7 +313,7 @@ export async function getUserStats(userId: string) {
   const userTrackStats = await prisma.userTrackProgress.findMany({
     where: {
       userId,
-      status: 'DONE',
+      status: TrackStatus.DONE,
     },
     select: {
       track: {
