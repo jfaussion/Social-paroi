@@ -12,6 +12,7 @@ export const authConfig = {
       const isProtectedRoute = nextUrl.pathname.startsWith('/dashboard') || 
                                nextUrl.pathname.startsWith('/opener') || 
                                nextUrl.pathname.startsWith('/stats') || 
+                               nextUrl.pathname.startsWith('/ranking') || 
                                nextUrl.pathname.startsWith('/admin');
       const isOpenRoute = nextUrl.pathname.startsWith('/privacy')
       if (isProtectedRoute) {
