@@ -34,7 +34,7 @@ const RankingList: React.FC = () => {
         </div>
       )}
       {!isLoading && ranking?.length > 0 && (
-        <div className='w-full border border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-900 sm:m-4 sm:mt-0 space-y-2'>
+        <div className='w-full border border-gray-600 rounded-lg bg-gradient-to-r from-slate-300 to-slate-100 dark:from-gray-700 dark:to-gray-900 sm:m-4 sm:mt-0 space-y-2'>
           <div className="flex flex-col sm:p-4">
             <span className="text-md p-4 w-full font-medium">Based on mounted blocs only</span>
             <div className="flex justify-between mb-3">
