@@ -112,7 +112,7 @@ model UserTrackProgress {
 
 
 model News {
-  id        String   @id @default(cuid())
+  id        Int      @id @default(autoincrement())
   title     String
   content   String
   date      DateTime @default(now())

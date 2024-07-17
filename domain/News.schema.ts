@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const NewsSchema = z.object({
-  id: z.string(),
+  id: z.number(),
   date: z.date(),
   title: z.string(),
   content: z.string(),

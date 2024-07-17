@@ -30,12 +30,12 @@ export const usePostTracks = () => {
       }
       setLoadingMessage('Posting block...');
       const newTrack = await postNewTrack(track.id, formData) as Track;
-      setIsLoading(false);
       return newTrack;
     } catch (err) {
       setError('An error occurred while posting the new block');
-      setIsLoading(false);
       return null;
+    } finally {
+      setIsLoading(false);
     }
   };
 
