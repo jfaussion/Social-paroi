@@ -10,6 +10,7 @@ export const authConfig = {
 
       // Protect dashboard routes
       const isProtectedRoute = nextUrl.pathname.startsWith('/dashboard') || 
+                               nextUrl.pathname.startsWith('/news') || 
                                nextUrl.pathname.startsWith('/opener') || 
                                nextUrl.pathname.startsWith('/stats') || 
                                nextUrl.pathname.startsWith('/ranking') || 

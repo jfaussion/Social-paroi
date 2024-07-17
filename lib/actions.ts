@@ -10,6 +10,7 @@ import { isOpener } from '@/utils/session.utils';
 import processTrackStats from './userStatsProcessor';
 import { Filters } from '@/domain/Filters';
 import { RemovedEnum } from '@/domain/Removed.enum';
+import { News } from '@/domain/News.schema';
 
 
 const prisma = new PrismaClient()
@@ -368,4 +369,22 @@ export async function getUserRankings() {
   userScores.sort((a, b) => b.score - a.score);
 
   return userScores;
+}
+
+
+export async function getAllActiveNews(): Promise<News[]> {
+  try {
+    const activeNews = await prisma.news.findMany({
+      where: {
+        deleted: false,
+      },
+      orderBy: {
+        date: 'desc',
+      },
+    });
+    return activeNews;
+  } catch (err) {
+    console.error('Error fetching active news', err);
+    return [];
+  }
 }
