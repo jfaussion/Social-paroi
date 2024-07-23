@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { Button } from './ui/Button';
-import Popin from './ui/Popin';
+import React, { useEffect, useState } from 'react';
+import { Button } from '../ui/Button';
+import Popin from '../ui/Popin';
 import { News } from '@/domain/News.schema';
+import Loader from '../ui/Loader';
 
 
 type ConfirmProps = {
@@ -10,18 +11,30 @@ type ConfirmProps = {
   onConfirm: (formData: News) => void;
   onCancel: () => void;
   error?: string;
-  isLoading?: boolean;
+  isLoading: boolean;
 };
 
 const NewsForm: React.FC<ConfirmProps> = ({ isOpen, news, onCancel, onConfirm, error, isLoading }) => {
 
   const [formData, setFormData] = useState(
-    {
-      id: news?.id,
-      title: news?.title ?? '',
-      content: news?.content ?? ''
-    } as News
-  );
+      {
+        id: news?.id,
+        title: news?.title ?? '',
+        content: news?.content ?? ''
+      }
+    );
+
+  useEffect(() => {
+    if (news) {
+      setFormData({...news});
+    } else {
+      setFormData({
+        id: undefined,
+        title: '',
+        content: ''
+      });
+    }
+  }, [news]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -30,14 +43,14 @@ const NewsForm: React.FC<ConfirmProps> = ({ isOpen, news, onCancel, onConfirm, e
 
   return (
     <Popin isOpen={isOpen} onClose={onCancel} title="Post News">
-      <form onSubmit={() => onConfirm(formData)} className="flex flex-col space-y-4">
+      <form onSubmit={() => onConfirm(formData as News)} className="flex flex-col space-y-4">
         <input
           type="text"
           name="title"
           value={formData.title}
           onChange={handleChange}
           placeholder="Title"
-          className="p-2 border border-gray-300 rounded dark:bg-gray-800"
+          className="p-2 border border-gray-500 rounded dark:bg-gray-800"
           required
         />
         <textarea
@@ -45,12 +58,14 @@ const NewsForm: React.FC<ConfirmProps> = ({ isOpen, news, onCancel, onConfirm, e
           value={formData.content}
           onChange={handleChange}
           placeholder="Content"
-          className="p-2 border border-gray-300 rounded dark:bg-gray-800 resize-none"
+          className="p-2 border border-gray-500 rounded dark:bg-gray-800 resize-y"
           rows={4}
-          style={{ resize: 'vertical' }} // Modified to 'vertical' for resizable textarea
           required
         />
-        <Button type="submit" className="p-2 bg-green-500 text-white rounded">
+        <Loader isLoading={isLoading} text="Posting news..." />
+        {error && <p className="text-red-500">Error: {error}</p>}
+
+        <Button type="submit">
           Submit
         </Button>
       </form>

@@ -192,7 +192,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
       </div>
       <ConfirmationDialog isOpen={isDeleteDialogOpen} title='Delete block' text='Are you sure you want to delete this block ?'
         onCancel={handleCancelDelete} onConfirm={handleDeleteTrack}
-        error={errorDelete ?? undefined} isLoading={isLoadingDelete}></ConfirmationDialog>
+        error={errorDelete ?? undefined} isLoading={isLoadingDelete} loadingMessage='Deleting block...'></ConfirmationDialog>
     </main>
   )
 

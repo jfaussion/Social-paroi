@@ -422,7 +422,7 @@ export async function postNews(news: News): Promise<News | null> {
   }
 }
 
-export async function deleteNews(newsId: number) {
+export async function deleteNewsAction(newsId: number) {
   const user = await auth();
   if (isOpener(user) === false) {
     throw new Error('You must be an admin to perform this action. User: \n' + user);

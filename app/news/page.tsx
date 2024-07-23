@@ -2,7 +2,7 @@
 import { auth } from "@/auth";
 import { SessionProvider } from "next-auth/react";
 import { isConnected, isOpener } from "@/utils/session.utils";
-import NewsList from "@/components/NewsList";
+import NewsList from "@/components/news/NewsList";
 
 export const dynamic = 'force-dynamic'
 
