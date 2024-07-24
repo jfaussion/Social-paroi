@@ -1,7 +1,7 @@
 "use client";
 import { useSession } from "next-auth/react";
 import UserRanking from "./UserRanking";
-import { useFetchRanking } from "@/lib/useFetchRanking";
+import { useFetchRanking } from "@/lib/stats/hooks/useFetchRanking";
 import { useEffect, useState } from "react";
 import { RankingPlaceholder } from "./ui/RankingPlaceholder";
 

@@ -1,5 +1,5 @@
-import { deleteNewsAction } from '@/lib/actions';
 import { useState } from 'react';
+import { deleteNewsAction } from '../actions/deleteNewsAction';
 
 type DeleteNewsResponse = {
   success: boolean;

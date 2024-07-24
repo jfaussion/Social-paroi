@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { CldImage } from 'next-cloudinary';
 import { Track } from '../domain/Track.schema';
-import { useUpdateTrackProgress } from '../lib/useUpdateTrackProgress';
+import { useUpdateTrackProgress } from '../lib/tracks/hooks/useUpdateTrackProgress';
 import { useSession } from 'next-auth/react';
 import placeholderImage from '@/public/bouldering-placeholder.jpeg';
 import { useRouter } from 'next/navigation';

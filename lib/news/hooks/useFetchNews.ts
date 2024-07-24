@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { News } from '@/domain/News.schema';
-import { getAllActiveNews } from '@/lib/actions';
+import { getAllActiveNews } from '../actions/getNewsAction';
 
 export const useFetchNews = () => {
   const [isLoading, setIsLoading] = useState(false);

@@ -1,5 +1,5 @@
+import { MountOrUnmountTrack } from "@/lib/actions";
 import { useState } from "react";
-import { MountOrUnmountTrack } from "./actions";
 
 export const useChangeMountedTrackStatus = () => {
   const [isLoading, setIsLoading] = useState(false);

@@ -1,6 +1,6 @@
 import { Track } from "@/domain/Track.schema";
+import { deleteTrackAndImage } from "@/lib/actions";
 import { useState } from "react";
-import { deleteTrackAndImage } from "./actions";
 
 export const useDeleteTrack = () => {
   const [isLoading, setIsLoading] = useState(false);

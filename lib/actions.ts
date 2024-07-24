@@ -7,7 +7,7 @@ import { UploadApiOptions } from 'cloudinary';
 import { mkdir, unlink, writeFile } from 'fs/promises';
 import fs from 'fs';
 import { isOpener } from '@/utils/session.utils';
-import processTrackStats from './userStatsProcessor';
+import processTrackStats from './stats/actions/userStatsProcessor';
 import { Filters } from '@/domain/Filters';
 import { RemovedEnum } from '@/domain/Removed.enum';
 import { News } from '@/domain/News.schema';
@@ -372,72 +372,3 @@ export async function getUserRankings() {
 }
 
 
-export async function getAllActiveNews(): Promise<News[]> {
-  try {
-    const activeNews = await prisma.news.findMany({
-      where: {
-        deleted: false,
-      },
-      orderBy: {
-        date: 'desc',
-      },
-    });
-    return activeNews;
-  } catch (err) {
-    console.error('Error fetching active news', err);
-    return [];
-  }
-}
-
-export async function postNews(news: News): Promise<News | null> {
-  const user = await auth();
-  if (isOpener(user) === false) {
-    throw new Error('You must be Admin or Opener to perform this action. User: \n' + user);
-  }
-
-  try {
-    const newNews = await prisma.news.upsert({
-      where: { 
-        id: news.id ?? -1,
-       },
-      update: {
-        title: news.title,
-        content: news.content,
-        userId: user?.user?.id,
-        date: new Date(),
-        deleted: false,
-      },
-      create: {
-        title: news.title,
-        content: news.content,
-        userId: user?.user?.id,
-        date: new Date(),
-        deleted: false,
-      },
-    });
-    return newNews;
-  } catch (err) {
-    console.error('Error creating/updating news', err);
-    return null;
-  }
-}
-
-export async function deleteNewsAction(newsId: number) {
-  const user = await auth();
-  if (isOpener(user) === false) {
-    throw new Error('You must be an admin to perform this action. User: \n' + user);
-  }
-
-  try {
-    await prisma.news.update({
-      where: { id: newsId },
-      data: {
-        deleted: true,
-      },
-    });
-
-    console.log('News marked as deleted, id:', newsId);
-  } catch (err) {
-    console.error('Error marking the news as deleted', err);
-  }
-}
