@@ -56,6 +56,9 @@ const Drawer = () => {
               <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href="/dashboard">Dashboard</Link>
             </li>
             <li>
+              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href="/news">News</Link>
+            </li>
+            <li>
               <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href="/stats">My stats</Link>
             </li>
             <li>

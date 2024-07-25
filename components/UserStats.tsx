@@ -1,5 +1,5 @@
 "use client";
-import { useFetchUserStats } from "@/lib/useFetchUserStats";
+import { useFetchUserStats } from "@/lib/stats/hooks/useFetchUserStats";
 import DonutChart from "./ui/DonutChart";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";

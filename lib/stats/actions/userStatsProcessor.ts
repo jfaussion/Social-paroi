@@ -2,7 +2,14 @@ import { difficultyOrder } from "@/domain/Difficulty.enum";
 import { Track } from "@/domain/Track.schema";
 import { TrackStats } from "@/domain/TrackStats.schema";
 
-const processTrackStats = (
+/**
+ * Processes the track stats for a user.
+ * 
+ * @param userTrackProgress - The tracks done by the user.
+ * @param totalMountedTracksByDifficulty - The total number of tracks mounted by difficulty.
+ * @returns The processed track stats.
+ */
+export const processTrackStats = (
   userTrackProgress: { track: Track }[], 
   totalMountedTracksByDifficulty: { _count: { _all: number }, level: string }[]
 ) => {
@@ -53,5 +60,3 @@ const sortTrackStatsByDifficulty: (stats: TrackStats[]) => TrackStats[] = (stats
     return difficultyOrder.indexOf(a.level) - difficultyOrder.indexOf(b.level);
   });
 };
-
-export default processTrackStats;

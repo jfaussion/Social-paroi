@@ -1,10 +1,10 @@
-import { getTrackDetails } from "@/lib/actions";
 import { auth } from "@/auth";
 import { SessionProvider } from "next-auth/react";
 import Image from 'next/image';
 import placeholderImage from "@/public/bouldering-placeholder.jpeg";
 import TrackDetails from "@/components/TrackDetails";
 import { redirect } from "next/navigation";
+import { getTrackDetails } from "@/lib/tracks/actions/getTrackDetails";
 
 export const dynamic = 'force-dynamic'
 

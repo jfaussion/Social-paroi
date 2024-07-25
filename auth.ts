@@ -4,7 +4,7 @@ import GithubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaClient } from '@prisma/client/edge';
 import { PrismaAdapter } from '@auth/prisma-adapter';
-import { AdapterUserCustom } from './lib/AdapterUserCustom';
+import { AdapterUserCustom } from './lib/users/AdapterUserCustom';
 
 const prisma = new PrismaClient()
 

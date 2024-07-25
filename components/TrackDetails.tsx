@@ -6,7 +6,7 @@ import { CldImage } from 'next-cloudinary';
 import { Track } from '../domain/Track.schema';
 import placeholderImage from "@/public/bouldering-placeholder.jpeg";
 import { useSession } from 'next-auth/react';
-import { useUpdateTrackProgress } from '@/lib/useUpdateTrackProgress';
+import { useUpdateTrackProgress } from '@/lib/tracks/hooks/useUpdateTrackProgress';
 import ToggleButton from './ui/ToggleButton';
 import RemovedLabel from './ui/RemovedLabel';
 import { TrackStatus } from '@/domain/TrackStatus.enum';
@@ -14,10 +14,10 @@ import { getBgColorForDifficulty } from '@/utils/difficulty.utils';
 import { getBgColor } from '@/utils/color.utils';
 import { Button } from './ui/Button';
 import { isOpener } from '@/utils/session.utils';
-import { useChangeMountedTrackStatus } from '@/lib/useChangeMountedTrackStatus';
+import { useChangeMountedTrackStatus } from '@/lib/tracks/hooks/useChangeMountedTrackStatus';
 import { useRouter } from "next/navigation";
 import ConfirmationDialog from './ui/ConfirmDialog';
-import { useDeleteTrack } from '@/lib/useDeleteTrack';
+import { useDeleteTrack } from '@/lib/tracks/hooks/useDeleteTrack';
 import { Zone } from './Zone';
 
 
@@ -192,7 +192,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
       </div>
       <ConfirmationDialog isOpen={isDeleteDialogOpen} title='Delete block' text='Are you sure you want to delete this block ?'
         onCancel={handleCancelDelete} onConfirm={handleDeleteTrack}
-        error={errorDelete ?? undefined} isLoading={isLoadingDelete}></ConfirmationDialog>
+        error={errorDelete ?? undefined} isLoading={isLoadingDelete} loadingMessage='Deleting block...'></ConfirmationDialog>
     </main>
   )
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getUserStats } from './actions';
+import { getUserStats } from '../actions/getUserStats';
 
 export const useFetchUserStats = () => {
   const [isLoading, setIsLoading] = useState(false);

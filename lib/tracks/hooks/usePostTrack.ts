@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { postNewTrack, postPhoto } from "./actions";
 import { Track } from "@/domain/Track.schema";
+import { postNewTrack } from "../actions/postTrack";
+import { postPhoto } from "../actions/postTrackImage";
 
 export const usePostTracks = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -30,12 +31,12 @@ export const usePostTracks = () => {
       }
       setLoadingMessage('Posting block...');
       const newTrack = await postNewTrack(track.id, formData) as Track;
-      setIsLoading(false);
       return newTrack;
     } catch (err) {
       setError('An error occurred while posting the new block');
-      setIsLoading(false);
       return null;
+    } finally {
+      setIsLoading(false);
     }
   };
 

@@ -1,7 +1,7 @@
 'use client'
 import { ChangeEvent, useEffect, useId, useRef, useState } from "react";
 import Image from 'next/image';
-import { usePostTracks } from "@/lib/usePostTrack";
+import { usePostTracks } from "@/lib/tracks/hooks/usePostTrack";
 import { Track } from "@/domain/Track.schema";
 import { DifficultyEnum } from "@/domain/Difficulty.enum";
 import { HoldColorEnum } from "@/domain/HoldColor.enum";
