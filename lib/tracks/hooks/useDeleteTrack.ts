@@ -1,6 +1,6 @@
 import { Track } from "@/domain/Track.schema";
 import { useState } from "react";
-import { deleteTrackAndImage } from "./actions";
+import { deleteTrackAndImage } from "../actions/deleteTrack";
 
 export const useDeleteTrack = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -11,11 +11,10 @@ export const useDeleteTrack = () => {
     setError(null);
   }
 
-  async function deleteTrack(track: Track): Promise<Boolean> {
+  async function deleteTrack(track: Track): Promise<boolean> {
     setIsLoading(true);
     setError(null);
     try {
-      // Delete track
       await deleteTrackAndImage(track);
       setIsLoading(false);
       return true;

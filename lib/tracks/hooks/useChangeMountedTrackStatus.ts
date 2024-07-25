@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MountOrUnmountTrack } from "./actions";
+import { mountOrUnmountTrack } from "../actions/mountOrUnmountTrack";
 
 export const useChangeMountedTrackStatus = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -8,7 +8,7 @@ export const useChangeMountedTrackStatus = () => {
   const changeMountedTrackStatus = async (trackId: number, removeTrack: boolean) => {
     setIsLoading(true);
     try {
-      await MountOrUnmountTrack(trackId, removeTrack);
+      await mountOrUnmountTrack(trackId, removeTrack);
       setIsLoading(false);
       return true;
     } catch (err) {

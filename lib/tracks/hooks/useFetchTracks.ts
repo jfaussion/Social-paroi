@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { getAllTracksForUser } from './actions';
 import { Track } from '@/domain/Track.schema';
 import { Filters } from '@/domain/Filters';
+import { searchTrackForUser } from '../actions/searchTrack';
 
 export const useFetchTracks = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -11,7 +11,7 @@ export const useFetchTracks = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const trackList = await getAllTracksForUser(userId, filters);
+      const trackList = await searchTrackForUser(userId, filters);
       setIsLoading(false);
       return trackList;
     } catch (err) {

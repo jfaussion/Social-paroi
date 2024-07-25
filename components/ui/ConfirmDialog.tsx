@@ -11,9 +11,10 @@ type ConfirmProps = {
   title: string;
   error?: string;
   isLoading?: boolean;
+  loadingMessage?: string;
 };
 
-const ConfirmationDialog: React.FC<ConfirmProps> = ({ isOpen, text, title, onCancel, onConfirm, error, isLoading }) => {
+const ConfirmationDialog: React.FC<ConfirmProps> = ({ isOpen, text, title, onCancel, onConfirm, error, isLoading, loadingMessage }) => {
 
   return (
     <Popin isOpen={isOpen} onClose={onCancel} title={title}>
@@ -22,7 +23,7 @@ const ConfirmationDialog: React.FC<ConfirmProps> = ({ isOpen, text, title, onCan
         <Button btnStyle='secondary' onClick={onConfirm}>Confirm</Button>
         <Button btnStyle='primary' onClick={onCancel}>Cancel</Button>
       </div>
-      <Loader isLoading={isLoading ?? false} text='Deleting block...' ></Loader>
+      <Loader isLoading={isLoading ?? false} text={loadingMessage ?? 'Deleting...'} ></Loader>
       {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
     </Popin>
   );

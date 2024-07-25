@@ -1,5 +1,5 @@
 import { UserRoleEnum } from "@/domain/UserRole.enum";
-import { AdapterUserCustom } from "@/lib/AdapterUserCustom";
+import { AdapterUserCustom } from "@/lib/users/AdapterUserCustom";
 import { Session } from "next-auth";
 
 const isConnected = (session: Session | null): boolean => {
