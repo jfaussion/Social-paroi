@@ -6,6 +6,13 @@ import { PrismaClient } from '@prisma/client/edge';
 
 const prisma = new PrismaClient()
 
+/**
+ * Create a new news or update an existing one.
+ * 
+ * @param news - The news to be posted.
+ * @returns A promise that resolves to the posted news.
+ * @throws Error - If the user is not an Admin or Opener.
+ */
 export async function postNews(news: News): Promise<News | null> {
   const user = await auth();
   if (isOpener(user) === false) {

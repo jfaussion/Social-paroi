@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { deleteNewsAction } from '../actions/deleteNewsAction';
+import { markNewsAsDeleted } from '../actions/deleteNews';
 
 type DeleteNewsResponse = {
   success: boolean;
@@ -20,7 +20,7 @@ export const useDeleteNews = () => {
     setError(null);
 
     try {
-      await deleteNewsAction(id);
+      await markNewsAsDeleted(id);
       return { success: true };
     } catch (error) {
       // Handle the error

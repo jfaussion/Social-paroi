@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { News } from '@/domain/News.schema';
-import { postNews } from '../actions/postNewsAction';
+import { postNews } from '../actions/postNews';
 
 export const usePostNews = () => {
   const [isLoading, setIsLoading] = useState(false);

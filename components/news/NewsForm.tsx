@@ -5,7 +5,7 @@ import { News } from '@/domain/News.schema';
 import Loader from '../ui/Loader';
 
 
-type ConfirmProps = {
+type NewsFromProps = {
   isOpen: boolean;
   news: News | null;
   onConfirm: (formData: News) => void;
@@ -14,7 +14,7 @@ type ConfirmProps = {
   isLoading: boolean;
 };
 
-const NewsForm: React.FC<ConfirmProps> = ({ isOpen, news, onCancel, onConfirm, error, isLoading }) => {
+export const NewsForm: React.FC<NewsFromProps> = ({ isOpen, news, onCancel, onConfirm, error, isLoading }) => {
 
   const [formData, setFormData] = useState(
       {
@@ -72,5 +72,3 @@ const NewsForm: React.FC<ConfirmProps> = ({ isOpen, news, onCancel, onConfirm, e
     </Popin>
   );
 };
-
-export default NewsForm;

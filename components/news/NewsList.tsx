@@ -8,15 +8,16 @@ import { usePostNews } from "@/lib/news/hooks/usePostNews";
 import ConfirmationDialog from "../ui/ConfirmDialog";
 import { useDeleteNews } from "@/lib/news/hooks/useDeleteNews";
 import NewsCard from "./NewsCard";
-import NewsForm from "./NewsForm";
 import { useFetchNews } from "@/lib/news/hooks/useFetchNews";
 import { NewsPlaceHolder } from "./NewsPlacehorlder";
+import { NewsForm } from "./NewsForm";
 
 
 function NewsList() {
 
   const { fetchNews, isLoading, error } = useFetchNews();
   const [newsList, setNewsList] = useState<News[]>([]);
+  const [hasLoadedDateOnce, setHasLoadedDateOnce] = useState<boolean>(false); // Pour éviter l'effet de clignotement à l'ouverture de la page
   const session = useSession();  
   const [isPopinOpen, setPopinOpen] = useState(false);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -60,12 +61,17 @@ function NewsList() {
   useEffect(() => {
     const fetch = async () => {
       const news = await fetchNews();
+      setHasLoadedDateOnce(true);
       setNewsList(news);
     };
     fetch();
   }, []);
 
-  if (isLoading) {
+  if (error && !isLoading) {
+    return <p className="text-red-500">{error}</p>;
+  }
+
+  if (!hasLoadedDateOnce || isLoading) {
     return <div className="w-full space-y-4">
       <NewsPlaceHolder />
       <NewsPlaceHolder />
@@ -73,11 +79,7 @@ function NewsList() {
       </div>;
   }
 
-  if (error) {
-    return <p className="text-red-500">{error}</p>;
-  }
-
-  if (!newsList || newsList.length === 0) {
+  if (newsList.length === 0) {
     return <p>Nothing new today...</p>;
   }
 

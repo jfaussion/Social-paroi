@@ -4,6 +4,10 @@ import { PrismaClient } from '@prisma/client/edge';
 
 const prisma = new PrismaClient()
 
+/**
+ * Retrieves all active news.
+ * @returns A promise that resolves to an array of active news ordered by date.
+ */
 export async function getAllActiveNews(): Promise<News[]> {
   try {
     const activeNews = await prisma.news.findMany({

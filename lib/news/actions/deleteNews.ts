@@ -5,7 +5,13 @@ import { PrismaClient } from '@prisma/client/edge';
 
 const prisma = new PrismaClient()
 
-export async function deleteNewsAction(newsId: number) {
+/**
+ * Marks a news as deleted.
+ * 
+ * @param newsId - The news id.
+ * @throws Error - If the user is not an Admin.
+ */
+export async function markNewsAsDeleted(newsId: number) {
   const user = await auth();
   if (isOpener(user) === false) {
     throw new Error('You must be an admin to perform this action. User: \n' + user);

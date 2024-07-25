@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Track } from "@/domain/Track.schema";
-import { postNewTrack, postPhoto } from "@/lib/actions";
+import { postNewTrack } from "../actions/postTrack";
+import { postPhoto } from "../actions/postTrackImage";
 
 export const usePostTracks = () => {
   const [isLoading, setIsLoading] = useState(false);
