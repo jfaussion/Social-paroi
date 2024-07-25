@@ -3,7 +3,6 @@ import { News } from "@/domain/News.schema";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/Button";
 import { useSession } from "next-auth/react";
-import { isAdmin } from "@/utils/session.utils";
 import { usePostNews } from "@/lib/news/hooks/usePostNews";
 import ConfirmationDialog from "../ui/ConfirmDialog";
 import { useDeleteNews } from "@/lib/news/hooks/useDeleteNews";
@@ -11,6 +10,7 @@ import NewsCard from "./NewsCard";
 import { useFetchNews } from "@/lib/news/hooks/useFetchNews";
 import { NewsPlaceHolder } from "./NewsPlacehorlder";
 import { NewsForm } from "./NewsForm";
+import { isOpener } from "@/utils/session.utils";
 
 
 function NewsList() {
@@ -88,7 +88,7 @@ function NewsList() {
       {newsList.map((news: News) => (
         <NewsCard key={news.id} news={news} editNews={handleEditNews} deleteNews={handleDeleteNews}/>
       ))}
-      {isAdmin(session.data) && (
+      {isOpener(session.data) && (
         <Button 
           onClick={handleCreateNews} 
           className="w-full sm:w-auto"
