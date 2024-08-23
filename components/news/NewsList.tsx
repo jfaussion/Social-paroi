@@ -19,8 +19,8 @@ function NewsList() {
   const [newsList, setNewsList] = useState<News[]>([]);
   const [hasLoadedDateOnce, setHasLoadedDateOnce] = useState<boolean>(false); // Pour éviter l'effet de clignotement à l'ouverture de la page
   const session = useSession();  
-  const [isPopinOpen, setPopinOpen] = useState(false);
-  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isPopinOpen, setIsPopinOpen] = useState<boolean>(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [selectedNews, setSelectedNews] = useState<News | null>(null);  
 
   const {isLoading: isPostLoading, error: errorPosting, postNewsData} = usePostNews();
@@ -28,24 +28,24 @@ function NewsList() {
 
   const handleCreateNews = () => {
     setSelectedNews(null);
-    setPopinOpen(true);
+    setIsPopinOpen(true);
   }
 
   const handleEditNews = (news : News) => {
     setSelectedNews(news);
-    setPopinOpen(true);
+    setIsPopinOpen(true);
   }
 
   const handleDeleteNews = (news : News) => {
     resetDeleteConrfimation();
     setSelectedNews(news);
-    setDeleteDialogOpen(true);
+    setIsDeleteDialogOpen(true);
   }
 
   const deleteNewsAndRefresh = async () => {
     const {success} = await deleteNews(selectedNews?.id ?? 0);
     if (success) {
-      setDeleteDialogOpen(false);
+      setIsDeleteDialogOpen(false);
       setNewsList(newsList.filter(news => news.id !== selectedNews?.id));
     }
   }
@@ -53,7 +53,7 @@ function NewsList() {
   const postNews = async (news: News) =>  {
     const uploadedNews = await postNewsData(news);
     if (uploadedNews) {
-      setPopinOpen(false);
+      setIsPopinOpen(false);
       setNewsList([...newsList, uploadedNews]);
     }
   }
@@ -98,14 +98,14 @@ function NewsList() {
       )}
       <NewsForm 
         isOpen={isPopinOpen} 
-        onCancel={() => setPopinOpen(false)}
+        onCancel={() => setIsPopinOpen(false)}
         onConfirm={postNews} 
         news={selectedNews}
         isLoading={isPostLoading}
         error={errorPosting ?? undefined}/>
       <ConfirmationDialog isOpen={isDeleteDialogOpen} title='Delete news' 
         text='Are you sure you want to delete this news ?'
-        onCancel={() => setDeleteDialogOpen(false)} onConfirm={deleteNewsAndRefresh}
+        onCancel={() => setIsDeleteDialogOpen(false)} onConfirm={deleteNewsAndRefresh}
         error={errorDelete ?? undefined} isLoading={isLoadingDelete}/>
     </div>
   );

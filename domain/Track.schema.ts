@@ -14,6 +14,7 @@ export const TrackSchema = z.object({
   points: z.number(),
   trackProgress: UserTrackProgressSchema.optional(),
   removed: z.boolean().default(false),
+  countDone: z.number().optional(),
 });
 
 export type Track = z.infer<typeof TrackSchema>;

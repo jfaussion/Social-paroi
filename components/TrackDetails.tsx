@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import ConfirmationDialog from './ui/ConfirmDialog';
 import { useDeleteTrack } from '@/lib/tracks/hooks/useDeleteTrack';
 import { Zone } from './Zone';
+import { FaUserCheck } from 'react-icons/fa6';
 
 
 const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
@@ -136,7 +137,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
 
           {/* Zone and Date row */}
           <div className="flex justify-between items-center mb-3">
-          <div>
+            <div>
               <span className="text-sm font-medium mr-2">Difficulty</span>
               <span className={`inline-block w-14 h-3 rounded ${levelClass}`}></span>
             </div>
@@ -145,7 +146,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
 
           {/* Difficulty and Points row */}
           <div className="flex justify-between items-center mb-3">
-          <div>
+            <div>
               <span className="text-sm font-medium mr-2">Hold color</span>
               <span className={`inline-block w-14 h-3 ${holdClass} rounded`}></span>
             </div>
@@ -153,26 +154,31 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
           </div>
 
           <div className="flex justify-between items-center mb-3">
-            {track.removed && (
-              <div className="flex self-start space-x-2">
+            <div className="flex self-start space-x-2">
+              {track.removed && (
                 <RemovedLabel color={'red'}></RemovedLabel>
-              </div>
-            )}
+              )}
+            </div>
+
+            <div className="flex flex-end items-center text-sm space-x-2 font-semibold mr-2">
+              <span>{track.countDone ?? 0}</span>
+              <FaUserCheck title="Nb of users that completed this track"/>
+            </div>
           </div>
-          
+
           <div className="flex justify-center sm:justify-between items-center pt-3 mb-3">
-            <Zone zone={track.zone} width={200} height={100}/>
+            <Zone zone={track.zone} width={200} height={100} />
           </div>
 
         </div>
 
         {isOpener(session.data) && (
           <div className='p-4 w-full border-t-2 border-gray-600 sm:border sm:border-gray-600 sm:rounded-lg dark:bg-gray-900 sm:m-4 sm:mt-0 space-y-2'>
-            
+
             <h2 className="text-lg font-bold mb-3">Editor zone</h2>
-            
+
             <div className='flex flex-wrap justify-between gap-2'>
-              <Button btnStyle={track.removed ? 'primary' : 'secondary'} className='grow' 
+              <Button btnStyle={track.removed ? 'primary' : 'secondary'} className='grow'
                 disabled={isLoadingRemove} onClick={() => changeMountedStatus(!track.removed)} >
                 Mark as {track.removed ? 'mounted' : 'removed'}
               </Button>

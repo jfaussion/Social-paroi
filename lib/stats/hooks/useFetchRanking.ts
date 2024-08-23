@@ -11,7 +11,6 @@ export const useFetchRanking = () => {
     try {
       const ranking = await getUserRankings();
       setIsLoading(false);
-      console.log(ranking);
       return ranking;
     } catch (err) {
       setError('An error occurred while fetching the ranking');
