@@ -1,6 +1,7 @@
 'use server';
 import { PrismaClient } from '@prisma/client/edge';
 import { mergeTrackWithProgress } from './mergeTrackWithProgress';
+import { TrackStatus } from '@/domain/TrackStatus.enum';
 
 const prisma = new PrismaClient();
 
@@ -27,9 +28,16 @@ export async function getTrackDetails(
         },
       },
     });
+    
+    const countDone = await prisma.userTrackProgress.count({
+      where: {
+        trackId: trackId,
+        status: TrackStatus.DONE,
+      },
+    });
 
     if (track) {
-      return mergeTrackWithProgress(track);
+      return mergeTrackWithProgress(track, countDone);
     }
     return null;
   } catch (err) {
