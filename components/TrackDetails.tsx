@@ -162,7 +162,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
 
             <div className="flex flex-end items-center text-sm space-x-2 font-medium mr-2">
               <span>{track.countDone ?? 0}</span>
-              <FaUserCheck />
+              <FaUserCheck title="Nb of users that completed this track"/>
             </div>
           </div>
 
