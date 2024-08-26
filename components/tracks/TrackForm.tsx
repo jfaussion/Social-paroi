@@ -7,13 +7,13 @@ import { DifficultyEnum } from "@/domain/Difficulty.enum";
 import { HoldColorEnum } from "@/domain/HoldColor.enum";
 import { difficultyCustomSelectClass, getPointsForDifficulty } from "@/utils/difficulty.utils";
 import Select from 'react-select';
-import customSelectClassName from "./ui/customSelectClassName";
-import { Button } from "./ui/Button";
-import Loader from "./ui/Loader";
 import { useRouter } from "next/navigation";
 import { holdColorCustomSelectClass } from "@/utils/hold.utils";
 import { CldImage } from "next-cloudinary";
-import { Zone } from "./Zone";
+import { Button } from "../ui/Button";
+import customSelectClassName from "../ui/customSelectClassName";
+import Loader from "../ui/Loader";
+import { Zone } from "../Zone";
 
 
 type TrackFromProps = {

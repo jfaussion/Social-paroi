@@ -2,16 +2,16 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { CldImage } from 'next-cloudinary';
-import { Track } from '../domain/Track.schema';
-import { useUpdateTrackProgress } from '../lib/tracks/hooks/useUpdateTrackProgress';
+import { Track } from '../../domain/Track.schema';
+import { useUpdateTrackProgress } from '../../lib/tracks/hooks/useUpdateTrackProgress';
 import { useSession } from 'next-auth/react';
 import placeholderImage from '@/public/bouldering-placeholder.jpeg';
 import { useRouter } from 'next/navigation';
-import ToggleButton from './ui/ToggleButton';
-import RemovedLabel from './ui/RemovedLabel';
+import ToggleButton from '../ui/ToggleButton';
+import RemovedLabel from '../ui/RemovedLabel';
 import { getBorderColorForDifficulty } from '@/utils/difficulty.utils';
 import { TrackStatus } from '@/domain/TrackStatus.enum';
-import { Zone } from './Zone';
+import { Zone } from '../Zone';
 
 
 const TrackCard: React.FC<Track> = ({ ...propTrack }) => {

@@ -1,11 +1,11 @@
 'use client'
 import TrackCard from "./TrackCard";
-import { Track } from "../domain/Track.schema";
+import { Track } from "../../domain/Track.schema";
 import { useEffect, useState } from "react";
 import { useFetchTracks } from "@/lib/tracks/hooks/useFetchTracks";
-import { CardPlaceHolder } from "./ui/CardPlacehorlder";
+import { CardPlaceHolder } from "../ui/CardPlacehorlder";
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
-import TrackFilters from "./filters/TrackFilters";
+import TrackFilters from "../filters/TrackFilters";
 import { Filters } from "@/domain/Filters";
 
 type TracksProps = {
