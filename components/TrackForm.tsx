@@ -5,7 +5,7 @@ import { usePostTracks } from "@/lib/tracks/hooks/usePostTrack";
 import { Track } from "@/domain/Track.schema";
 import { DifficultyEnum } from "@/domain/Difficulty.enum";
 import { HoldColorEnum } from "@/domain/HoldColor.enum";
-import { difficultyCustomSelectClass } from "@/utils/difficulty.utils";
+import { difficultyCustomSelectClass, getPointsForDifficulty } from "@/utils/difficulty.utils";
 import Select from 'react-select';
 import customSelectClassName from "./ui/customSelectClassName";
 import { Button } from "./ui/Button";
@@ -51,6 +51,11 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack }) => {
   const handleInputChange = (name: string, value: any) => {
     setTrack(prev => ({ ...prev, [name]: value }));
   };
+
+  const handleDifficultyChange = (value: any) => {
+    const difficultyPoints = getPointsForDifficulty(value);
+    setTrack(prev => ({ ...prev, difficulty: value, points: difficultyPoints }));
+  }
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -148,7 +153,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack }) => {
         name="difficulty"
         isSearchable={false}
         value={difficultyOptions.find(option => option.value === track.difficulty)}
-        onChange={option => handleInputChange('difficulty', option?.value)}
+        onChange={option => handleDifficultyChange(option?.value)}
         options={difficultyOptions}
         classNames={difficultyCustomSelectClass}
         unstyled={true}
