@@ -5,10 +5,10 @@ export const useChangeMountedTrackStatus = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const changeMountedTrackStatus = async (trackId: number, removeTrack: boolean) => {
+  const changeMountedTrackStatus = async (trackIds: number[], removeTrack: boolean) => {
     setIsLoading(true);
     try {
-      await mountOrUnmountTrack(trackId, removeTrack);
+      await mountOrUnmountTrack(trackIds, removeTrack);
       setIsLoading(false);
       return true;
     } catch (err) {

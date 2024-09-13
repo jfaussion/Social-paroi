@@ -70,7 +70,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
       ...track,
       removed: removeTrack
     });
-    const wasSuccessful = await changeMountedTrackStatus(track.id, removeTrack);
+    const wasSuccessful = await changeMountedTrackStatus([track.id], removeTrack);
 
     if (!wasSuccessful) {
       // Handle failure (e.g., revert the status change in the UI, show an error message)

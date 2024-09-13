@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { CldImage } from 'next-cloudinary';
 import { Track } from '../../domain/Track.schema';
@@ -21,13 +21,26 @@ const TrackCard: React.FC<Track> = ({ ...propTrack }) => {
   const levelBorderColor = getBorderColorForDifficulty(track.level);
   const session = useSession();
   const router = useRouter();
+  const prevPropTrackRef = useRef<Track | null>(propTrack);
 
+  useEffect(() => {
+    if (hasTrackChanged(propTrack, prevPropTrackRef.current)) {
+      setTrack(propTrack);
+      prevPropTrackRef.current = propTrack;
+    }
+  }, [propTrack]);
+
+  const hasTrackChanged = (newTrack: Track, prevTrack: Track | null) => {
+    return Object.keys(newTrack).some(key => newTrack[key as keyof Track] !== prevTrack?.[key as keyof Track]);
+  };
+  
   const handleStatusChange = async () => {
     const previousStatus = track.trackProgress?.status ?? TrackStatus.TO_DO;
     const newStatus = track.trackProgress?.status === TrackStatus.DONE ? TrackStatus.TO_DO : TrackStatus.DONE;
 
     setTrack({
-      ...track, trackProgress: {
+      ...track, 
+      trackProgress: {
         ...track.trackProgress,
         status: newStatus,
         liked: track.trackProgress?.liked ?? false,
@@ -45,7 +58,8 @@ const TrackCard: React.FC<Track> = ({ ...propTrack }) => {
       // Handle failure (e.g., revert the status change in the UI, show an error message)
       console.error(error);
       setTrack({
-        ...track, trackProgress: {
+        ...track, 
+        trackProgress: {
           ...track.trackProgress,
           status: previousStatus,
           liked: track.trackProgress?.liked ?? false

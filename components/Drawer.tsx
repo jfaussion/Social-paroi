@@ -68,7 +68,7 @@ const Drawer = () => {
               <>
                 <hr className="border-t border-gray-400 dark:border-gray-600" />
                 <li>
-                  <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href="/opener">Create new block</Link>
+                  <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href="/opener/create">Create new block</Link>
                 </li>
               </>
             )}
