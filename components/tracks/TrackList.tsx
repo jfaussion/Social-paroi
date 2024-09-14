@@ -1,18 +1,23 @@
 'use client'
 import TrackCard from "./TrackCard";
-import { Track } from "../domain/Track.schema";
+import { Track } from "../../domain/Track.schema";
 import { useEffect, useState } from "react";
 import { useFetchTracks } from "@/lib/tracks/hooks/useFetchTracks";
-import { CardPlaceHolder } from "./ui/CardPlacehorlder";
+import { CardPlaceHolder } from "../ui/CardPlacehorlder";
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
-import TrackFilters from "./filters/TrackFilters";
+import TrackFilters from "../filters/TrackFilters";
 import { Filters } from "@/domain/Filters";
+import { isOpener } from "@/utils/session.utils";
+import { Button } from "../ui/Button";
+import { useSession } from "next-auth/react";
+import TrackBulkRemove from "./TrackBulkRemove";
 
 type TracksProps = {
   userId: string;
 };
 
 const TrackList: React.FC<TracksProps> = ({ userId }) => {
+  const session = useSession();
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -89,9 +94,21 @@ const TrackList: React.FC<TracksProps> = ({ userId }) => {
     updateFiltersInURL(selectedZones, selectedDifficulties, selectedShowRemoved, holdColor);
   };
 
+  const handleRemoveAllSuccess = () => {
+    const removedTrackList = trackList.map(track => ({ ...track, removed: true }));
+    setTrackList(removedTrackList);
+  }
 
   return (
-    <div className="space-y-4 w-full max-w-3xl">
+    <div className="space-y-2 w-full max-w-3xl mt-4">
+      {
+        isOpener(session.data) && (
+          <div className="w-full flex justify-between">
+            <Button onClick={() => router.push('/opener/create')}>Create new Block</Button>
+            <TrackBulkRemove trackList={trackList} onRemoveAllSuccess={() => handleRemoveAllSuccess()}/>
+          </div>
+        )
+      }
       <TrackFilters
         selectedZones={selectedZones}
         selectedDifficulties={selectedDifficulties}
@@ -102,6 +119,7 @@ const TrackList: React.FC<TracksProps> = ({ userId }) => {
         onShowRemovedChange={handleShowRemovedChange}
         onHoldColorChange={handleHoldColorChange}
       />
+      <hr className="my-4 border-t border-gray-300 dark:border-gray-700" />
       {isLoading ? (
         <>
           <CardPlaceHolder />

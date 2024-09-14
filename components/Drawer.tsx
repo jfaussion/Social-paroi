@@ -18,7 +18,7 @@ const Drawer = () => {
   const session = useSession();
   const router = useRouter();
 
-  const showBackButtonInsteadOfMenu = () => pathname.startsWith('/dashboard/track/');
+  const showBackButtonInsteadOfMenu = () => pathname.startsWith('/dashboard/track/') || pathname.startsWith('/opener/create');
 
   return (
     <div>
@@ -64,14 +64,6 @@ const Drawer = () => {
             <li>
               <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href="/ranking">Ranking</Link>
             </li>
-            {isOpener(session.data) && (
-              <>
-                <hr className="border-t border-gray-400 dark:border-gray-600" />
-                <li>
-                  <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href="/opener">Create new block</Link>
-                </li>
-              </>
-            )}
           </ul>
 
           {/* Footer links */}
