@@ -99,13 +99,19 @@ const TrackList: React.FC<TracksProps> = ({ userId }) => {
     setTrackList(removedTrackList);
   }
 
+  const isRemoveDisabled = () => {
+    return trackList.length === 0 
+      || !!selectedShowRemoved 
+      || (selectedZones.length === 0 && selectedDifficulties.length === 0 && !selectedHoldColor);
+  };
+
   return (
     <div className="space-y-2 w-full max-w-3xl mt-4">
       {
         isOpener(session.data) && (
           <div className="w-full flex justify-between">
             <Button onClick={() => router.push('/opener/create')}>Create new Block</Button>
-            <TrackBulkRemove trackList={trackList} onRemoveAllSuccess={() => handleRemoveAllSuccess()}/>
+            <TrackBulkRemove trackList={trackList} isRemoveDisabled={isRemoveDisabled()} onRemoveAllSuccess={() => handleRemoveAllSuccess()}/>
           </div>
         )
       }
