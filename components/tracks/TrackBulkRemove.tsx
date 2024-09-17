@@ -8,10 +8,11 @@ import { useChangeMountedTrackStatus } from '@/lib/tracks/hooks/useChangeMounted
 
 type TrackBulkRemoveProps = {
   trackList: Track[];
+  isRemoveDisabled: boolean;
   onRemoveAllSuccess: () => void;
 };
 
-const TrackBulkRemove: React.FC<TrackBulkRemoveProps> = ({ trackList, onRemoveAllSuccess }) => {
+const TrackBulkRemove: React.FC<TrackBulkRemoveProps> = ({ trackList, isRemoveDisabled, onRemoveAllSuccess }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { changeMountedTrackStatus, isLoading, error } = useChangeMountedTrackStatus();
 
@@ -26,7 +27,7 @@ const TrackBulkRemove: React.FC<TrackBulkRemoveProps> = ({ trackList, onRemoveAl
 
   return (
     <>
-      <Button btnStyle="secondary" onClick={() => setIsDialogOpen(true)}>
+      <Button btnStyle="secondary" onClick={() => setIsDialogOpen(true)} disabled={isRemoveDisabled}>
         Remove All Blocks
       </Button>
       <ConfirmationDialog
