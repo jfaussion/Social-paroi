@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import TrackForm from "@/components/TrackForm";
+import TrackForm from "@/components/tracks/TrackForm";
 import { getTrackDetails } from "@/lib/tracks/actions/getTrackDetails";
 import { SessionProvider } from "next-auth/react";
 import { redirect } from "next/navigation";

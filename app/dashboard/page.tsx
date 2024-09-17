@@ -3,7 +3,7 @@ import Image from "next/image";
 import { auth } from "@/auth";
 import { SessionProvider } from "next-auth/react";
 import RoomMapImage from "@/public/room-map.png";
-import TrackList from "@/components/TrackList";
+import TrackList from "@/components/tracks/TrackList";
 
 export const dynamic = 'force-dynamic'
 

@@ -6,30 +6,31 @@ import { isOpener } from '@/utils/session.utils';
 const prisma = new PrismaClient();
 
 /**
- * Mounts or unmounts a track.
+ * Mounts or unmounts tracks.
  * 
- * @param trackId - The track id.
- * @param removeTrack - True if the track should be unmounted, false if it should be mounted.
+ * @param trackIds - The list of track ids.
+ * @param removeTrack - True if the tracks should be unmounted, false if they should be mounted.
  * @throws Error - If the user is not an Admin or Opener.
  */
 export async function mountOrUnmountTrack(
-  trackId: number,
+  trackIds: number[],
   removeTrack: boolean
 ) {
   const session = await auth();
   if (isOpener(session) === false) {
     throw new Error('You must be Admin or Opener in to perform this action. User id: ' + session?.user?.id);
   }
+  console.log(`mountOrUnmountTrack - Remove Track: ${removeTrack}, Track IDs: ${trackIds}`);
   try {
-    await prisma.track.update({
-      where: { id: trackId },
+    await prisma.track.updateMany({
+      where: { id: { in: trackIds } },
       data: {
         removed: removeTrack,
       },
     });
     return true;
   } catch (err) {
-    console.error('Error updating the track', err);
+    console.error('Error updating the tracks', err);
     return false;
   }
 }
