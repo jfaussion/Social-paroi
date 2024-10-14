@@ -4,6 +4,7 @@ import { Filters } from "@/domain/Filters";
 import { RemovedEnum } from "@/domain/Removed.enum";
 import { mergeTrackWithProgress } from "./mergeTrackWithProgress";
 import { Track } from '@/domain/Track.schema';
+import { TrackStatus } from '@/domain/TrackStatus.enum';
 
 const prisma = new PrismaClient();
 
@@ -62,8 +63,17 @@ export async function searchTrackForUser(userId: string, filters: Filters): Prom
         select: {
           status: true,
           dateCompleted: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
         },
-        where: { userId: userId },
+        where: { 
+          status: TrackStatus.DONE,
+        },
       },
     },
     orderBy: {
@@ -71,7 +81,7 @@ export async function searchTrackForUser(userId: string, filters: Filters): Prom
     },
   });
   if (tracks) {
-    return tracks.map(mergeTrackWithProgress);
+    return tracks.map(track => mergeTrackWithProgress(track, userId));
   }
   return [] as Track[];
 }
