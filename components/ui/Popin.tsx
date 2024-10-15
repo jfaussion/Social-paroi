@@ -34,7 +34,7 @@ const Popin: React.FC<PopinProps> = ({ isOpen, onClose, title, children }) => {
             <span aria-hidden>×</span>
           </button>
         </div>
-        <div className='p-8 pt-0'>
+        <div className='p-6 sm:p-8 pt-0'>
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold">{title}</h2>
           </div>

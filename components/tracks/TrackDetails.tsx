@@ -20,6 +20,7 @@ import ConfirmationDialog from '../ui/ConfirmDialog';
 import { useDeleteTrack } from '@/lib/tracks/hooks/useDeleteTrack';
 import { Zone } from '../Zone';
 import { FaUserCheck } from 'react-icons/fa6';
+import TrackCompletionList from './TrackCompletionList';
 
 
 const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
@@ -32,6 +33,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
   const levelClass = getBgColorForDifficulty(track.level);
   const holdClass = getBgColor(track.holdColor);
   const router = useRouter();
+  const [isCompletionListOpen, setCompletionListOpen] = useState<boolean>(false);
 
 
   const handleStatusChange = async () => {
@@ -160,8 +162,9 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
               )}
             </div>
 
-            <div className="flex flex-end items-center text-sm space-x-2 font-semibold mr-2">
-              <span>{track.countDone ?? 0}</span>
+            <div className="flex flex-end items-center text-sm space-x-2 font-semibold mr-2 cursor-pointer" 
+                onClick={() => setCompletionListOpen(true)}>
+              <span>{track.usersWhoCompleted?.length ?? 0}</span>
               <FaUserCheck title="Nb of users that completed this track"/>
             </div>
           </div>
@@ -199,6 +202,9 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
       <ConfirmationDialog isOpen={isDeleteDialogOpen} title='Delete block' text='Are you sure you want to delete this block ?'
         onCancel={handleCancelDelete} onConfirm={handleDeleteTrack}
         error={errorDelete ?? undefined} isLoading={isLoadingDelete} loadingMessage='Deleting block...'></ConfirmationDialog>
+
+      <TrackCompletionList isOpen={isCompletionListOpen} userRanking={track.usersWhoCompleted ?? []} 
+        onClose={() => {setCompletionListOpen(false)}} currentUserId={session.data?.user?.id} />
     </main>
   )
 

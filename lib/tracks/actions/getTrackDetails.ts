@@ -23,21 +23,23 @@ export async function getTrackDetails(
           select: {
             status: true,
             dateCompleted: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
           },
-          where: { userId: userId },
+          where: { 
+            status: TrackStatus.DONE,
+          },
         },
-      },
-    });
-    
-    const countDone = await prisma.userTrackProgress.count({
-      where: {
-        trackId: trackId,
-        status: TrackStatus.DONE,
       },
     });
 
     if (track) {
-      return mergeTrackWithProgress(track, countDone);
+      return mergeTrackWithProgress(track, userId);
     }
     return null;
   } catch (err) {
