@@ -12,7 +12,7 @@ type TrackCompletionListProps = {
 
 export const TrackCompletionList: React.FC<TrackCompletionListProps> = ({ isOpen, userRanking, onClose, currentUserId }) => {
   return (
-    <Popin isOpen={isOpen} onClose={onClose} title="They did it !">
+    <Popin isOpen={isOpen} onClose={onClose} title="They did it !" bodyClassName="px-2 mt-4 pb-6 sm:pb-8">
       <div className="overflow-auto max-h-96 scrollbar-custom">
         {userRanking.length > 0 ? (
           userRanking.map((user, index) => (
