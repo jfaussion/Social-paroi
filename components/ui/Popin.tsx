@@ -6,9 +6,10 @@ type PopinProps = {
   onClose: () => void;
   title: string;
   children: React.ReactNode;
+  bodyClassName?: string;
 };
 
-const Popin: React.FC<PopinProps> = ({ isOpen, onClose, title, children }) => {
+const Popin: React.FC<PopinProps> = ({ isOpen, onClose, title, children, bodyClassName }) => {
 
   // Close if click outside
   const popinRef = useRef(null);
@@ -34,11 +35,11 @@ const Popin: React.FC<PopinProps> = ({ isOpen, onClose, title, children }) => {
             <span aria-hidden>×</span>
           </button>
         </div>
-        <div className='p-8 pt-0'>
-          <div className="flex justify-between items-center">
+        <div>
+          <div className="flex justify-between items-center px-6 sm:px-8">
             <h2 className="text-xl font-bold">{title}</h2>
           </div>
-          <div className="mt-4">
+          <div className={`${bodyClassName ?? 'mt-4 pb-6 sm:pb-8 px-6 sm:px-8'}`}>
             {children}
           </div>
         </div>

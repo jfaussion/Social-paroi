@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { DifficultyEnum } from './Difficulty.enum';
 import { HoldColorEnum } from './HoldColor.enum';
 import { UserTrackProgressSchema } from './UserTrackProgress.schema';
+import { UserSchema } from './User.schema';
 
 export const TrackSchema = z.object({
   id: z.number(),
@@ -14,7 +15,7 @@ export const TrackSchema = z.object({
   points: z.number(),
   trackProgress: UserTrackProgressSchema.optional(),
   removed: z.boolean().default(false),
-  countDone: z.number().optional(),
+  usersWhoCompleted: z.array(UserSchema).optional(),
 });
 
 export type Track = z.infer<typeof TrackSchema>;
