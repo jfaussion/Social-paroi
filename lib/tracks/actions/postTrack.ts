@@ -45,6 +45,7 @@ export async function postNewTrack(
         date: new Date(),
         imageUrl: track.get('imageUrl') as string,
         removed: false,
+        locationId: 1, // TODO: Remove this once we have a real location
       },
     });
     return newTrack;
