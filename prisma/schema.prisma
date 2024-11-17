@@ -89,6 +89,9 @@ model Track {
   removed       Boolean?            @default(false)
   trackProgress UserTrackProgress[]
 
+  locationId    Int?                
+  location      Location?           @relation("LocationTracks", fields: [locationId], references: [id], onDelete: Cascade)
+
   @@index([id], name: "idx_tracks_id")
   @@index([name], name: "idx_tracks_name")
 }
@@ -123,4 +126,20 @@ model News {
   @@index([id], name: "idx_news_id")
   @@index([userId], name: "idx_news_user_id")
   @@map("news")
+}
+
+model Location {
+  id          Int      @id @default(autoincrement())
+  name        String
+  type        String   // Should be validated as 'gym' or 'outdoor'
+  address     String?
+  website     String?
+  mapImageUrl String?  @map(name: "map_image_url")
+
+  createdAt   DateTime @default(now()) @map(name: "created_at")
+  updatedAt   DateTime @updatedAt @map(name: "updated_at") 
+
+  tracks      Track[]  @relation("LocationTracks")
+
+  @@map("locations")
 }

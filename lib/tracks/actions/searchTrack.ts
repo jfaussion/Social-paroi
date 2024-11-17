@@ -53,6 +53,10 @@ export async function searchTrackForUser(userId: string, filters: Filters): Prom
     // No filter needed
   }
 
+  andConditions.push({
+    locationId: 1, // TODO: Remove this once we have a real location
+  });
+
   let whereCondition = andConditions.length > 0 ? { AND: andConditions } : {};
 
   const tracks = await prisma.track.findMany({

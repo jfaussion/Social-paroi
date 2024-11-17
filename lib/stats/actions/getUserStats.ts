@@ -16,6 +16,9 @@ export async function getUserStats(userId: string) {
     where: {
       userId,
       status: 'DONE',
+      track: {
+        locationId: 1, // TODO: Remove this once we have a real location
+      }
     },
     select: {
       track: {
@@ -32,6 +35,7 @@ export async function getUserStats(userId: string) {
     by: ['level'],
     where: {
       removed: false,
+      locationId: 1, // TODO: Remove this once we have a real location
     },
     _count: {
       _all: true,

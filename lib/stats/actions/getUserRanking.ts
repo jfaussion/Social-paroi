@@ -21,6 +21,7 @@ export async function getUserRankings() {
             },
             where: {
               removed: false, // Filter out removed tracks
+              locationId: 1, // TODO: Remove this once we have a real location
             }
           },
         }
