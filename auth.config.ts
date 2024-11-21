@@ -14,6 +14,7 @@ export const authConfig = {
                                nextUrl.pathname.startsWith('/opener') || 
                                nextUrl.pathname.startsWith('/stats') || 
                                nextUrl.pathname.startsWith('/ranking') || 
+                               nextUrl.pathname.startsWith('/contests') || 
                                nextUrl.pathname.startsWith('/admin');
       const isOpenRoute = nextUrl.pathname.startsWith('/privacy')
       if (isProtectedRoute) {

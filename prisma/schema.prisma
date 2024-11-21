@@ -143,3 +143,12 @@ model Location {
 
   @@map("locations")
 }
+
+model Contest {
+  id            Int      @id @default(autoincrement())
+  name          String
+  date          DateTime
+  coverImage    String?
+
+  @@index([date], name: "idx_contests_date")
+}

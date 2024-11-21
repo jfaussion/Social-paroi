@@ -1,12 +1,10 @@
-
-import { auth } from "@/auth";
-import { SessionProvider } from "next-auth/react";
+import React from 'react';
+import { auth } from '@/auth';
+import { SessionProvider } from 'next-auth/react';
 import { isConnected } from "@/utils/session.utils";
-import NewsList from "@/components/news/NewsList";
+import ContestList from '@/components/contests/ContestList';
 
-export const dynamic = 'force-dynamic'
-
-export default async function News() {
+export default async function Contests() {
 
   const session = await auth();
 
@@ -18,9 +16,9 @@ export default async function News() {
           <div className="w-full max-w-2xl items-center ">
             <div className="flex flex-col items-center">
               <span className="text-xl font-semibold w-full p-4 pt-0">
-                News
+                Contests
               </span>
-              <NewsList/>
+              <ContestList/>
             </div>
           </div>
         )}
