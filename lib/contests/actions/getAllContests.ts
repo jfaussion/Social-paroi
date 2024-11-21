@@ -15,7 +15,7 @@ export async function getAllContests(): Promise<Contest[]> {
         date: 'asc',
       },
     });
-    return activeContests;
+    return activeContests as Contest[];
   } catch (err) {
     console.error('Error fetching active contests', err);
     return [];

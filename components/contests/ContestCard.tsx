@@ -46,7 +46,7 @@ const ContestCard: React.FC<ContestCardProps> = ({ contest, editContest, deleteC
   }, []);
 
   return (
-    <div key={contest.id} className="w-full bg-gradient-to-r from-slate-300 to-slate-200 dark:from-gray-700 dark:to-gray-900 border border-gray-600 rounded-lg shadow-lg p-4 relative">
+    <div key={contest.id} className="w-full bg-gradient-to-r from-slate-300 to-slate-200 dark:from-gray-700 dark:to-gray-900 border border-gray-600 rounded-lg shadow-lg relative">
       {contest.coverImage && (
         <CldImage
           width="400"
@@ -55,11 +55,13 @@ const ContestCard: React.FC<ContestCardProps> = ({ contest, editContest, deleteC
           crop="thumb"
           gravity="center"
           alt={contest.name}
-          className="w-full h-48 object-cover rounded-md mb-4"
+          className="w-full h-48 object-cover rounded-md"
         />
       )}
-      <h2 className="text-xl font-bold">{contest.name}</h2>
-      <p className="text-sm text-gray-500">{new Date(contest.date).toLocaleDateString()}</p>
+      <div className='p-4'>
+        <h2 className="text-xl font-bold">{contest.name}</h2>
+        <p className="text-sm text-gray-500">{new Date(contest.date).toLocaleDateString()}</p>
+      </div>
 
       {isOpener(session.data) && (
         <div className="absolute top-4 right-4">

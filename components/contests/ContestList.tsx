@@ -52,8 +52,21 @@ function ContestList() {
     const uploadedContest = await postContestData(contest, coverPhoto);
     if (uploadedContest) {
       setIsPopinOpen(false);
-      setContestList([...contestList, uploadedContest]);
+      updateContestList(uploadedContest);
     }
+  }
+
+  const updateContestList = (uploadedContest: Contest) => {
+      const existingContestIndex = contestList.findIndex(contest => contest.id === uploadedContest.id);
+      if (existingContestIndex > -1) {
+        // Replace the existing contest
+        const updatedList = [...contestList];
+        updatedList[existingContestIndex] = uploadedContest;
+        setContestList(updatedList);
+      } else {
+        // Add the new contest
+        setContestList([...contestList, uploadedContest]);
+      }
   }
 
   useEffect(() => {

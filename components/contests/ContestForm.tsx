@@ -3,9 +3,8 @@ import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { Button } from "../ui/Button";
 import Loader from "../ui/Loader";
 import { Contest } from "@/domain/Contest.schema";
-import { usePostContest } from "@/lib/contests/hooks/usePostContest";
-import { useRouter } from "next/navigation";
 import { CldImage } from "next-cloudinary";
+import Popin from "../ui/Popin";
 
 type ContestFormProps = {
   isOpen: boolean;
@@ -26,8 +25,6 @@ const ContestForm: React.FC<ContestFormProps> = ({ isOpen, contest, onCancel, on
 
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null); // State for the cover image file
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
-  const { postContest, isLoading: isPosting, error: postError } = usePostContest();
 
   useEffect(() => {
     if (contest) {
@@ -48,80 +45,67 @@ const ContestForm: React.FC<ContestFormProps> = ({ isOpen, contest, onCancel, on
     console.log(name, value);
     setFormData((prevData) => ({
       ...prevData,
-      [name]: name === 'date' ? new Date(value) : value, 
+      [name]: name === 'date' ? new Date(value) : value,
     } as Contest));
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      setCoverImageFile(files[0]); // Set the cover image file
+      setCoverImageFile(files[0]);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const uploadedContest = await postContest(formData, coverImageFile); // Pass the cover image file
-    if (uploadedContest) {
-      onConfirm(uploadedContest, coverImageFile); // Pass the uploaded contest and cover image file
-      router.push(`/dashboard/contest/${uploadedContest.id}`);
-    }
+    onConfirm(formData, coverImageFile);
   };
 
   return (
-    <div className={`fixed inset-0 z-50 ${isOpen ? 'block' : 'hidden'}`}>
-      <div className="flex items-center justify-center min-h-screen bg-black bg-opacity-50">
-        <div className="bg-white rounded-lg p-6 shadow-lg">
-          <h2 className="text-lg font-semibold mb-4">{contest ? 'Edit Contest' : 'Create Contest'}</h2>
-          <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Contest Name"
-              className="p-2 border border-gray-500 rounded"
-              required
+    <Popin isOpen={isOpen} onClose={onCancel} title={contest ? 'Edit Contest' : 'Create Contest'}>
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
+        <input
+          type="text"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          placeholder="Contest Name"
+          className="p-2 text-black dark:text-white bg-gray-200 dark:bg-gray-800 rounded-md border border-gray-800 dark:border-gray-600"
+          required
+        />
+        <input
+          type="date"
+          name="date"
+          value={formData.date.toISOString().split('T')[0]} // Convert Date to string in YYYY-MM-DD format
+          onChange={handleChange}
+          className="p-2 text-black dark:text-white bg-gray-200 dark:bg-gray-800 rounded-md border border-gray-800 dark:border-gray-600"
+          required
+        />
+        <input
+          ref={fileInputRef}
+          type="file"
+          name="coverImage"
+          onChange={handleFileChange}
+          className="p-2 text-black dark:text-white bg-gray-200 dark:bg-gray-800 rounded-md border border-gray-800 dark:border-gray-600"
+        />
+        {coverImageFile && ( // Use coverImageFile for preview
+          <div className="relative w-32 h-32">
+            <CldImage
+              width={400}
+              height={400}
+              src={URL.createObjectURL(coverImageFile)}
+              alt="Contest Cover Preview"
+              className="mx-auto"
             />
-            <input
-              type="date"
-              name="date"
-              value={formData.date.toISOString().split('T')[0]} // Convert Date to string in YYYY-MM-DD format
-              onChange={handleChange}
-              className="p-2 border border-gray-500 rounded"
-              required
-            />
-            <input
-              ref={fileInputRef}
-              type="file"
-              name="coverImage"
-              onChange={handleFileChange}
-              className="p-2 border border-gray-500 rounded"
-            />
-            {coverImageFile && ( // Use coverImageFile for preview
-              <div className="relative w-32 h-32">
-                <CldImage
-                  width={400}
-                  height={400}
-                  src={URL.createObjectURL(coverImageFile)}
-                  alt="Contest Cover Preview"
-                  className="mx-auto"
-                />
-              </div>
-            )}
-            <Loader isLoading={isLoading || isPosting} text="Submitting..." />
-            {error && <p className="text-red-500">Error: {error}</p>}
-            {postError && <p className="text-red-500">Error: {postError}</p>}
-            <Button type="submit" disabled={isLoading || isPosting}>
-              Submit
-            </Button>
-            <Button type="button" onClick={onCancel}>
-              Cancel
-            </Button>
-          </form>
-        </div>
-      </div>
-    </div>
+          </div>
+        )}
+        <Loader isLoading={isLoading} text="Submitting..." />
+        {error && <p className="text-red-500">Error: {error}</p>}
+        <Button type="submit" disabled={isLoading}>
+          Submit
+        </Button>
+      </form>
+    </Popin>
   );
 };
 
