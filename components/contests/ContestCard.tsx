@@ -4,6 +4,7 @@ import { Contest } from '@/domain/Contest.schema';
 import { isOpener } from '@/utils/session.utils';
 import { useSession } from 'next-auth/react';
 import { CldImage } from 'next-cloudinary';
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { FaEdit, FaEllipsisV, FaTrash } from 'react-icons/fa';
 
@@ -17,6 +18,11 @@ const ContestCard: React.FC<ContestCardProps> = ({ contest, editContest, deleteC
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
   const session = useSession();
+  const router = useRouter();
+
+  const handleClick = () => {
+    router.push(`/contests/${contest.id}`);
+  };
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -46,7 +52,8 @@ const ContestCard: React.FC<ContestCardProps> = ({ contest, editContest, deleteC
   }, []);
 
   return (
-    <div key={contest.id} className="w-full bg-gradient-to-r from-slate-300 to-slate-200 dark:from-gray-700 dark:to-gray-900 border border-gray-600 rounded-lg shadow-lg relative">
+    <button key={contest.id} onClick={handleClick}
+      className="w-full cursor-pointer bg-gradient-to-r from-slate-300 to-slate-200 dark:from-gray-700 dark:to-gray-900 border border-gray-600 rounded-lg shadow-lg relative">
       {contest.coverImage && (
         <CldImage
           width="400"
@@ -74,7 +81,7 @@ const ContestCard: React.FC<ContestCardProps> = ({ contest, editContest, deleteC
                 onClick={handleEdit}
                 className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
-                <FaEdit className="mr-2" /> Edit
+                <FaEdit className="mr-2" /> Edit info
               </button>
               <button
                 onClick={handleDelete}
@@ -86,7 +93,7 @@ const ContestCard: React.FC<ContestCardProps> = ({ contest, editContest, deleteC
           )}
         </div>
       )}
-    </div>
+    </button>
   );
 };
 
