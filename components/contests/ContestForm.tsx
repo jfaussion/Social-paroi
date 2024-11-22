@@ -86,7 +86,12 @@ const ContestForm: React.FC<ContestFormProps> = ({ isOpen, contest, onCancel, on
           type="file"
           name="coverImage"
           onChange={handleFileChange}
-          className="p-2 text-black dark:text-white bg-gray-200 dark:bg-gray-800 rounded-md border border-gray-800 dark:border-gray-600"
+          className="w-full p-2 text-black dark:text-white bg-transparent
+            file:mr-4 file:py-2 file:px-4
+            file:rounded-full file:border-0
+            file:text-sm file:font-semibold
+            file:bg-violet-100 file:text-violet-700 hover:file:bg-violet-100
+            dark:file:bg-slate-800 dark:file:text-violet-300 dark:hover:file:bg-slate-950"
         />
         {coverImageFile && ( // Use coverImageFile for preview
           <div className="relative w-32 h-32">
