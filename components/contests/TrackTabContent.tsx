@@ -5,9 +5,9 @@ import { Button } from '../ui/Button';
 import { FaPlus } from 'react-icons/fa';
 import Popin from '../ui/Popin';
 import AddTrackCard from '../tracks/AddTrackCard';
-import { useFetchCotnestTracks } from '@/lib/tracks/hooks/useFetchContestTracks';
-import Loader from '../ui/Loader';
+import { useFetchCotnestTracks as useFetchContestTracks } from '@/lib/tracks/hooks/useFetchContestTracks';
 import { CardPlaceHolder } from '../ui/CardPlacehorlder';
+import { useManageContestTracks } from '@/lib/contests/hooks/useManageContestTracks';
 
 interface TrackTabContentProps {
   contestTracks: Track[];
@@ -19,15 +19,22 @@ interface TrackTabContentProps {
 
 const TrackTabContent: React.FC<TrackTabContentProps> = ({ contestTracks, isOpener, contestId, onAddTrack, onRemoveTrack }) => {
   const [isPopinOpen, setPopinOpen] = useState<boolean>(false);
-  const { fetchTracks, isLoading: isLoadingTracks, error } = useFetchCotnestTracks();
+  const { fetchTracks, isLoading: isLoadingTracks, error: fetchError } = useFetchContestTracks();
   const [tracks, setTracks] = useState<Track[]>([]);
+  const { addTrack, removeTrack, isLoading: isLoadingAddOrRemove, error: manageError } = useManageContestTracks();
 
-  const handleAddTrack = (trackToAdd: Track) => {
-    onAddTrack(trackToAdd);
+  const handleAddTrack = async (trackToAdd: Track) => {
+    const success = await addTrack(contestId, trackToAdd.id);
+    if (success) {
+      onAddTrack(trackToAdd);
+    }
   };
 
-  const handleRemoveTrack = (trackToRemove: Track) => {
-    onRemoveTrack(trackToRemove);
+  const handleRemoveTrack = async (trackToRemove: Track) => {
+    const success = await removeTrack(contestId, trackToRemove.id);
+    if (success) {
+      onRemoveTrack(trackToRemove);
+    }
   };
 
   const loadTracks = async () => {
@@ -47,7 +54,7 @@ const TrackTabContent: React.FC<TrackTabContentProps> = ({ contestTracks, isOpen
         ))
       )}
       {isOpener && (
-        <Button onClick={() => {setPopinOpen(true); loadTracks();}} className="mt-4 w-full flex items-center">
+        <Button onClick={() => { setPopinOpen(true); loadTracks(); }} className="mt-4 w-full flex items-center">
           <span className="flex items-center justify-center mr-2">
             <FaPlus className="text-gray-600 dark:text-gray-300" />
           </span>
@@ -69,7 +76,8 @@ const TrackTabContent: React.FC<TrackTabContentProps> = ({ contestTracks, isOpen
           ) : (
             <div className="space-y-2">
               {tracks.map(track => (
-                <AddTrackCard key={track.id} track={track} trackList={contestTracks} addTrack={handleAddTrack} removeTrack={handleRemoveTrack} />
+                <AddTrackCard key={track.id} track={track} trackList={contestTracks}
+                  addTrack={handleAddTrack} removeTrack={handleRemoveTrack} />
               ))}
             </div>
           )}

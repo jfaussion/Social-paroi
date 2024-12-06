@@ -49,7 +49,8 @@ model User {
   Authenticator     Authenticator[]
   UserTrackProgress UserTrackProgress[]
   role              String?             @default("user")
-  news              News[]              
+  news              News[]
+  contestUsers      ContestUser[]       @relation("UserContestUsers")
 
   @@map("users")
 }
@@ -89,8 +90,10 @@ model Track {
   removed       Boolean?            @default(false)
   trackProgress UserTrackProgress[]
 
-  locationId    Int?                
-  location      Location?           @relation("LocationTracks", fields: [locationId], references: [id], onDelete: Cascade)
+  locationId Int?
+  location   Location? @relation("LocationTracks", fields: [locationId], references: [id], onDelete: Cascade)
+
+  contestTracks ContestTrack[] @relation("TrackContestTracks")
 
   @@index([id], name: "idx_tracks_id")
   @@index([name], name: "idx_tracks_name")
@@ -113,15 +116,14 @@ model UserTrackProgress {
   @@index([trackId], name: "idx_usertrackprogress_track_id")
 }
 
-
 model News {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String
-  date      DateTime @default(now())
-  deleted   Boolean  @default(false)
-  userId    String
-  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id      Int      @id @default(autoincrement())
+  title   String
+  content String
+  date    DateTime @default(now())
+  deleted Boolean  @default(false)
+  userId  String
+  user    User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([id], name: "idx_news_id")
   @@index([userId], name: "idx_news_user_id")
@@ -129,26 +131,70 @@ model News {
 }
 
 model Location {
-  id          Int      @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   name        String
-  type        String   // Should be validated as 'gym' or 'outdoor'
+  type        String // Should be validated as 'gym' or 'outdoor'
   address     String?
   website     String?
-  mapImageUrl String?  @map(name: "map_image_url")
+  mapImageUrl String? @map(name: "map_image_url")
 
-  createdAt   DateTime @default(now()) @map(name: "created_at")
-  updatedAt   DateTime @updatedAt @map(name: "updated_at") 
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
 
-  tracks      Track[]  @relation("LocationTracks")
+  tracks Track[] @relation("LocationTracks")
 
   @@map("locations")
 }
 
 model Contest {
-  id            Int      @id @default(autoincrement())
-  name          String
-  date          DateTime
-  coverImage    String?
+  id                Int             @id @default(autoincrement())
+  name              String
+  date              DateTime
+  coverImage        String?
+  contestTracks     ContestTrack[]  @relation("ContestContestTracks")
+  contestUsers      ContestUser[]   @relation("ContestContestUsers")
+  contestActivities ContestActivity[] @relation("ContestContestActivities")
 
   @@index([date], name: "idx_contests_date")
+}
+
+model ContestTrack {
+  id        Int @id @default(autoincrement())
+  contestId Int
+  trackId   Int
+
+  contest Contest @relation(name: "ContestContestTracks", fields: [contestId], references: [id], onDelete: Cascade)
+  track   Track   @relation(name: "TrackContestTracks", fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@map("contest_tracks")
+}
+
+model ContestActivity {
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String
+  contestId   Int
+
+  contest Contest @relation(name: "ContestContestActivities", fields: [contestId], references: [id], onDelete: Cascade)
+
+  @@map("contest_activities")
+}
+
+model ContestUser {
+  id        Int     @id @default(autoincrement())
+  contestId Int
+  userId    String? // Foreign key to User, can be NULL for temporary users
+  name      String? // Name for temporary users
+  gender    Gender
+  isTemp    Boolean @default(false) // True for temporary users
+
+  contest Contest @relation(name: "ContestContestUsers", fields: [contestId], references: [id], onDelete: Cascade)
+  user    User?   @relation(name: "UserContestUsers", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("contest_users")
+}
+
+enum Gender {
+  Male
+  Female
 }

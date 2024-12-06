@@ -27,9 +27,6 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
       case 'users':
         return <p>User list</p>;
       case 'tracks':
-        if (contest.tracks.length === 0) {
-          return <p>No blocks yet</p>;
-        }
         return (
           <TrackTabContent
             contestTracks={contest.tracks}
