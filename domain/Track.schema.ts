@@ -9,6 +9,12 @@ export const TrackSchema = z.object({
   name: z.string(),
   date: z.date(),
   imageUrl: z.string().optional(),
+  contests: z.array(z.object({ // redeclare contest schema to avoid circular dependency
+    id: z.number(),
+    name: z.string(),
+    date: z.date(),
+    coverImage: z.string().optional(),
+  })).optional(),
   holdColor: HoldColorEnum.nullish().transform(val => val ?? 'Unknown').default('Unknown'),
   level: DifficultyEnum.default('Unknown'),
   zone: z.number(),

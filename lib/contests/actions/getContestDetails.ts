@@ -1,4 +1,5 @@
 'use server';
+import { ContestSchema } from '@/domain/Contest.schema';
 import { PrismaClient } from '@prisma/client/edge';
 
 const prisma = new PrismaClient();
@@ -16,10 +17,29 @@ export async function getContestDetails(
   try {
     const contest = await prisma.contest.findUnique({
       where: { id: contestId },
+      include: {
+        contestTracks: {
+          include: {
+            track: true, // Fetch the linked Track details
+          },
+        },
+        contestUsers: {
+          include: {
+            user: true, // Fetch the linked User details
+          },
+        },
+        contestActivities: true, // Fetch BonusActivity details
+      },
     });
 
     if (contest) {
-      return contest;
+      // Validate and return the contest details using the schema
+      return ContestSchema.parse({
+        ...contest,
+        activities: contest.contestActivities, // Rename to match the schema
+        users: contest.contestUsers, // Rename to match the schema
+        tracks: contest.contestTracks.map(ct => ({...ct.track})),
+      });
     }
     return null;
   } catch (err) {

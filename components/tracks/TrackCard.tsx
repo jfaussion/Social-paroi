@@ -69,7 +69,7 @@ const TrackCard: React.FC<Track> = ({ ...propTrack }) => {
   };
 
   const openTrackDetails = () => {
-    router.push(`dashboard/track/${track.id}`)
+    router.push(`/dashboard/track/${track.id}`);
   }
 
   return (
