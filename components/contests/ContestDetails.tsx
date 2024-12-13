@@ -12,6 +12,8 @@ import { useDeleteContest } from '@/lib/contests/hooks/useDeleteContest';
 import { isOpener } from '@/utils/session.utils';
 import { Track } from '@/domain/Track.schema';
 import TrackTabContent from './TrackTabContent';
+import UserTabContent from './UserTabContent';
+import { ContestUser } from '@/domain/ContestUser.schema';
 
 const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
   const [contest, setContest] = useState<Contest>(propContest);
@@ -25,7 +27,13 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
   const renderTabContent = () => {
     switch (activeTab) {
       case 'users':
-        return <p>User list</p>;
+        return <UserTabContent 
+          contestUsers={contest.users}
+          isOpener={isOpener(session.data)}
+          contestId={contest.id} 
+          onAddUser={handleAddUser}
+          onRemoveUser={handleRemoveUser}
+        />;
       case 'tracks':
         return (
           <TrackTabContent
@@ -58,13 +66,29 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
     resetDelete();
   };
 
+  const handleAddUser = (userToAdd: ContestUser) => {
+    console.log('Adding user:', userToAdd);
+    setContest(prevContest => ({
+      ...prevContest,
+      users: [...prevContest.users, userToAdd]
+    }));
+  };
+
+  const handleRemoveUser = (userToRemove: ContestUser) => {
+    console.log('Removing user:', userToRemove);
+    setContest(prevContest => ({
+      ...prevContest,
+      users: prevContest.users.filter(user => user.id !== userToRemove.id)
+    }));
+  };
+
   const handleAddTrack = (trackToAdd: Track) => {
     console.log('Adding track:', trackToAdd);
     setContest(prevContest => ({
       ...prevContest,
       tracks: prevContest.tracks.some(track => track.id === trackToAdd.id)
-        ? prevContest.tracks // If the track already exists, keep the previous list
-        : [...prevContest.tracks, trackToAdd] // Add the new track to the list
+        ? prevContest.tracks
+        : [...prevContest.tracks, trackToAdd]
     }));
   };
 

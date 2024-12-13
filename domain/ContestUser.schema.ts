@@ -11,3 +11,8 @@ export const ContestUserSchema = z.object({
 });
 
 export type ContestUser = z.infer<typeof ContestUserSchema>;
+
+export enum Gender {
+  Male = 'Male',
+  Female = 'Female',
+}

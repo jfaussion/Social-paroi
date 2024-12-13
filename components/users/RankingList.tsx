@@ -1,9 +1,9 @@
 "use client";
 import { useSession } from "next-auth/react";
-import UserRanking from "./UserRanking";
+import UserCard from "./UserCard";
 import { useFetchRanking } from "@/lib/stats/hooks/useFetchRanking";
 import { useEffect, useState } from "react";
-import { RankingPlaceholder } from "./ui/RankingPlaceholder";
+import { RankingPlaceholder } from "./RankingPlaceholder";
 
 
 const RankingList: React.FC = () => {
@@ -44,13 +44,16 @@ const RankingList: React.FC = () => {
               </div>
             </div>
             {ranking.map((user, index) => (
-              <UserRanking
+              <UserCard
                 key={user.id}
                 rank={index + 1}
                 profilePicture={user.image}
                 name={user.name}
                 score={user.score}
                 isCurrentUser={user.id === session.data?.user?.id}
+                isAddable={false}
+                isRemovable={false}
+                containerClass={"px-4"}
               />
             ))}
           </div>

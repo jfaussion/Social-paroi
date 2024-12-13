@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import UserStats from "@/components/UserStats";
+import UserStats from "@/components/users/UserStats";
 import { isConnected } from "@/utils/session.utils";
 import { SessionProvider } from "next-auth/react";
 

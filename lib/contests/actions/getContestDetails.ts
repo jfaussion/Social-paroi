@@ -25,7 +25,14 @@ export async function getContestDetails(
         },
         contestUsers: {
           include: {
-            user: true, // Fetch the linked User details
+            user: { // Fetch the linked User details
+              select: {
+                id: true,
+                name: true,
+                image: true,
+                emailVerified: true, // Include any other fields you need
+              },
+            },
           },
         },
         contestActivities: true, // Fetch BonusActivity details

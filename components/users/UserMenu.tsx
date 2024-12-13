@@ -1,7 +1,7 @@
 "use client"
 
 import { signOut, useSession } from "next-auth/react";
-import { Button } from "./ui/Button";
+import { Button } from "../ui/Button";
 import Image from 'next/image';
 import { useEffect, useRef, useState } from "react";
 import DefaultAvatarImage from '@/public/default-avatar.svg';
