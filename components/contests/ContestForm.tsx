@@ -17,10 +17,13 @@ type ContestFormProps = {
 
 const ContestForm: React.FC<ContestFormProps> = ({ isOpen, contest, onCancel, onConfirm, error, isLoading }) => {
   const [formData, setFormData] = useState<Contest>({
-    id: contest?.id || 0,
-    name: contest?.name || '',
-    date: contest?.date || new Date(),
-    coverImage: contest?.coverImage || '',
+    id: contest?.id ?? 0,
+    name: contest?.name ?? '',
+    date: contest?.date ?? new Date(),
+    coverImage: contest?.coverImage ?? '',
+    users: contest?.users ?? [],
+    activities: contest?.activities ?? [],
+    tracks: contest?.tracks ?? [],
   });
 
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null); // State for the cover image file
@@ -36,6 +39,9 @@ const ContestForm: React.FC<ContestFormProps> = ({ isOpen, contest, onCancel, on
         name: '',
         date: new Date(),
         coverImage: '',
+        users: [],
+        activities: [],
+        tracks: [],
       });
     }
   }, [contest]);
