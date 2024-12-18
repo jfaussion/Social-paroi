@@ -25,15 +25,17 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contestId, isOpener, co
   const { fetchUsers, isLoading: isLoadingUsers } = useFetchUsers();
   const { addUser, deleteUser } = useManageContestUsers(); // Use the new hook
   const [users, setUsers] = useState<User[]>([]);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null); // New state for selected user
+  const [isGenderPopinOpen, setGenderPopinOpen] = useState<boolean>(false); // State for gender selection popin
 
-  const handleAddUserInApp = async (user: User) => {
-    const contestUserId = await addUser(contestId, user.id, Gender.Male); // Default gender for example
+  const handleAddUserInApp = async (user: User, gender: 'Male' | 'Female') => {
+    const contestUserId = await addUser(contestId, user.id, gender); // Default gender for example
     if (contestUserId) {
       // Optionally call onAddUser to update the parent component
       onAddUser({
         id: contestUserId,
         contestId,
-        gender: Gender.Male,
+        gender: gender,
         isTemp: false,
         user: user,
       } as ContestUser);
@@ -66,6 +68,14 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contestId, isOpener, co
     setUsers(fetchedUsers);
   };
 
+  const handleConfirmAddUser = (gender: 'Male' | 'Female') => {
+    if (selectedUser) {
+      handleAddUserInApp(selectedUser, gender); // Pass the selected user and gender
+      setGenderPopinOpen(false); // Close the gender selection popin
+      setSelectedUser(null); // Reset selected user
+    }
+  };
+
   return (
     <div>
       {/* Display the list of contest users */}
@@ -96,17 +106,18 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contestId, isOpener, co
                 key={user.id}
                 name={user.name ?? 'Unknown User'} // Provide a default name if undefined
                 profilePicture={user.image ?? '/default-profile.png'} // Provide a default profile picture if undefined
-                isAdded={contestUsers.some(u => u.id === String(user.id))} // Ensure user.id is compared as a string
+                isAdded={contestUsers.some(u => u.user?.id === user.id)} // Ensure user.id is compared as a string
                 isAddable={true}
                 isRemovable={false}
                 onClickAdd={() => {
-                  const isUserAdded = contestUsers.some(u => u.id === String(user.id));
-                  if (isUserAdded) {
-                    handleRemoveContestUser(user); // Call the remove function
+                  const contestUserAdded = contestUsers.find(u => u.user?.id === user.id);
+                  if (contestUserAdded) {
+                    handleRemoveContestUser(contestUserAdded);
                   } else {
-                    handleAddUserInApp(user); // Call the add function
+                    setSelectedUser(user); // Set the selected user
+                    setGenderPopinOpen(true); // Open the gender selection popin  
                   }
-                }} // Toggle add/remove functionality
+                }}
               />
             ))
           )}
@@ -135,6 +146,17 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contestId, isOpener, co
           </div>
           <button type="submit">Add Temp User</button>
         </form>
+      </Popin>
+
+      {/* Popin for selecting gender */}
+      <Popin isOpen={isGenderPopinOpen} onClose={() => setGenderPopinOpen(false)} title="Select Gender">
+        <div>
+          <p>Select gender for {selectedUser?.name}:</p>
+          <div className="flex space-x-2">
+            <Button onClick={() => handleConfirmAddUser('Male')}>Male</Button>
+            <Button onClick={() => handleConfirmAddUser('Female')}>Female</Button>
+          </div>
+        </div>
       </Popin>
 
       {/* Confirmation Dialog for removing a user */}
