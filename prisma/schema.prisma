@@ -185,7 +185,7 @@ model ContestUser {
   contestId Int
   userId    String? // Foreign key to User, can be NULL for temporary users
   name      String? // Name for temporary users
-  gender    Gender
+  gender    String?
   isTemp    Boolean @default(false) // True for temporary users
 
   contest Contest @relation(name: "ContestContestUsers", fields: [contestId], references: [id], onDelete: Cascade)
@@ -194,7 +194,3 @@ model ContestUser {
   @@map("contest_users")
 }
 
-enum Gender {
-  Male
-  Female
-}

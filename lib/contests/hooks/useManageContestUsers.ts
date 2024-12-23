@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { addContestUser } from '@/lib/contests/actions/addContestUser';
 import { removeContestUser } from '@/lib/contests/actions/removeContestUser';
-import { ContestUser, Gender } from '@/domain/ContestUser.schema';
+import { ContestUser, GenderType } from '@/domain/ContestUser.schema';
 
 /**
  * Custom hook for managing contest users.
@@ -11,7 +11,7 @@ export const useManageContestUsers = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const addUser = async (contestId: number, userId: string, gender: Gender) => {
+  const addUser = async (contestId: number, userId: string, gender: GenderType) => {
     setIsLoading(true);
     try {
       const contestUserId = await addContestUser(contestId, gender, userId);
@@ -37,7 +37,7 @@ export const useManageContestUsers = () => {
     }
   };
 
-  const addTempUser = async (contestId: number, name: string, gender: Gender) => {
+  const addTempUser = async (contestId: number, name: string, gender: GenderType) => {
     setIsLoading(true);
     try {
       const contestUserId = await addContestUser(contestId, gender, undefined, name);

@@ -1,6 +1,6 @@
 'use server';
 import { PrismaClient } from '@prisma/client/edge';
-import { Gender } from '@/domain/ContestUser.schema';
+import { GenderType } from '@/domain/ContestUser.schema';
 
 const prisma = new PrismaClient();
 
@@ -15,7 +15,7 @@ const prisma = new PrismaClient();
  */
 export async function addContestUser(
   contestId: number,
-  gender: Gender,
+  gender: GenderType,
   userId?: string,
   name?: string
 ): Promise<number | null> {
