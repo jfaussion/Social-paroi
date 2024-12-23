@@ -24,7 +24,7 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contestId, isOpener, co
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [userToRemove, setUserToRemove] = useState<ContestUser | null>(null);
   const { fetchUsers, isLoading: isLoadingUsers } = useFetchUsers();
-  const { addUser, deleteUser } = useManageContestUsers();
+  const { addUser, addTempUser,deleteUser } = useManageContestUsers();
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isGenderPopinOpen, setGenderPopinOpen] = useState<boolean>(false);
@@ -38,6 +38,19 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contestId, isOpener, co
         gender: gender,
         isTemp: false,
         user: user,
+      } as ContestUser);
+    }
+  };
+
+  const handleAddTempUser = async (name: string, gender: GenderType) => {
+    const contestUserId = await addTempUser(contestId, name, gender);
+    if (contestUserId) {
+      onAddUser({
+        id: contestUserId,
+        contestId,
+        gender: gender,
+        isTemp: true,
+        name: name,
       } as ContestUser);
     }
   };
@@ -56,12 +69,6 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contestId, isOpener, co
       setIsDeleteDialogOpen(false);
       setUserToRemove(null);
     }
-  };
-
-  const handleAddTempUser = async (name: string, gender: GenderType) => {
-    console.log('handleAddTempUser', name, gender);
-    // Implement the logic to add a temporary user
-    // This could involve calling an API or updating state
   };
 
   const loadUsers = async () => {

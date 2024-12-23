@@ -31,11 +31,17 @@ const AddTempUserPopin: React.FC<AddTempUserPopinProps> = ({ isOpen, name, gende
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     addTempUser(tempName, tempGender);
+    closeAndReset();
+  };
+
+  const closeAndReset = () => {
+    setTempName('');
+    setTempGender(GenderEnum.Enum.Man);
     onClose();
   };
 
   return (
-    <Popin isOpen={isOpen} onClose={onClose} title="Add Temporary User">
+    <Popin isOpen={isOpen} onClose={closeAndReset} title="Add Temporary User">
       <form onSubmit={handleSubmit}>
         <div className="flex flex-col space-y-2">
           <input
