@@ -89,19 +89,21 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contestId, isOpener, co
       {/* Display the list of contest users */}
       <div className="flex flex-col w-full">
         {contestUsers.map(contestUser => (
-          <ContestUserCard key={contestUser.id} contestUser={contestUser} onRemove={handleRemoveContestUser} />
+          <ContestUserCard key={contestUser.id} contestUser={contestUser} onRemove={handleRemoveContestUser} isRemovable={isOpener}/>
         ))}
       </div>
 
-      {/* Buttons on the same line */}
-      <div className="flex space-x-2 mt-4 justify-center">
-        <div className="flex-1">
-          <Button className="w-full" onClick={() => { setUserPopinOpen(true); loadUsers(); }}>Add user in app</Button>
+      {/* Only show buttons if user is opener or admin */}
+      {isOpener && (
+        <div className="flex space-x-2 mt-4 justify-center">
+          <div className="flex-1">
+            <Button className="w-full" onClick={() => { setUserPopinOpen(true); loadUsers(); }}>Add user in app</Button>
+          </div>
+          <div className="flex-1">
+            <Button className="w-full" onClick={() => setTempUserPopinOpen(true)}>Add temp user</Button>
+          </div>
         </div>
-        <div className="flex-1">
-          <Button className="w-full" onClick={() => setTempUserPopinOpen(true)}>Add temp user</Button>
-        </div>
-      </div>
+      )}
 
       {/* Popin for adding users from the app */}
       <Popin isOpen={isUserPopinOpen} onClose={() => setUserPopinOpen(false)} title="Add User">

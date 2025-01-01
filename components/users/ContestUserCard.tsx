@@ -5,16 +5,21 @@ import { ContestUser } from '@/domain/ContestUser.schema';
 interface ContestUserCardProps {
   contestUser: ContestUser;
   onRemove: (contestUser: ContestUser) => void;
+  isRemovable: boolean;
 }
 
-const ContestUserCard: React.FC<ContestUserCardProps> = ({ contestUser, onRemove }) => {
+const ContestUserCard: React.FC<ContestUserCardProps> = ({ 
+  contestUser, 
+  onRemove,
+  isRemovable = false
+}) => {
   return (
     <UserCard
       name={contestUser.isTemp ? contestUser.name || '' : contestUser.user?.name || ''}
       profilePicture={contestUser.isTemp ? undefined : contestUser.user?.image || ''}
       isCurrentUser={false} // Adjust as needed
       gender={contestUser.gender}
-      isRemovable={true}
+      isRemovable={isRemovable}
       onClickRemove={() => onRemove(contestUser)}
     />
   );

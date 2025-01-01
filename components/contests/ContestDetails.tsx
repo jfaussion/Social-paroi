@@ -19,7 +19,7 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
   const [contest, setContest] = useState<Contest>(propContest);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
   const { deleteContest, isLoading: isLoadingDelete, error: errorDelete, reset: resetDelete } = useDeleteContest();
-  const session = useSession();
+  const { data: session } = useSession();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('tracks');
 
@@ -29,7 +29,7 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
       case 'users':
         return <UserTabContent 
           contestUsers={contest.users}
-          isOpener={isOpener(session.data)}
+          isOpener={isOpener(session)}
           contestId={contest.id} 
           onAddUser={handleAddUser}
           onRemoveUser={handleRemoveUser}
@@ -38,7 +38,7 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
         return (
           <TrackTabContent
             contestTracks={contest.tracks}
-            isOpener={isOpener(session.data)}
+            isOpener={isOpener(session)}
             contestId={contest.id}
             onAddTrack={handleAddTrack}
             onRemoveTrack={handleRemoveTrack}
@@ -165,7 +165,7 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
           <div className="my-4">{renderTabContent()}</div>
 
           {/* Editor zone for admin actions */}
-          {isOpener(session.data) && (
+          {isOpener(session) && (
             <div className='p-4 w-full border-t-2 border-gray-600 sm:border sm:border-gray-600 sm:rounded-lg dark:bg-gray-900 sm:m-4 sm:mt-0 space-y-2'>
               <h2 className="text-lg font-bold mb-3">Editor zone</h2>
               <div className='flex flex-wrap justify-between gap-2'>
