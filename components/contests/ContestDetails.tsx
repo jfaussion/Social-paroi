@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { CldImage } from 'next-cloudinary';
 import { Contest } from "@/domain/Contest.schema";
@@ -14,6 +14,7 @@ import { Track } from '@/domain/Track.schema';
 import TrackTabContent from './TrackTabContent';
 import UserTabContent from './UserTabContent';
 import { ContestUser } from '@/domain/ContestUser.schema';
+import ActivityTabContent from './ActivityTabContent';
 
 const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
   const [contest, setContest] = useState<Contest>(propContest);
@@ -45,7 +46,26 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
           />
         );
       case 'bonus':
-        return contest.activities.map(activity => <p key={activity.id}>{activity.name}</p>);
+        return (
+          <ActivityTabContent
+            contestActivities={contest.activities}
+            isOpener={isOpener(session)}
+            contestId={contest.id}
+            onAddActivity={(activity) => {
+              setContest(prev => ({
+                ...prev,
+                activities: [...prev.activities, activity]
+              }));
+            }}
+            onRemoveActivity={(activity) => {
+              setContest(prev => ({
+                ...prev,
+                activities: prev.activities.filter(a => a.id !== activity.id)
+              }));
+            }}
+            onUpdateScore={handleUpdateActivityScore}
+          />
+        );
       default:
         return null;
     }
@@ -97,6 +117,17 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
     setContest(prevContest => ({
       ...prevContest, 
       tracks: prevContest.tracks.filter(track => track.id !== trackToRemove.id)
+    }));
+  };
+
+  const handleUpdateActivityScore = (activityId: number, newScore: number) => {
+    setContest(prevContest => ({
+      ...prevContest,
+      activities: prevContest.activities.map(activity =>
+        activity.id === activityId
+          ? { ...activity, score: newScore }
+          : activity
+      )
     }));
   };
 
