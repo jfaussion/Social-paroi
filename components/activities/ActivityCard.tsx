@@ -100,7 +100,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <span className="text-gray-400 mr-2">Score:</span>
-            <span className="font-semibold">{activity.score ?? '-'}</span>
+            <span className="font-semibold">{'-'}</span>
           </div>
           <Button 
             onClick={() => setIsScorePopinOpen(true)}
