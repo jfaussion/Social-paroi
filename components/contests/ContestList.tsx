@@ -104,7 +104,7 @@ function ContestList() {
         <Button
           onClick={handleCreateContest}
           className="w-full sm:w-auto"
-          btnStyle="secondary">
+          btnType="secondary">
           Post Contest
         </Button>
       )}

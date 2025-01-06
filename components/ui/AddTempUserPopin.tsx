@@ -70,7 +70,7 @@ const AddTempUserPopin: React.FC<AddTempUserPopinProps> = ({ isOpen, name, gende
           />
         </div>
         <div className="mt-4 flex justify-end space-x-2">
-          <Button type="submit" btnStyle="primary">Add Temp User</Button>
+          <Button type="submit" btnType="primary">Add Temp User</Button>
         </div>
       </form>
     </Popin>

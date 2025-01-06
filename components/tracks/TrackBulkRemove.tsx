@@ -27,7 +27,7 @@ const TrackBulkRemove: React.FC<TrackBulkRemoveProps> = ({ trackList, isRemoveDi
 
   return (
     <>
-      <Button btnStyle="secondary" onClick={() => setIsDialogOpen(true)} disabled={isRemoveDisabled}>
+      <Button btnType="secondary" onClick={() => setIsDialogOpen(true)} disabled={isRemoveDisabled}>
         Remove All Blocks
       </Button>
       <ConfirmationDialog

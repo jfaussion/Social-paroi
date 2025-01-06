@@ -201,7 +201,7 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
               <h2 className="text-lg font-bold mb-3">Editor zone</h2>
               <div className='flex flex-wrap justify-between gap-2'>
                 <Button className='grow' onClick={() => router.push(`${contest.id}/edit`)}>Edit Contest</Button>
-                <Button className='grow bg-red-500 text-white' btnStyle='danger' onClick={() => setDeleteDialogOpen(true)}>Delete Contest</Button>
+                <Button className='grow bg-red-500 text-white' btnType='danger' onClick={() => setDeleteDialogOpen(true)}>Delete Contest</Button>
               </div>
             </div>
           )}

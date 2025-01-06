@@ -144,7 +144,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
 
         <div className="flex justify-end space-x-2">
         <Button 
-            btnStyle="secondary"
+            btnType="secondary"
             type="submit" 
             disabled={isLoading}
           >

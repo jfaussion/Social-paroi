@@ -92,7 +92,7 @@ function NewsList() {
         <Button 
           onClick={handleCreateNews} 
           className="w-full sm:w-auto"
-          btnStyle="secondary">
+          btnType="secondary">
           Post News
         </Button>
       )}

@@ -54,7 +54,7 @@ export default function UserMenu() {
                 <div className="text-gray-600 dark:text-gray-400">{session.user?.email}</div>
               </div>
               <div className="flex justify-center mt-2 w-full px-4 py-2">
-                <Button className="w-full" btnStyle="secondary" onClick={handleSignOut}>Sign Out</Button>
+                <Button className="w-full" btnType="secondary" onClick={handleSignOut}>Sign Out</Button>
               </div>
             </div>
           )}

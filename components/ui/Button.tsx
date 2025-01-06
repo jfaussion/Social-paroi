@@ -2,10 +2,10 @@ import React from 'react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
-  btnStyle?: 'primary' | 'secondary' | 'danger';
+  btnType?: 'primary' | 'secondary' | 'danger';
 }
 
-export function Button({ children, btnStyle, className, ...rest }: ButtonProps, ) {
+export function Button({ children, btnType: variant, className, ...rest }: Readonly<ButtonProps>, ) {
   const baseClasses =
     'flex h-10 items-center justify-center rounded-lg border px-4 text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 dark:focus-visible:outline-gray-100 aria-disabled:cursor-not-allowed aria-disabled:opacity-50';
 
@@ -19,8 +19,8 @@ export function Button({ children, btnStyle, className, ...rest }: ButtonProps, 
 
   if (rest.disabled) {
     btnTypeClasses = disabledClasses;
-  } else if (btnStyle) {
-    switch (btnStyle) {
+  } else if (variant) {
+    switch (variant) {
       case 'primary':
         btnTypeClasses = primaryClasses;
         break;
