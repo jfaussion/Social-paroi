@@ -41,7 +41,7 @@ const UserCard: React.FC<UserCardProps> = ({ rank, profilePicture, name, score, 
         {isAddable && <AddButton isActive={!!isAdded} isLoading={false} onChange={onClickAdd} style='small' />}
         {isRemovable && <MinusButton isActive={false} isLoading={false} onChange={onClickRemove} style='small' />}
       </div>
-      <div className="absolute bottom-0 h-px bg-gray-300 dark:bg-gray-700" style={{ left: '10%', right: '10%' }}></div>
+      <div className="absolute bottom-0 h-px bg-gray-300 dark:bg-gray-700 left-[10%] right-[10%]"></div>
     </div>
   );
 };

@@ -3,7 +3,7 @@ import React from 'react';
 interface AddButtonProps {
   isActive: boolean;
   isLoading: boolean;
-  onChange: () => void;
+  onChange?: () => void;
   style?: 'small';
 }
 
