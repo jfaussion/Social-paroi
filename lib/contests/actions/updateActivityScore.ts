@@ -17,15 +17,18 @@ export const updateActivityScore = async (
   score: number
 ): Promise<boolean> => {
   try {
-    await prisma.contestActivity.update({
-      where: {
-        id: activityId,
-        contestId: contestId,
-      },
-      data: {
-        score: score,
-      },
-    });
+    console.log('Updating activity score:', contestId, activityId, score);
+    // TODO: update activity score in database using the future activityUser table
+    
+    // await prisma.contestActivity.update({
+    //   where: {
+    //     id: activityId,
+    //     contestId: contestId,
+    //   },
+    //   data: {
+    //     score: score,
+    //   },
+    // });
     return true;
   } catch (error) {
     console.error('Error updating activity score:', error);
