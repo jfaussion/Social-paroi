@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { User } from '@/domain/User.schema'; // Adjust the import based on your User schema
-import { getAllUsersWithContests } from '../actions/getAllUsersWithContests'; // Import the new function
+import { User } from '@/domain/User.schema';
+import { getAllUsersWithContests } from '../actions/getAllUsersWithContests';
 
 export const useFetchUsers = () => {
   const [isLoading, setIsLoading] = useState(false);

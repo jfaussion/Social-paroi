@@ -13,16 +13,16 @@ export async function getAllUsersWithContests() {
       id: true,
       name: true,
       image: true,
-      contestUsers: { // Use the contestUsers relation
+      contestUsers: {
         select: {
-          contest: { // Access the contest details
+          isTemp: true,
+          contest: {
             select: {
               id: true,
               name: true,
-              date: true, // Assuming you want the contest date as well
+              date: true,
             },
           },
-          isTemp: true, // Include any additional fields you need from ContestUser
         },
       },
     },
