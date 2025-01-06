@@ -76,7 +76,10 @@ export const useManageContestActivities = () => {
   ): Promise<boolean> => {
     setIsLoading(true);
     try {
-      const success = await removeActivity(activity);
+      const success = await removeActivity({
+        ...activity,
+        image: activity.image ?? null,
+      });
       setIsLoading(false);
       return success;
     } catch (err) {
