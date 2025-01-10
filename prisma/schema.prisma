@@ -151,6 +151,7 @@ model Contest {
   name              String
   date              DateTime
   coverImage        String?
+  status            String          @default("Created")
   contestTracks     ContestTrack[]  @relation("ContestContestTracks")
   contestUsers      ContestUser[]   @relation("ContestContestUsers")
   contestActivities ContestActivity[] @relation("ContestContestActivities")

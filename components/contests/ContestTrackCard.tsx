@@ -6,34 +6,46 @@ import { useUpdateContestTrackStatus } from "@/lib/contests/hooks/useUpdateConte
 import { ContestUser } from "@/domain/ContestUser.schema";
 import { useSession } from "next-auth/react";
 import { isOpener } from "@/utils/session.utils";
+import { Contest } from "@/domain/Contest.schema";
+import { ContestStatusEnum } from "@/domain/ContestStatus.enum";
+import { useState } from "react";
 
 interface ContestTrackCardProps extends Track {
-  contestId: number;
+  contest: Contest;
   contestUser: ContestUser | undefined;
+  onStatusUpdate?: (trackId: number, newStatus: TrackStatus) => void;
 }
 
-const ContestTrackCard: React.FC<ContestTrackCardProps> = ({ contestId, contestUser, ...track }) => {
+const ContestTrackCard: React.FC<ContestTrackCardProps> = ({ contest, contestUser, onStatusUpdate, ...track }) => {
   const { updateStatus, isLoading } = useUpdateContestTrackStatus();
   const { data: session } = useSession();
+  const [localStatus, setLocalStatus] = useState<TrackStatus | undefined>(
+    track.contestProgress?.status
+  );
 
   const isSelfContester = contestUser && session?.user?.id === contestUser.user?.id;
   const isActiveStatusChange = isSelfContester || isOpener(session);
 
   const handleStatusChange = async () => {
-    const newStatus = track.contestProgress?.status === TrackStatus.DONE 
+    const newStatus = localStatus === TrackStatus.DONE 
       ? TrackStatus.TO_DO 
       : TrackStatus.DONE;
 
-    await updateStatus(contestId, contestUser?.id ?? 0, track.id, newStatus);
+    const success = await updateStatus(contest.id, contestUser?.id ?? 0, track.id, newStatus);
+    
+    if (success) {
+      setLocalStatus(newStatus);
+      onStatusUpdate?.(track.id, newStatus);
+    }
   };
-
+  
   const statusHandler = {
-    isCompleted: track.contestProgress?.status === TrackStatus.DONE,
-    isDisabled: isLoading || !contestUser,
+    isCompleted: localStatus === TrackStatus.DONE,
+    isDisabled: isLoading || !contestUser || contest.status === ContestStatusEnum.Enum.Over,
     onStatusChange: handleStatusChange
   };
 
-  return <TrackCard {...track} statusHandler={statusHandler} disableNavigation hideToggleButton={!contestUser}/>;
+  return <TrackCard {...track} statusHandler={statusHandler} hideToggleButton={!contestUser}/>;
 };
 
 export default ContestTrackCard; 

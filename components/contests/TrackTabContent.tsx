@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Track } from '@/domain/Track.schema';
-import TrackCard from '../tracks/TrackCard';
 import { Button } from '../ui/Button';
 import { FaPlus } from 'react-icons/fa';
 import Popin from '../ui/Popin';
@@ -10,38 +9,65 @@ import { CardPlaceHolder } from '../ui/CardPlacehorlder';
 import { useManageContestTracks } from '@/lib/contests/hooks/useManageContestTracks';
 import ContestTrackCard from './ContestTrackCard';
 import { ContestUser } from '@/domain/ContestUser.schema';
+import { Contest } from '@/domain/Contest.schema';
+import { TrackStatus } from '@/domain/TrackStatus.enum';
 
 interface TrackTabContentProps {
-  contestTracks: Track[];
   isOpener: boolean;
-  contestId: number;
+  contest: Contest;
   contestUser: ContestUser | undefined;
-  onAddTrack: (trackToAdd: Track) => void; // Callback to handle adding a track
-  onRemoveTrack: (trackToRemove: Track) => void; // Callback to handle removing a track
+  onAddTrack: (trackToAdd: Track) => void;
+  onRemoveTrack: (trackToRemove: Track) => void;
 }
 
-const TrackTabContent: React.FC<TrackTabContentProps> = ({ contestTracks, isOpener, contestId, contestUser, onAddTrack, onRemoveTrack }) => {
+const TrackTabContent: React.FC<TrackTabContentProps> = ({ isOpener, contest, contestUser, onAddTrack, onRemoveTrack }) => {
   const [isPopinOpen, setPopinOpen] = useState<boolean>(false);
   const { fetchTracks, isLoading: isLoadingTracks, error: fetchError } = useFetchContestTracks();
   const [tracks, setTracks] = useState<Track[]>([]);
+  const [contestTracks, setContestTracks] = useState(contest.tracks);
   const { addTrack, removeTrack, isLoading: isLoadingAddOrRemove, error: manageError } = useManageContestTracks();
 
+  const handleStatusUpdate = (trackId: number, newStatus: TrackStatus) => {
+    setContestTracks(prevTracks => 
+      prevTracks.map(track => 
+        track.id === trackId 
+          ? {
+              ...track,
+              contestProgress: track.contestProgress 
+                ? {
+                    ...track.contestProgress,
+                    status: newStatus
+                  }
+                : {
+                    id: 0,
+                    contestUserId: contestUser?.id ?? 0,
+                    contestTrackId: trackId,
+                    status: newStatus,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                }
+            }
+          : track
+      )
+    );
+  };
+
   const handleAddTrack = async (trackToAdd: Track) => {
-    const success = await addTrack(contestId, trackToAdd.id);
+    const success = await addTrack(contest.id, trackToAdd.id);
     if (success) {
       onAddTrack(trackToAdd);
     }
   };
 
   const handleRemoveTrack = async (trackToRemove: Track) => {
-    const success = await removeTrack(contestId, trackToRemove.id);
+    const success = await removeTrack(contest.id, trackToRemove.id);
     if (success) {
       onRemoveTrack(trackToRemove);
     }
   };
 
   const loadTracks = async () => {
-    const fetchedTracks = await fetchTracks(contestId, {}); // Assuming filters are not needed for now
+    const fetchedTracks = await fetchTracks(contest.id, {}); // Assuming filters are not needed for now
     setTracks(fetchedTracks);
   };
 
@@ -52,7 +78,12 @@ const TrackTabContent: React.FC<TrackTabContentProps> = ({ contestTracks, isOpen
       ) : (
         contestTracks.map(track => (
           <div key={track.id}>
-            <ContestTrackCard {...track} contestId={contestId} contestUser={contestUser} />
+            <ContestTrackCard 
+              {...track} 
+              contest={contest} 
+              contestUser={contestUser}
+              onStatusUpdate={handleStatusUpdate}
+            />
           </div>
         ))
       )}

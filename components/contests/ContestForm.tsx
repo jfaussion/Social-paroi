@@ -5,6 +5,7 @@ import Loader from "../ui/Loader";
 import { Contest } from "@/domain/Contest.schema";
 import { CldImage } from "next-cloudinary";
 import Popin from "../ui/Popin";
+import { ContestStatusEnum } from "@/domain/ContestStatus.enum";
 
 type ContestFormProps = {
   isOpen: boolean;
@@ -21,6 +22,7 @@ const ContestForm: React.FC<ContestFormProps> = ({ isOpen, contest, onCancel, on
     name: contest?.name ?? '',
     date: contest?.date ?? new Date(),
     coverImage: contest?.coverImage ?? '',
+    status: contest?.status ?? ContestStatusEnum.Enum.Created,
     users: contest?.users ?? [],
     activities: contest?.activities ?? [],
     tracks: contest?.tracks ?? [],
@@ -42,6 +44,7 @@ const ContestForm: React.FC<ContestFormProps> = ({ isOpen, contest, onCancel, on
         users: [],
         activities: [],
         tracks: [],
+        status: ContestStatusEnum.Enum.Created,
       });
     }
   }, [contest]);

@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { UserSchema } from "./User.schema";
 
-
 export const GenderEnum = z.enum(['Man', 'Woman']);
 export type GenderType = z.infer<typeof GenderEnum>;
 

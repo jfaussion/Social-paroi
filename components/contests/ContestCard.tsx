@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import React from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import ToggleMenu from '../ui/ToggleMenu';
+import ContestStatus from '../ui/ContestStatus';
 
 interface ContestCardProps {
   contest: Contest;
@@ -16,12 +17,21 @@ interface ContestCardProps {
 }
 
 const ContestCard: React.FC<ContestCardProps> = ({ contest, editContest, deleteContest }) => {
-  const session = useSession();
+  const { data: session } = useSession();
   const router = useRouter();
+  const isOpenerOrAdmin = isOpener(session);
 
   const handleClick = () => {
-    router.push(`/contests/${contest.id}`);
+    // Only allow navigation if contest is InProgress or if user is opener/admin
+    if (contest.status !== 'Created' || isOpenerOrAdmin) {
+      router.push(`/contests/${contest.id}`);
+    }
   };
+
+  // Don't show Created contests to regular users
+  if (contest.status === 'Created' && !isOpenerOrAdmin) {
+    return null;
+  }
 
   return (
     <button key={contest.id} onClick={handleClick}
@@ -38,11 +48,14 @@ const ContestCard: React.FC<ContestCardProps> = ({ contest, editContest, deleteC
         />
       )}
       <div className='p-4'>
-        <h2 className="text-xl font-bold">{contest.name}</h2>
-        <p className="text-sm text-gray-500">{new Date(contest.date).toLocaleDateString()}</p>
+          <h2 className="text-xl font-bold">{contest.name}</h2>
+          <p className="text-sm text-gray-500">{new Date(contest.date).toLocaleDateString()}</p>
+          {(isOpenerOrAdmin || contest.status !== 'Created') && (
+            <ContestStatus status={contest.status} />
+          )}
       </div>
 
-      {isOpener(session.data) && (
+      {isOpenerOrAdmin && (
         <div className="absolute top-4 right-4">
           <ToggleMenu
             actions={[

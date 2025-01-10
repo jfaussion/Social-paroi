@@ -15,6 +15,7 @@ import TrackTabContent from './TrackTabContent';
 import UserTabContent from './UserTabContent';
 import { ContestUser } from '@/domain/ContestUser.schema';
 import ActivityTabContent from './ActivityTabContent';
+import ContestStatus from '../ui/ContestStatus';
 
 const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
   const [contest, setContest] = useState<Contest>(propContest);
@@ -38,10 +39,9 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
       case 'tracks':
         return (
           <TrackTabContent
-            contestTracks={contest.tracks}
             isOpener={isOpener(session)}
             contestUser={contest.users.find(contestUser => contestUser.user?.id === session?.user?.id)}
-            contestId={contest.id}
+            contest={contest}
             onAddTrack={handleAddTrack}
             onRemoveTrack={handleRemoveTrack}
           />
@@ -166,9 +166,12 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
             <h1 className="text-xl font-bold">{contest.name}</h1>
           </div>
 
-          {/* Date and Zone row */}
-          <div className="flex justify-start items-center mb-3">
-            <span className="text-sm text-gray-600 dark:text-gray-400">{contest.date ? contest.date.toLocaleDateString() : '...'}</span>
+          {/* Date and Status row */}
+          <div className="flex justify-between items-center gap-2 mb-3">
+            <span className="text-sm text-gray-600 dark:text-gray-400">
+              {contest.date ? contest.date.toLocaleDateString() : '...'}
+            </span>
+            <ContestStatus status={contest.status} />
           </div>
 
           {/* Tab navigation */}
