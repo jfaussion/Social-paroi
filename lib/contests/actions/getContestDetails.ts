@@ -21,6 +21,13 @@ export async function getContestDetails(
         contestTracks: {
           include: {
             track: true, // Fetch the linked Track details
+            userResults: {
+              where: {
+                contestUser: {
+                  userId: userId
+                }
+              }
+            }
           },
         },
         contestUsers: {
@@ -30,12 +37,12 @@ export async function getContestDetails(
                 id: true,
                 name: true,
                 image: true,
-                emailVerified: true, // Include any other fields you need
+                emailVerified: true,
               },
             },
           },
         },
-        contestActivities: true, // Fetch BonusActivity details
+        contestActivities: true,
       },
     });
 
@@ -43,9 +50,12 @@ export async function getContestDetails(
       // Validate and return the contest details using the schema
       return ContestSchema.parse({
         ...contest,
-        activities: contest.contestActivities, // Rename to match the schema
-        users: contest.contestUsers, // Rename to match the schema
-        tracks: contest.contestTracks.map(ct => ({...ct.track})),
+        activities: contest.contestActivities,
+        users: contest.contestUsers,
+        tracks: contest.contestTracks.map(ct => ({
+          ...ct.track,
+          contestProgress: ct.userResults[0] || null
+        })),
       });
     }
     return null;

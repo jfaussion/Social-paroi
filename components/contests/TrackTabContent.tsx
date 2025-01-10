@@ -8,16 +8,19 @@ import AddTrackCard from '../tracks/AddTrackCard';
 import { useFetchCotnestTracks as useFetchContestTracks } from '@/lib/tracks/hooks/useFetchContestTracks';
 import { CardPlaceHolder } from '../ui/CardPlacehorlder';
 import { useManageContestTracks } from '@/lib/contests/hooks/useManageContestTracks';
+import ContestTrackCard from './ContestTrackCard';
+import { ContestUser } from '@/domain/ContestUser.schema';
 
 interface TrackTabContentProps {
   contestTracks: Track[];
   isOpener: boolean;
   contestId: number;
+  contestUser: ContestUser | undefined;
   onAddTrack: (trackToAdd: Track) => void; // Callback to handle adding a track
   onRemoveTrack: (trackToRemove: Track) => void; // Callback to handle removing a track
 }
 
-const TrackTabContent: React.FC<TrackTabContentProps> = ({ contestTracks, isOpener, contestId, onAddTrack, onRemoveTrack }) => {
+const TrackTabContent: React.FC<TrackTabContentProps> = ({ contestTracks, isOpener, contestId, contestUser, onAddTrack, onRemoveTrack }) => {
   const [isPopinOpen, setPopinOpen] = useState<boolean>(false);
   const { fetchTracks, isLoading: isLoadingTracks, error: fetchError } = useFetchContestTracks();
   const [tracks, setTracks] = useState<Track[]>([]);
@@ -49,7 +52,7 @@ const TrackTabContent: React.FC<TrackTabContentProps> = ({ contestTracks, isOpen
       ) : (
         contestTracks.map(track => (
           <div key={track.id}>
-            <TrackCard {...track} />
+            <ContestTrackCard {...track} contestId={contestId} contestUser={contestUser} />
           </div>
         ))
       )}

@@ -40,6 +40,7 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
           <TrackTabContent
             contestTracks={contest.tracks}
             isOpener={isOpener(session)}
+            contestUser={contest.users.find(contestUser => contestUser.user?.id === session?.user?.id)}
             contestId={contest.id}
             onAddTrack={handleAddTrack}
             onRemoveTrack={handleRemoveTrack}

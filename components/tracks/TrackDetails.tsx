@@ -134,7 +134,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
           {/* Name and Done button row */}
           <div className="flex justify-between items-center mb-3">
             <h1 className="text-xl font-bold">{track.name}</h1>
-            <ToggleButton isActive={track.trackProgress?.status === TrackStatus.DONE} isLoading={false} onChange={handleStatusChange} />
+            <ToggleButton isActive={track.trackProgress?.status === TrackStatus.DONE} isDisabled={false} onChange={handleStatusChange} />
           </div>
 
           {/* Zone and Date row */}

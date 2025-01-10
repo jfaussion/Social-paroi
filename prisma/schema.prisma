@@ -165,6 +165,8 @@ model ContestTrack {
 
   contest Contest @relation(name: "ContestContestTracks", fields: [contestId], references: [id], onDelete: Cascade)
   track   Track   @relation(name: "TrackContestTracks", fields: [trackId], references: [id], onDelete: Cascade)
+  
+  userResults ContestUserTrack[]
 
   @@map("contest_tracks")
 }
@@ -177,6 +179,8 @@ model ContestActivity {
   contestId   Int
 
   contest Contest @relation(name: "ContestContestActivities", fields: [contestId], references: [id], onDelete: Cascade)
+  
+  userResults ContestUserActivity[]
 
   @@map("contest_activities")
 }
@@ -192,6 +196,44 @@ model ContestUser {
   contest Contest @relation(name: "ContestContestUsers", fields: [contestId], references: [id], onDelete: Cascade)
   user    User?   @relation(name: "UserContestUsers", fields: [userId], references: [id], onDelete: Cascade)
 
+  trackResults     ContestUserTrack[]     @relation("ContestUserTracks")
+  activityResults  ContestUserActivity[]  @relation("ContestUserActivities")
+
   @@map("contest_users")
+}
+
+model ContestUserTrack {
+  id            Int         @id @default(autoincrement())
+  contestUserId Int
+  contestTrackId Int
+  status        String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  contestUser   ContestUser   @relation("ContestUserTracks", fields: [contestUserId], references: [id], onDelete: Cascade)
+  contestTrack  ContestTrack  @relation(fields: [contestTrackId], references: [id], onDelete: Cascade)
+
+  @@unique([contestUserId, contestTrackId])
+  @@index([contestUserId], name: "idx_contestusertrack_user_id")
+  @@index([contestTrackId], name: "idx_contestusertrack_track_id")
+  @@map("contest_user_tracks")
+}
+
+model ContestUserActivity {
+  id              Int              @id @default(autoincrement())
+  contestUserId   Int
+  contestActivityId Int
+  score           Int              @default(0)
+  notes           String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  contestUser     ContestUser      @relation("ContestUserActivities", fields: [contestUserId], references: [id], onDelete: Cascade)
+  contestActivity ContestActivity  @relation(fields: [contestActivityId], references: [id], onDelete: Cascade)
+
+  @@unique([contestUserId, contestActivityId])
+  @@index([contestUserId], name: "idx_contestuseractivity_user_id")
+  @@index([contestActivityId], name: "idx_contestuseractivity_activity_id")
+  @@map("contest_user_activities")
 }
 
