@@ -50,7 +50,7 @@ const ActivityTabContent: React.FC<ActivityTabContentProps> = ({
   };
 
   const handleAddActivity = async (
-    activityData: Omit<ContestActivity, 'contestId'>,
+    activityData: Omit<ContestActivity, 'contestId' | 'userScore'>,
     imageFile: File | null
   ) => {
     const newActivity = await addActivity(contest.id, activityData, imageFile);

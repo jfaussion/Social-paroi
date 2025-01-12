@@ -34,7 +34,7 @@ export const useManageContestActivities = () => {
 
   const addActivity = async (
     contestId: number,
-    activity: Omit<ContestActivity, 'contestId'>,
+    activity: Omit<ContestActivity, 'contestId' | 'userScore'>,
     imageFile: File | null
   ): Promise<ContestActivity | null> => {
     setIsLoading(true);

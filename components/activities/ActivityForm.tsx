@@ -9,7 +9,7 @@ import Popin from "../ui/Popin";
 type ActivityFormProps = {
   isOpen: boolean;
   activity: ContestActivity | null;
-  onConfirm: (formData: Omit<ContestActivity, 'contestId'>, imageFile: File | null) => void;
+  onConfirm: (formData: Omit<ContestActivity, 'contestId' | 'userScore'>, imageFile: File | null) => void;
   onCancel: () => void;
   error?: string;
   isLoading: boolean;
@@ -25,7 +25,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({
   loadingMessage,
   activity
 }) => {
-  const [formData, setFormData] = useState<Omit<ContestActivity, 'contestId'>>({
+  const [formData, setFormData] = useState<Omit<ContestActivity, 'contestId' | 'userScore'>>({
     id: activity?.id ?? 0,
     name: activity?.name ?? '',
     description: activity?.description ?? '',
