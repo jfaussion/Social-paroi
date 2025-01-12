@@ -6,7 +6,7 @@ import { ContestStatusEnum } from '@/domain/ContestStatus.enum';
 const prisma = new PrismaClient()
 
 async function updateRegularTrackStatus(
-  tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'>,
+  tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>,
   trackId: number,
   userId: string,
   status: TrackStatus,
@@ -28,7 +28,7 @@ async function updateRegularTrackStatus(
 }
 
 async function findActiveContestTracks(
-  tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'>,
+  tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>,
   trackId: number,
   userId: string,
 ) {
@@ -55,7 +55,7 @@ async function findActiveContestTracks(
 }
 
 async function updateContestTrackStatus(
-  tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'>,
+  tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>,
   contestTrack: any,
   contestUser: any,
   status: TrackStatus,

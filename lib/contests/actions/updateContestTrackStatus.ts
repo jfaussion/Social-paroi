@@ -10,7 +10,7 @@ import { Session } from 'next-auth';
 const prisma = new PrismaClient();
 
 async function getFinalContestUserId(
-  tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'>,
+  tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>,
   user: Session,
   contestId: number,
   contestUserId: number,
@@ -42,7 +42,7 @@ async function getFinalContestUserId(
 }
 
 async function getContestTrack(
-  tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'>,
+  tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>,
   contestId: number,
   trackId: number,
 ) {
@@ -61,7 +61,7 @@ async function getContestTrack(
 }
 
 async function updateContestUserTrack(
-  tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'>,
+  tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>,
   contestUserId: number,
   contestTrackId: number,
   status: TrackStatus,
@@ -86,7 +86,7 @@ async function updateContestUserTrack(
 }
 
 async function updateRegularTrackProgress(
-  tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'>,
+  tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>,
   finalContestUserId: number,
   trackId: number,
   status: TrackStatus,
