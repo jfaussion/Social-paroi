@@ -49,9 +49,9 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
       case 'bonus':
         return (
           <ActivityTabContent
-            contestActivities={contest.activities}
+            contest={contest}
             isOpener={isOpener(session)}
-            contestId={contest.id}
+            contestUser={contest.users.find(contestUser => contestUser.user?.id === session?.user?.id)}
             onAddActivity={(activity) => {
               setContest(prev => ({
                 ...prev,
@@ -126,7 +126,7 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
       ...prevContest,
       activities: prevContest.activities.map(activity =>
         activity.id === activityId
-          ? { ...activity, score: newScore }
+          ? { ...activity, userScore: newScore }
           : activity
       )
     }));

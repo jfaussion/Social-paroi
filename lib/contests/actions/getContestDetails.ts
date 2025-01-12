@@ -20,7 +20,7 @@ export async function getContestDetails(
       include: {
         contestTracks: {
           include: {
-            track: true, // Fetch the linked Track details
+            track: true,
             userResults: {
               where: {
                 contestUser: {
@@ -32,7 +32,7 @@ export async function getContestDetails(
         },
         contestUsers: {
           include: {
-            user: { // Fetch the linked User details
+            user: {
               select: {
                 id: true,
                 name: true,
@@ -42,7 +42,17 @@ export async function getContestDetails(
             },
           },
         },
-        contestActivities: true,
+        contestActivities: {
+          include: {
+            userResults: {
+              where: {
+                contestUser: {
+                  userId: userId
+                }
+              }
+            }
+          }
+        },
       },
     });
 
@@ -50,7 +60,10 @@ export async function getContestDetails(
       // Validate and return the contest details using the schema
       return ContestSchema.parse({
         ...contest,
-        activities: contest.contestActivities,
+        activities: contest.contestActivities.map(activity => ({
+          ...activity,
+          userScore: activity.userResults[0]?.score || 0
+        })),
         users: contest.contestUsers,
         tracks: contest.contestTracks.map(ct => ({
           ...ct.track,

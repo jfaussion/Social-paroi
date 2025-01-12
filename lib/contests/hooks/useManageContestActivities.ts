@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { updateActivityScore } from '@/lib/contests/actions/updateActivityScore';
+import { updateActivityScoreForUser } from '@/lib/contests/actions/updateActivityScoreForUser';
 import { addActivityToContest } from '@/lib/contests/actions/addActivityToContest';
 import { removeActivity } from '@/lib/contests/actions/removeActivity';
 import { ContestActivity } from '@/domain/ContestActivity.schema';
@@ -17,11 +17,12 @@ export const useManageContestActivities = () => {
   const updateActivityScore = async (
     contestId: number, 
     activityId: number, 
-    score: number
+    score: number,
+    contestUserId: number
   ): Promise<boolean> => {
     setIsLoading(true);
     try {
-      const success = await updateActivityScore(contestId, activityId, score);
+      const success = await updateActivityScoreForUser(contestId, activityId, score, contestUserId);
       setIsLoading(false);
       return success;
     } catch (err) {

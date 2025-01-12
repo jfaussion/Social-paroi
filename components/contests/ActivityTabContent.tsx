@@ -7,20 +7,23 @@ import { useManageContestActivities } from '@/lib/contests/hooks/useManageContes
 import { ContestActivity } from '@/domain/ContestActivity.schema';
 import ActivityForm from '../activities/ActivityForm';
 import ConfirmationDialog from '../ui/ConfirmDialog';
+import { Contest } from '@/domain/Contest.schema';
+import { ContestUser } from '@/domain/ContestUser.schema';
+import { toast } from 'sonner';
 
 interface ActivityTabContentProps {
-  contestActivities: ContestActivity[];
+  contest: Contest;
   isOpener: boolean;
-  contestId: number;
+  contestUser: ContestUser | undefined;
   onAddActivity: (activityToAdd: ContestActivity) => void;
   onRemoveActivity: (activityToRemove: ContestActivity) => void;
   onUpdateScore: (activityId: number, newScore: number) => void;
 }
 
 const ActivityTabContent: React.FC<ActivityTabContentProps> = ({
-  contestActivities,
+  contest,
+  contestUser,
   isOpener,
-  contestId,
   onAddActivity,
   onRemoveActivity,
   onUpdateScore
@@ -37,10 +40,12 @@ const ActivityTabContent: React.FC<ActivityTabContentProps> = ({
     error 
   } = useManageContestActivities();
 
-  const handleScoreUpdate = async (activityId: number, newScore: number) => {
-    const success = await updateActivityScore(contestId, activityId, newScore);
+  const handleScoreUpdate = async (activityId: number, newScore: number, contestUserId: number) => {
+    const success = await updateActivityScore(contest.id, activityId, newScore, contestUserId);
     if (success) {
       onUpdateScore(activityId, newScore);
+    } else {
+      toast.error('Failed to update score');
     }
   };
 
@@ -48,11 +53,13 @@ const ActivityTabContent: React.FC<ActivityTabContentProps> = ({
     activityData: Omit<ContestActivity, 'contestId'>,
     imageFile: File | null
   ) => {
-    const newActivity = await addActivity(contestId, activityData, imageFile);
+    const newActivity = await addActivity(contest.id, activityData, imageFile);
     if (newActivity) {
       onAddActivity(newActivity);
       setIsAddActivityPopinOpen(false);
       setSelectedActivity(null);
+    } else if (error) {
+      toast.error(error);
     }
   };
 
@@ -70,6 +77,8 @@ const ActivityTabContent: React.FC<ActivityTabContentProps> = ({
       const success = await deleteActivity(activityToDelete);
       if (success) {
         onRemoveActivity(activityToDelete);
+      } else if (error) {
+        toast.error(error);
       }
       setActivityToDelete(null);
     }
@@ -77,13 +86,14 @@ const ActivityTabContent: React.FC<ActivityTabContentProps> = ({
 
   return (
     <div className="space-y-4">
-      {contestActivities.length === 0 ? (
+      {contest.activities.length === 0 ? (
         <p className="text-gray-400">No activities yet</p>
       ) : (
-        contestActivities.map(activity => (
+        contest.activities.map(activity => (
           <ActivityCard
             key={activity.id}
             activity={activity}
+            contestUser={contestUser}
             onScoreUpdate={handleScoreUpdate}
             onEdit={handleEditActivity}
             onDelete={handleDeleteActivity}

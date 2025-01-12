@@ -8,10 +8,12 @@ import Popin from '../ui/Popin';
 import { ContestActivity } from '@/domain/ContestActivity.schema';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import ToggleMenu from '../ui/ToggleMenu';
+import { ContestUser } from '@/domain/ContestUser.schema';
 
 interface ActivityCardProps {
   activity: ContestActivity;
-  onScoreUpdate: (activityId: number, newScore: number) => void;
+  contestUser: ContestUser | undefined;
+  onScoreUpdate: (activityId: number, newScore: number, contestUserId: number) => void;
   onEdit?: (activity: ContestActivity) => void;
   onDelete?: (activity: ContestActivity) => void;
   isOpener: boolean;
@@ -19,18 +21,19 @@ interface ActivityCardProps {
 
 const ActivityCard: React.FC<ActivityCardProps> = ({ 
   activity, 
+  contestUser,
   onScoreUpdate,
   onEdit,
   onDelete,
   isOpener 
 }) => {
   const [isScorePopinOpen, setIsScorePopinOpen] = useState(false);
-  const [currentScore, setCurrentScore] = useState<string>('');
+  const [currentScore, setCurrentScore] = useState<string>(activity.userScore?.toString() || '');
 
   const handleScoreSubmit = () => {
     const numScore = parseFloat(currentScore);
-    if (!isNaN(numScore)) {
-      onScoreUpdate(activity.id, numScore);
+    if (!isNaN(numScore) && contestUser) {
+      onScoreUpdate(activity.id, numScore, contestUser.id);
       setIsScorePopinOpen(false);
     }
   };
@@ -66,10 +69,15 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <span className="text-gray-400 mr-2">Score:</span>
-            <span className="font-semibold">{'-'}</span>
+            <span className="font-semibold">
+              {activity.userScore > 0 ? activity.userScore : '-'}
+            </span>
           </div>
           <Button 
-            onClick={() => setIsScorePopinOpen(true)}
+            onClick={() => {
+              setCurrentScore(activity.userScore?.toString() || '');
+              setIsScorePopinOpen(true);
+            }}
             className="px-4 py-2"
           >
             Edit Score
@@ -109,18 +117,19 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
             onChange={(e) => setCurrentScore(e.target.value)}
             className="w-full p-2 mb-4 rounded bg-gray-700 text-white"
             placeholder="Enter score"
+            autoFocus
           />
           <div className="flex justify-end space-x-2">
             <Button
               btnType="secondary"
-              onClick={() => setIsScorePopinOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
               onClick={handleScoreSubmit}
             >
               Save
+            </Button>
+            <Button
+              onClick={() => setIsScorePopinOpen(false)}
+            >
+              Cancel
             </Button>
           </div>
         </div>
