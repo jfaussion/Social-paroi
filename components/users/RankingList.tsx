@@ -51,8 +51,6 @@ const RankingList: React.FC = () => {
                 name={user.name}
                 score={user.score}
                 isCurrentUser={user.id === session.data?.user?.id}
-                isAddable={false}
-                isRemovable={false}
                 containerClass={"px-4"}
               />
             ))}

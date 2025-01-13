@@ -9,6 +9,7 @@ import ContestUserCard from '../users/ContestUserCard';
 import { User } from '@/domain/User.schema';
 import ConfirmationDialog from '../ui/ConfirmDialog';
 import AddTempUserPopin from '../ui/AddTempUserPopin';
+import AddButton from '../ui/AddButton';
 
 interface UserTabContentProps {
   contestId: number;
@@ -111,25 +112,32 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contestId, isOpener, co
           {isLoadingUsers ? (
             <p>Loading users...</p>
           ) : (
-            users.map((user: User) => (
-              <UserCard
-                key={user.id}
-                name={user.name ?? 'Unknown User'}
-                profilePicture={user.image ?? '/default-profile.png'}
-                isAdded={contestUsers.some(u => u.user?.id === user.id)}
-                isAddable={true}
-                isRemovable={false}
-                onClickAdd={() => {
-                  const contestUserAdded = contestUsers.find(u => u.user?.id === user.id);
-                  if (contestUserAdded) {
-                    handleRemoveContestUser(contestUserAdded);
-                  } else {
-                    setSelectedUser(user);
-                    setGenderPopinOpen(true);
-                  }
-                }}
-              />
-            ))
+            users.map((user: User) => {
+              const isUserAdded = contestUsers.some(u => u.user?.id === user.id);
+
+              return (
+                <UserCard
+                  key={user.id}
+                  name={user.name ?? 'Unknown User'}
+                  profilePicture={user.image ?? '/default-profile.png'}
+                >
+                  <AddButton 
+                    isActive={isUserAdded}
+                    isLoading={false}
+                    onChange={() => {
+                      const contestUserAdded = contestUsers.find(u => u.user?.id === user.id);
+                      if (contestUserAdded) {
+                        handleRemoveContestUser(contestUserAdded);
+                      } else {
+                        setSelectedUser(user);
+                        setGenderPopinOpen(true);
+                      }
+                    }}
+                    style='small'
+                  />
+                </UserCard>
+              );
+            })
           )}
         </div>
       </Popin>

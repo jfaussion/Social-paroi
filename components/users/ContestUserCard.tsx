@@ -1,6 +1,7 @@
 import React from 'react';
 import UserCard from './UserCard';
 import { ContestUser } from '@/domain/ContestUser.schema';
+import { FaTrash } from 'react-icons/fa';
 
 interface ContestUserCardProps {
   contestUser: ContestUser;
@@ -13,15 +14,24 @@ const ContestUserCard: React.FC<ContestUserCardProps> = ({
   onRemove,
   isRemovable = false
 }) => {
+  const actions = isRemovable ? [
+    {
+      label: 'Remove User',
+      icon: <FaTrash className="w-4 h-4" />,
+      onClick: () => onRemove(contestUser),
+      className: 'text-red-600 dark:text-red-400'
+    }
+  ] : undefined;
+
   return (
     <UserCard
       name={contestUser.isTemp ? contestUser.name || '' : contestUser.user?.name || ''}
       profilePicture={contestUser.isTemp ? undefined : contestUser.user?.image || ''}
-      isCurrentUser={false} // Adjust as needed
+      isCurrentUser={false}
       gender={contestUser.gender}
-      isRemovable={isRemovable}
-      onClickRemove={() => onRemove(contestUser)}
-    />
+      actions={actions}
+    >
+    </UserCard>
   );
 };
 

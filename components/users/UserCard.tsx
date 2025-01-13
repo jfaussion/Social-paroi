@@ -1,8 +1,8 @@
 import React from 'react';
 import Image from 'next/image';
 import DefaultAvatar from "@/public/default-avatar.svg";
-import AddButton from '../ui/AddButton';
-import MinusButton from '../ui/MinusButton';
+import ToggleMenu from '../ui/ToggleMenu';
+import { MenuAction } from '@/types/ui';
 
 interface UserCardProps {
   rank?: number;
@@ -11,15 +11,22 @@ interface UserCardProps {
   score?: number;
   isCurrentUser?: boolean;
   gender?: string;
-  isAddable?: boolean;
-  isAdded?: boolean;
-  isRemovable?: boolean;
-  onClickAdd?: () => void;
-  onClickRemove?: () => void;
+  actions?: MenuAction[];
   containerClass?: string;
+  children?: React.ReactNode;
 }
 
-const UserCard: React.FC<UserCardProps> = ({ rank, profilePicture, name, score, isCurrentUser, gender, isAddable, isAdded, isRemovable, onClickAdd, onClickRemove, containerClass }) => {
+const UserCard: React.FC<UserCardProps> = ({ 
+  rank, 
+  profilePicture, 
+  name, 
+  score, 
+  isCurrentUser, 
+  gender,
+  actions,
+  containerClass,
+  children 
+}) => {
   return (
     <div className={`relative flex items-center justify-between py-4 w-full ${isCurrentUser ? 'bg-slate-300 dark:bg-gray-700' : ''} ${containerClass}`}>
       <div className="flex items-center">
@@ -35,11 +42,17 @@ const UserCard: React.FC<UserCardProps> = ({ rank, profilePicture, name, score, 
         </div>
         <span className="text-md">{name}</span>
       </div>
-      <div className="flex items-center justify-self-end">
+      <div className="flex items-center justify-self-end gap-2">
         {gender && <span className="text-md mr-2">{gender}</span>}
-        {score && <span className="text-md font-bold">{score}</span>}
-        {isAddable && <AddButton isActive={!!isAdded} isLoading={false} onChange={onClickAdd} style='small' />}
-        {isRemovable && <MinusButton isActive={false} isLoading={false} onChange={onClickRemove} style='small' />}
+        {score && <span className="text-md font-bold mr-2">{score}</span>}
+        {children}
+        {actions && actions.length > 0 && (
+          <ToggleMenu 
+            actions={actions}
+            position="top-right"
+            buttonClassName="text-gray-600 dark:text-gray-300 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
+          />
+        )}
       </div>
       <div className="absolute bottom-0 h-px bg-gray-300 dark:bg-gray-700 left-[10%] right-[10%]"></div>
     </div>
