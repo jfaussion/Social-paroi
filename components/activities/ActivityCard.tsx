@@ -9,6 +9,8 @@ import { ContestActivity } from '@/domain/ContestActivity.schema';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import ToggleMenu from '../ui/ToggleMenu';
 import { ContestUser } from '@/domain/ContestUser.schema';
+import { isOpener } from '@/utils/session.utils';
+import { useSession } from 'next-auth/react';
 
 interface ActivityCardProps {
   activity: ContestActivity;
@@ -16,7 +18,8 @@ interface ActivityCardProps {
   onScoreUpdate: (activityId: number, newScore: number, contestUserId: number) => void;
   onEdit?: (activity: ContestActivity) => void;
   onDelete?: (activity: ContestActivity) => void;
-  isOpener: boolean;
+  displayToggleMenu: boolean;
+  displayImageAndDesc: boolean;
 }
 
 const ActivityCard: React.FC<ActivityCardProps> = ({ 
@@ -25,10 +28,15 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
   onScoreUpdate,
   onEdit,
   onDelete,
-  isOpener 
+  displayToggleMenu,
+  displayImageAndDesc = true
 }) => {
   const [isScorePopinOpen, setIsScorePopinOpen] = useState(false);
   const [currentScore, setCurrentScore] = useState<string>(activity.userScore?.toString() || '');
+  const { data: session } = useSession();
+
+  const isSelfContester = contestUser && session?.user?.id === contestUser.user?.id;
+  const isSelfOrOpener = isSelfContester || isOpener(session);
 
   const handleScoreSubmit = () => {
     const numScore = parseFloat(currentScore);
@@ -40,31 +48,35 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
     
   return (
     <div className="w-full cursor-pointer bg-gradient-to-r from-slate-300 to-slate-200 dark:from-gray-700 dark:to-gray-900 border border-gray-600 rounded-lg shadow-lg relative">
-      {activity.image ? (
-        <CldImage
-          width="400"
-          height="200"
-          src={activity.image}
-          crop="thumb"
-          gravity="center"
-          alt={activity.name}
-          className="w-full h-48 object-cover rounded-t-lg"
-        />
-      ) : (
-        <Image
-          src={placeholderImage}
-          alt={activity.name}
-          className="w-full h-48 object-cover rounded-t-lg"
-          width={400}
-          height={200}
-        />
+      {displayImageAndDesc && (
+        activity.image ? (
+          <CldImage
+            width="400"
+            height="200"
+            src={activity.image}
+            crop="thumb"
+            gravity="center"
+            alt={activity.name}
+            className="w-full h-48 object-cover rounded-t-lg"
+          />
+        ) : (
+          <Image
+            src={placeholderImage}
+            alt={activity.name}
+            className="w-full h-48 object-cover rounded-t-lg"
+            width={400}
+            height={200}
+          />
+        )
       )}
 
       <div className="p-4">
         <h3 className="text-lg font-semibold mb-2">{activity.name}</h3>
-        <p className="text-gray-400 mb-4 whitespace-pre-line">
-          {activity.description}
-        </p>
+        {displayImageAndDesc &&
+          <p className="text-gray-400 mb-4 whitespace-pre-line">
+            {activity.description}
+          </p>
+        }
         
         <div className="flex items-center justify-between">
           <div className="flex items-center">
@@ -73,19 +85,21 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
               {activity.userScore > 0 ? activity.userScore : '-'}
             </span>
           </div>
-          <Button 
-            onClick={() => {
-              setCurrentScore(activity.userScore?.toString() || '');
-              setIsScorePopinOpen(true);
-            }}
-            className="px-4 py-2"
-          >
-            Edit Score
-          </Button>
+          {isSelfOrOpener && (
+            <Button 
+              onClick={() => {
+                setCurrentScore(activity.userScore?.toString() || '');
+                setIsScorePopinOpen(true);
+              }}
+              className="px-4 py-2"
+            >
+              Edit Score
+              </Button>
+          )}
         </div>
       </div>
 
-      {isOpener && (
+      {displayToggleMenu && (
         <div className="absolute top-4 right-4">
           <ToggleMenu
             actions={[

@@ -97,7 +97,8 @@ const ActivityTabContent: React.FC<ActivityTabContentProps> = ({
             onScoreUpdate={handleScoreUpdate}
             onEdit={handleEditActivity}
             onDelete={handleDeleteActivity}
-            isOpener={isOpener}
+            displayToggleMenu={isOpener}
+            displayImageAndDesc={true}
           />
         ))
       )}

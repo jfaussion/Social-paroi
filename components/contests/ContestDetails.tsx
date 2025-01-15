@@ -15,6 +15,7 @@ import TrackTabContent from './TrackTabContent';
 import UserTabContent from './UserTabContent';
 import { ContestUser } from '@/domain/ContestUser.schema';
 import ActivityTabContent from './ActivityTabContent';
+import { ContestActivity } from '@/domain/ContestActivity.schema';
 import ContestStatus from '../ui/ContestStatus';
 
 const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
@@ -30,9 +31,8 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
     switch (activeTab) {
       case 'users':
         return <UserTabContent 
-          contestUsers={contest.users}
           isOpener={isOpener(session)}
-          contestId={contest.id} 
+          contest={contest} 
           onAddUser={handleAddUser}
           onRemoveUser={handleRemoveUser}
         />;
@@ -52,18 +52,8 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
             contest={contest}
             isOpener={isOpener(session)}
             contestUser={contest.users.find(contestUser => contestUser.user?.id === session?.user?.id)}
-            onAddActivity={(activity) => {
-              setContest(prev => ({
-                ...prev,
-                activities: [...prev.activities, activity]
-              }));
-            }}
-            onRemoveActivity={(activity) => {
-              setContest(prev => ({
-                ...prev,
-                activities: prev.activities.filter(a => a.id !== activity.id)
-              }));
-            }}
+            onAddActivity={handleAddActivity}
+            onRemoveActivity={handleRemoveActivity}
             onUpdateScore={handleUpdateActivityScore}
           />
         );
@@ -85,6 +75,24 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
   const handleCancelDelete = async () => {
     setDeleteDialogOpen(false);
     resetDelete();
+  };
+
+
+
+  const handleAddActivity= (activityoAdd: ContestActivity) => {
+    console.log('Adding activity:', activityoAdd);
+    setContest(prevContest => ({
+      ...prevContest,
+      activities: [...prevContest.activities, activityoAdd]
+    }));
+  };
+
+  const handleRemoveActivity = (activityToRemove: ContestActivity) => {
+    console.log('Removing activity:', activityToRemove);
+    setContest(prevContest => ({
+      ...prevContest,
+      activities: prevContest.activities.filter(activity => activity.id !== activityToRemove.id)
+    }));
   };
 
   const handleAddUser = (userToAdd: ContestUser) => {

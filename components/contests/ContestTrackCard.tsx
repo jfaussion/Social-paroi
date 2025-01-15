@@ -24,7 +24,7 @@ const ContestTrackCard: React.FC<ContestTrackCardProps> = ({ contest, contestUse
   );
 
   const isSelfContester = contestUser && session?.user?.id === contestUser.user?.id;
-  const isActiveStatusChange = isSelfContester || isOpener(session);
+  const isSelfOrOpener = isSelfContester || isOpener(session);
 
   const handleStatusChange = async () => {
     const newStatus = localStatus === TrackStatus.DONE 
@@ -41,7 +41,7 @@ const ContestTrackCard: React.FC<ContestTrackCardProps> = ({ contest, contestUse
   
   const statusHandler = {
     isCompleted: localStatus === TrackStatus.DONE,
-    isDisabled: isLoading || !contestUser || contest.status === ContestStatusEnum.Enum.Over,
+    isDisabled: isLoading || !contestUser || contest.status === ContestStatusEnum.Enum.Over || !isSelfOrOpener,
     onStatusChange: handleStatusChange
   };
 

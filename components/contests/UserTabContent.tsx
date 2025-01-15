@@ -10,16 +10,20 @@ import { User } from '@/domain/User.schema';
 import ConfirmationDialog from '../ui/ConfirmDialog';
 import AddTempUserPopin from '../ui/AddTempUserPopin';
 import AddButton from '../ui/AddButton';
+import ContestTrackCard from '../contests/ContestTrackCard';
+import ActivityCard from '../activities/ActivityCard';
+import { useContestUserDetails } from '@/lib/contests/hooks/useContestUserDetails';
+import { Contest } from '@/domain/Contest.schema';
+import { useManageContestActivities } from '@/lib/contests/hooks/useManageContestActivities';
 
 interface UserTabContentProps {
-  contestId: number;
+  contest: Contest;
   isOpener: boolean;
-  contestUsers: ContestUser[];
   onRemoveUser: (user: ContestUser) => void;
   onAddUser: (user: ContestUser) => void;
 }
 
-const UserTabContent: React.FC<UserTabContentProps> = ({ contestId, isOpener, contestUsers, onRemoveUser, onAddUser }) => {
+const UserTabContent: React.FC<UserTabContentProps> = ({ contest, isOpener, onRemoveUser, onAddUser }) => {
   const [isUserPopinOpen, setUserPopinOpen] = useState<boolean>(false);
   const [isTempUserPopinOpen, setTempUserPopinOpen] = useState<boolean>(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
@@ -28,14 +32,25 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contestId, isOpener, co
   const { addUser, addTempUser, deleteUser } = useManageContestUsers();
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedContestUser, setSelectedContestUser] = useState<ContestUser | null>(null);
   const [isGenderPopinOpen, setGenderPopinOpen] = useState<boolean>(false);
+  const [isScorePopinOpen, setIsScorePopinOpen] = useState<boolean>(false);
+  const { 
+    tracks: userTracks, 
+    activities: userActivities, 
+    isLoading: isLoadingDetails,
+    fetchDetails,
+    setActivities 
+  } = useContestUserDetails();
+  const { updateActivityScore } = useManageContestActivities();
+
 
   const handleAddUserInApp = async (user: User, gender: GenderType) => {
-    const contestUserId = await addUser(contestId, user.id, gender);
+    const contestUserId = await addUser(contest.id, user.id, gender);
     if (contestUserId) {
       onAddUser({
         id: contestUserId,
-        contestId,
+        contestId: contest.id,
         gender: gender,
         isTemp: false,
         user: user,
@@ -44,11 +59,11 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contestId, isOpener, co
   };
 
   const handleAddTempUser = async (name: string, gender: GenderType) => {
-    const contestUserId = await addTempUser(contestId, name, gender);
+    const contestUserId = await addTempUser(contest.id, name, gender);
     if (contestUserId) {
       onAddUser({
         id: contestUserId,
-        contestId,
+        contestId: contest.id,
         gender: gender,
         isTemp: true,
         name: name,
@@ -85,12 +100,25 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contestId, isOpener, co
     }
   };
 
+  const handleViewScoreAction = async (contestUser: ContestUser) => {
+    setSelectedContestUser(contestUser);
+    await fetchDetails(contest.id, contestUser.id);
+    setIsScorePopinOpen(true);
+  };
+
   return (
     <div>
       {/* Display the list of contest users */}
       <div className="flex flex-col w-full">
-        {contestUsers.map(contestUser => (
-          <ContestUserCard key={contestUser.id} contestUser={contestUser} onRemove={handleRemoveContestUser} isRemovable={isOpener}/>
+        {contest.users.map(contestUser => (
+          <ContestUserCard
+            key={contestUser.id}
+            contestUser={contestUser}
+            onRemove={handleRemoveContestUser}
+            onViewScoreAction={handleViewScoreAction}
+            isRemovable={isOpener}
+            isOpener={isOpener}
+          />
         ))}
       </div>
 
@@ -113,7 +141,7 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contestId, isOpener, co
             <p>Loading users...</p>
           ) : (
             users.map((user: User) => {
-              const isUserAdded = contestUsers.some(u => u.user?.id === user.id);
+              const isUserAdded = contest.users.some(u => u.user?.id === user.id);
 
               return (
                 <UserCard
@@ -125,7 +153,7 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contestId, isOpener, co
                     isActive={isUserAdded}
                     isLoading={false}
                     onChange={() => {
-                      const contestUserAdded = contestUsers.find(u => u.user?.id === user.id);
+                      const contestUserAdded = contest.users.find(u => u.user?.id === user.id);
                       if (contestUserAdded) {
                         handleRemoveContestUser(contestUserAdded);
                       } else {
@@ -168,6 +196,80 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contestId, isOpener, co
         onCancel={() => setIsDeleteDialogOpen(false)}
         onConfirm={confirmRemoveUser}
       />
+
+      {/* Score Recap Popin */}
+      <Popin 
+        isOpen={isScorePopinOpen} 
+        onClose={() => setIsScorePopinOpen(false)} 
+        title={`Score Recap - ${selectedContestUser?.user?.name ?? selectedContestUser?.name}`}
+      >
+        <div className="space-y-6 p-4">
+          {isLoadingDetails ? (
+            <div className="flex justify-center items-center py-8">
+              <p>Loading details...</p>
+            </div>
+          ) : (
+            <>
+              {/* Tracks Section */}
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Completed Tracks</h3>
+                <div className="space-y-4">
+                  {userTracks.map(track => (
+                    <ContestTrackCard
+                      key={track.id}
+                      {...track}
+                      contest={contest}
+                      contestUser={selectedContestUser ?? undefined}
+                    />
+                  ))}
+                  {userTracks.length === 0 && (
+                    <p className="text-gray-500">No tracks completed yet</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Activities Section */}
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Activities</h3>
+                <div className="space-y-4">
+                  {userActivities.map(activity => (
+                    <ActivityCard
+                      key={activity.id}
+                      activity={activity}
+                      contestUser={selectedContestUser ?? undefined}
+                      displayImageAndDesc={false}
+                      onScoreUpdate={async (activityId, newScore) => {
+                        if (selectedContestUser) {
+                          const success = await updateActivityScore(
+                            contest.id,
+                            activityId,
+                            newScore,
+                            selectedContestUser.id
+                          );
+                          if (success) {
+                            // Update the activity score locally
+                            setActivities(
+                              userActivities.map(a => 
+                                a.id === activityId 
+                                  ? { ...a, userScore: newScore }
+                                  : a
+                              )
+                            );
+                          }
+                        }
+                      }}
+                      displayToggleMenu={false}
+                    />
+                  ))}
+                  {userActivities.length === 0 && (
+                    <p className="text-gray-500">No activities available</p>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </Popin>
 
     </div>
   );

@@ -96,12 +96,12 @@ async function updateRegularTrackProgress(
     select: { userId: true },
   });
 
-  if (contestUser) {
+  if (contestUser?.userId) {
     await tx.userTrackProgress.upsert({
       where: {
         user_track_unique_constraint: {
           trackId,
-          userId: contestUser.userId!,
+          userId: contestUser.userId,
         },
       },
       update: { status },
