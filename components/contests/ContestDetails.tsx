@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useId, useState } from 'react';
 import Image from 'next/image';
 import { CldImage } from 'next-cloudinary';
 import { Contest } from "@/domain/Contest.schema";
@@ -17,15 +17,39 @@ import { ContestUser } from '@/domain/ContestUser.schema';
 import ActivityTabContent from './ActivityTabContent';
 import { ContestActivity } from '@/domain/ContestActivity.schema';
 import ContestStatus from '../ui/ContestStatus';
+import { useChangeContestStatus } from '@/lib/contests/hooks/useChangeContestStatus';
+import { ContestStatusEnum } from '@/domain/ContestStatus.enum';
+import { ContestStatusType } from '@/domain/ContestStatus.enum';
+import Popin from '../ui/Popin';
+import customSelectClassName from '../ui/customSelectClassName';
+import Select from 'react-select';
+
+type StatusOption = {
+  value: ContestStatusType;
+  label: ContestStatusType;
+};
 
 const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
   const [contest, setContest] = useState<Contest>(propContest);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
+  const [isStatusDialogOpen, setStatusDialogOpen] = useState<boolean>(false);
+  const [selectedStatus, setSelectedStatus] = useState<ContestStatusType>(contest.status);
   const { deleteContest, isLoading: isLoadingDelete, error: errorDelete, reset: resetDelete } = useDeleteContest();
+  const { changeContestStatus, isLoading: isLoadingChangeStatus, error: errorChangeStatus, reset: resetChangeStatus } = useChangeContestStatus();
   const { data: session } = useSession();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('tracks');
 
+  const handleStatusChange = async () => {
+    const result = await changeContestStatus(contest, selectedStatus);
+    if (result.success) {
+      setContest(prevContest => ({
+        ...prevContest,
+        status: selectedStatus
+      }));
+      setStatusDialogOpen(false);
+    }
+  };
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -212,8 +236,13 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
             <div className='p-4 w-full border-t-2 border-gray-600 sm:border sm:border-gray-600 sm:rounded-lg dark:bg-gray-900 sm:m-4 sm:mt-0 space-y-2'>
               <h2 className="text-lg font-bold mb-3">Editor zone</h2>
               <div className='flex flex-wrap justify-between gap-2'>
-                <Button className='grow' onClick={() => router.push(`${contest.id}/edit`)}>Edit Contest</Button>
+                <Button className='grow' onClick={() => setStatusDialogOpen(true)}>
+                  Change Status
+                </Button>
                 <Button className='grow bg-red-500 text-white' btnType='danger' onClick={() => setDeleteDialogOpen(true)}>Delete Contest</Button>
+              </div>
+              <div className='flex flex-wrap justify-between gap-2'>
+                <Button className='grow' btnType='secondary' onClick={() => {}}>Generate Ranking</Button>
               </div>
             </div>
           )}
@@ -222,6 +251,36 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
         <ConfirmationDialog isOpen={isDeleteDialogOpen} title='Delete Contest' text='Are you sure you want to delete this contest?'
           onCancel={handleCancelDelete} onConfirm={handleDeleteContest}
           error={errorDelete ?? undefined} isLoading={isLoadingDelete} loadingMessage='Deleting contest...'></ConfirmationDialog>
+
+        {/* Status Change Dialog */}
+        <Popin isOpen={isStatusDialogOpen} onClose={() => setStatusDialogOpen(false)} title="Change Contest Status">
+          <div>
+            <Select<StatusOption>
+              instanceId={useId()}
+              isSearchable={false}
+              name="status"
+              value={{ value: selectedStatus, label: selectedStatus }}
+              options={Object.values(ContestStatusEnum.Enum).map(status => ({ value: status, label: status }))}
+              className="basic-multi-select"
+              classNamePrefix="select"
+              onChange={(newValue) => setSelectedStatus(newValue?.value as ContestStatusType)}
+              classNames={customSelectClassName}
+              unstyled={true}
+              placeholder="Select Status"
+            />
+            <div className="flex justify-end gap-2 mt-4">
+              <Button btnType="secondary" onClick={handleStatusChange} disabled={isLoadingChangeStatus}>
+                Change Status
+              </Button>
+              <Button onClick={() => setStatusDialogOpen(false)}>
+                Cancel
+              </Button>
+            </div>
+            {errorChangeStatus && (
+              <p className="text-red-500 mt-2">{errorChangeStatus}</p>
+            )}
+          </div>
+        </Popin>
       </div>
     </main>
   );
