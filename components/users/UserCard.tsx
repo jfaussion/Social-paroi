@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import DefaultAvatar from "@/public/default-avatar.svg";
 import ToggleMenu from '../ui/ToggleMenu';
-import { MenuAction } from '@/types/ui';
+import { MenuAction } from '@/domain/MenuAction.type';
 
 interface UserCardProps {
   rank?: number;
