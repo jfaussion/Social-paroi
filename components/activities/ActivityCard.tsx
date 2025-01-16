@@ -47,7 +47,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
   };
     
   return (
-    <div className="w-full cursor-pointer bg-gradient-to-r from-slate-300 to-slate-200 dark:from-gray-700 dark:to-gray-900 border border-gray-600 rounded-lg shadow-lg relative">
+    <div className="w-full cursor-pointer bg-gradient-to-r from-slate-200 to-slate-100 dark:from-gray-700 dark:to-gray-900 border border-gray-600 rounded-lg shadow-lg relative">
       {displayImageAndDesc && (
         activity.image ? (
           <CldImage
@@ -73,14 +73,14 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
       <div className="p-4">
         <h3 className="text-lg font-semibold mb-2">{activity.name}</h3>
         {displayImageAndDesc &&
-          <p className="text-gray-400 mb-4 whitespace-pre-line">
+          <p className="text-gray-600 dark:text-gray-400 mb-4 whitespace-pre-line">
             {activity.description}
           </p>
         }
         
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <span className="text-gray-400 mr-2">Score:</span>
+            <span className="text-gray-600 dark:text-gray-400 mr-2">Score:</span>
             <span className="font-semibold">
               {activity.userScore > 0 ? activity.userScore : '-'}
             </span>
@@ -129,7 +129,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
             type="number"
             value={currentScore}
             onChange={(e) => setCurrentScore(e.target.value)}
-            className="w-full p-2 mb-4 rounded bg-gray-700 text-white"
+            className="w-full p-2 mb-4 rounded bg-gray-300 dark:bg-gray-700 text-black dark:text-white"
             placeholder="Enter score"
             autoFocus
           />
