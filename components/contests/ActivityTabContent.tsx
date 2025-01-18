@@ -15,7 +15,7 @@ interface ActivityTabContentProps {
   contest: Contest;
   isOpener: boolean;
   contestUser: ContestUser | undefined;
-  onAddActivity: (activityToAdd: ContestActivity) => void;
+  onPostActivity: (activityToAddOrUpdate: ContestActivity) => void;
   onRemoveActivity: (activityToRemove: ContestActivity) => void;
   onUpdateScore: (activityId: number, newScore: number) => void;
 }
@@ -24,15 +24,15 @@ const ActivityTabContent: React.FC<ActivityTabContentProps> = ({
   contest,
   contestUser,
   isOpener,
-  onAddActivity,
+  onPostActivity,
   onRemoveActivity,
   onUpdateScore
 }) => {
-  const [isAddActivityPopinOpen, setIsAddActivityPopinOpen] = useState(false);
+  const [isFormActivityPopinOpen, setIsFormActivityPopinOpen] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<ContestActivity | null>(null);
   const [activityToDelete, setActivityToDelete] = useState<ContestActivity | null>(null);
   const { 
-    addActivity, 
+    postActivity, 
     deleteActivity, 
     updateActivityScore,
     isLoading,
@@ -49,14 +49,14 @@ const ActivityTabContent: React.FC<ActivityTabContentProps> = ({
     }
   };
 
-  const handleAddActivity = async (
+  const handlePostActivity = async (
     activityData: Omit<ContestActivity, 'contestId' | 'userScore'>,
     imageFile: File | null
   ) => {
-    const newActivity = await addActivity(contest.id, activityData, imageFile);
+    const newActivity = await postActivity(contest.id, activityData, imageFile);
     if (newActivity) {
-      onAddActivity(newActivity);
-      setIsAddActivityPopinOpen(false);
+      onPostActivity(newActivity);
+      setIsFormActivityPopinOpen(false);
       setSelectedActivity(null);
     } else if (error) {
       toast.error(error);
@@ -65,7 +65,7 @@ const ActivityTabContent: React.FC<ActivityTabContentProps> = ({
 
   const handleEditActivity = (activity: ContestActivity) => {
     setSelectedActivity(activity);
-    setIsAddActivityPopinOpen(true);
+    setIsFormActivityPopinOpen(true);
   };
 
   const handleDeleteActivity = async (activity: ContestActivity) => {
@@ -107,7 +107,7 @@ const ActivityTabContent: React.FC<ActivityTabContentProps> = ({
         <Button 
           onClick={() => {
             setSelectedActivity(null);
-            setIsAddActivityPopinOpen(true);
+            setIsFormActivityPopinOpen(true);
           }} 
           className="w-full flex items-center justify-center"
         >
@@ -117,12 +117,12 @@ const ActivityTabContent: React.FC<ActivityTabContentProps> = ({
       )}
 
       <ActivityForm
-        isOpen={isAddActivityPopinOpen}
+        isOpen={isFormActivityPopinOpen}
         onCancel={() => {
-          setIsAddActivityPopinOpen(false);
+          setIsFormActivityPopinOpen(false);
           setSelectedActivity(null);
         }}
-        onConfirm={handleAddActivity}
+        onConfirm={handlePostActivity}
         error={error ?? undefined}
         isLoading={isLoading}
         loadingMessage={loadingMessage ?? undefined}

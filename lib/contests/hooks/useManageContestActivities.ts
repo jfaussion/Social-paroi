@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { updateActivityScoreForUser } from '@/lib/contests/actions/updateActivityScoreForUser';
-import { addActivityToContest } from '@/lib/contests/actions/addActivityToContest';
+import { postActivityToContest } from '@/lib/contests/actions/postActivityToContest';
 import { removeActivity } from '@/lib/contests/actions/removeActivity';
 import { ContestActivity } from '@/domain/ContestActivity.schema';
 import { postActivityImage } from '../actions/postActivityImage';
@@ -32,7 +32,7 @@ export const useManageContestActivities = () => {
     }
   };
 
-  const addActivity = async (
+  const postActivity = async (
     contestId: number,
     activity: Omit<ContestActivity, 'contestId' | 'userScore'>,
     imageFile: File | null
@@ -58,7 +58,7 @@ export const useManageContestActivities = () => {
 
       // Handle post activity
       setLoadingMessage('Posting activity...');
-      const newActivity = await addActivityToContest(contestId, formData);
+      const newActivity = await postActivityToContest(contestId, formData);
 
       setIsLoading(false);
       return newActivity;
@@ -92,7 +92,7 @@ export const useManageContestActivities = () => {
 
   return { 
     updateActivityScore,
-    addActivity,
+    postActivity,
     deleteActivity,
     loadingMessage,
     isLoading, 

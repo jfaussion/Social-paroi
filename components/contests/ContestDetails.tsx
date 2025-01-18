@@ -76,7 +76,7 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
             contest={contest}
             isOpener={isOpener(session)}
             contestUser={contest.users.find(contestUser => contestUser.user?.id === session?.user?.id)}
-            onAddActivity={handleAddActivity}
+            onPostActivity={handlePostActivity}
             onRemoveActivity={handleRemoveActivity}
             onUpdateScore={handleUpdateActivityScore}
           />
@@ -101,13 +101,15 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
     resetDelete();
   };
 
-
-
-  const handleAddActivity= (activityoAdd: ContestActivity) => {
-    console.log('Adding activity:', activityoAdd);
+  const handlePostActivity = (activityToAddOrUpdate: ContestActivity) => {
+    console.log('Adding/Updating activity:', activityToAddOrUpdate);
     setContest(prevContest => ({
       ...prevContest,
-      activities: [...prevContest.activities, activityoAdd]
+      activities: prevContest.activities.some(activity => activity.id === activityToAddOrUpdate.id)
+        ? prevContest.activities.map(activity => 
+            activity.id === activityToAddOrUpdate.id ? activityToAddOrUpdate : activity
+          )
+        : [...prevContest.activities, activityToAddOrUpdate]
     }));
   };
 

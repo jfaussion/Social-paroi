@@ -8,12 +8,12 @@ import { isOpener } from "@/utils/session.utils";
 const prisma = new PrismaClient();
 
 /**
- * Adds a new activity to a contest or updates an existing one
+ * Adds or updates an activity to a contest
  * @param contestId - The ID of the contest
  * @param formData - The form data containing activity information
  * @returns The created or updated activity if successful, null otherwise
  */
-export const addActivityToContest = async (
+export const postActivityToContest = async (
   contestId: number,
   formData: FormData
 ): Promise<ContestActivity | null> => {
