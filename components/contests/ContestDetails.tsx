@@ -23,6 +23,8 @@ import { ContestStatusType } from '@/domain/ContestStatus.enum';
 import Popin from '../ui/Popin';
 import customSelectClassName from '../ui/customSelectClassName';
 import Select from 'react-select';
+import { useContestRankings } from '@/lib/contests/hooks/useContestRankings';
+import { ContestRankingType, ContestRankingTypeEnum } from '@/domain/ContestRankingType.enum';
 
 type StatusOption = {
   value: ContestStatusType;
@@ -36,9 +38,45 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
   const [selectedStatus, setSelectedStatus] = useState<ContestStatusType>(contest.status);
   const { deleteContest, isLoading: isLoadingDelete, error: errorDelete, reset: resetDelete } = useDeleteContest();
   const { changeContestStatus, isLoading: isLoadingChangeStatus, error: errorChangeStatus, reset: resetChangeStatus } = useChangeContestStatus();
+  const { 
+    isGenerating,
+    isExporting,
+    generateError,
+    exportError,
+    generateRankings,
+    exportRanking,
+    resetErrors: resetRankingErrors
+  } = useContestRankings();
   const { data: session } = useSession();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('tracks');
+
+  const handleGenerateRanking = async () => {
+    const success = await generateRankings(contest.id);
+    if (success) {
+      setContest(prev => ({
+        ...prev,
+        status: ContestStatusEnum.Enum.Over
+      }));
+    }
+  };
+
+  const handleExportRanking = async (type: ContestRankingType) => {
+    const csvContent = await exportRanking(contest.id, type);
+    if (csvContent) {
+      // Create blob and download
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `${contest.name}_${type}_ranking.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    }
+  };
 
   const handleStatusChange = async () => {
     const result = await changeContestStatus(contest, selectedStatus);
@@ -244,7 +282,49 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
                 <Button className='grow bg-red-500 text-white' btnType='danger' onClick={() => setDeleteDialogOpen(true)}>Delete Contest</Button>
               </div>
               <div className='flex flex-wrap justify-between gap-2'>
-                <Button className='grow' btnType='secondary' onClick={() => {}}>Generate Ranking</Button>
+                <Button 
+                  className='grow' 
+                  btnType={contest.status === ContestStatusEnum.Enum.Over ? 'primary' : 'secondary'} 
+                  onClick={handleGenerateRanking}
+                  disabled={isGenerating}
+                >
+                  {isGenerating ? 'Generating...' : contest.status === ContestStatusEnum.Enum.Over ? 'Regenerate Rankings' : 'Generate Rankings'}
+                </Button>
+                {generateError && (
+                  <p className="text-red-500 text-sm w-full mt-1">{generateError}</p>
+                )}
+                  
+                {contest.status === ContestStatusEnum.Enum.Over && (
+                  <>
+                    <Button 
+                      className='grow' 
+                      btnType='secondary' 
+                      onClick={() => handleExportRanking(ContestRankingTypeEnum.Enum.Men)}
+                      disabled={isExporting}
+                    >
+                      {isExporting ? 'Exporting...' : 'Export Men\'s Ranking'}
+                    </Button>
+                    <Button 
+                      className='grow' 
+                      btnType='secondary' 
+                      onClick={() => handleExportRanking(ContestRankingTypeEnum.Enum.Women)}
+                      disabled={isExporting}
+                    >
+                      {isExporting ? 'Exporting...' : 'Export Women\'s Ranking'}
+                    </Button>
+                    <Button 
+                      className='grow' 
+                      btnType='secondary' 
+                      onClick={() => handleExportRanking(ContestRankingTypeEnum.Enum.Overall)}
+                      disabled={isExporting}
+                    >
+                      {isExporting ? 'Exporting...' : 'Export Overall Ranking'}
+                    </Button>
+                    {exportError && (
+                      <p className="text-red-500 text-sm w-full mt-1">{exportError}</p>
+                    )}
+                  </>
+                )}
               </div>
             </div>
           )}

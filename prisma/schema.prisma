@@ -155,6 +155,7 @@ model Contest {
   contestTracks     ContestTrack[]  @relation("ContestContestTracks")
   contestUsers      ContestUser[]   @relation("ContestContestUsers")
   contestActivities ContestActivity[] @relation("ContestContestActivities")
+  rankings         ContestRanking[] @relation("ContestRankings")
 
   @@index([date], name: "idx_contests_date")
 }
@@ -199,6 +200,7 @@ model ContestUser {
 
   trackResults     ContestUserTrack[]     @relation("ContestUserTracks")
   activityResults  ContestUserActivity[]  @relation("ContestUserActivities")
+  rankingResults   ContestRankingResult[]
 
   @@map("contest_users")
 }
@@ -236,5 +238,41 @@ model ContestUserActivity {
   @@index([contestUserId], name: "idx_contestuseractivity_user_id")
   @@index([contestActivityId], name: "idx_contestuseractivity_activity_id")
   @@map("contest_user_activities")
+}
+
+model ContestRanking {
+  id        Int      @id @default(autoincrement())
+  contestId Int
+  type      String   // "men" | "women" | "overall"
+  generatedAt DateTime @default(now())
+  csvContent String  @db.Text // Store the CSV content directly
+  
+  contest   Contest  @relation("ContestRankings", fields: [contestId], references: [id], onDelete: Cascade)
+  results   ContestRankingResult[]
+
+  @@unique([contestId, type])
+  @@index([contestId], name: "idx_contestranking_contest_id")
+  @@map("contest_rankings")
+}
+
+model ContestRankingResult {
+  id              Int      @id @default(autoincrement())
+  contestRankingId Int
+  contestUserId   Int
+  rank            Int
+  totalScore      Float    
+  trackScore      Float    
+  activityScore   Int      
+  completedTracks Int      
+  trackDetails    Json     // Store track completion details as JSON: [{ trackId, name, points, status }]
+  activityDetails Json     // Store activity scores as JSON: [{ activityId, name, score }]
+  
+  contestRanking ContestRanking @relation(fields: [contestRankingId], references: [id], onDelete: Cascade)
+  contestUser    ContestUser    @relation(fields: [contestUserId], references: [id], onDelete: Cascade)
+
+  @@unique([contestRankingId, contestUserId])
+  @@index([contestRankingId], name: "idx_contestrankingresult_ranking_id")
+  @@index([contestUserId], name: "idx_contestrankingresult_user_id")
+  @@map("contest_ranking_results")
 }
 
