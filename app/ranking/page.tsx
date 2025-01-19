@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import RankingList from "@/components/RankingList";
+import RankingList from "@/components/users/RankingList";
 import { isConnected } from "@/utils/session.utils";
 import { SessionProvider } from "next-auth/react";
 

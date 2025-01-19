@@ -1,12 +1,12 @@
 "use client";
 import { useFetchUserStats } from "@/lib/stats/hooks/useFetchUserStats";
-import DonutChart from "./ui/DonutChart";
+import DonutChart from "../ui/DonutChart";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { DifficultyType } from "@/domain/Difficulty.enum";
 import { getBgColorForDifficulty } from "@/utils/difficulty.utils";
 import { TrackStats } from "@/domain/TrackStats.schema";
-import { StatsPlaceHolder } from "./ui/StatsPlaceholder";
+import { StatsPlaceHolder } from "./StatsPlaceholder";
 
 const UserStats = () => {
   const { fetchStats, isLoading, error } = useFetchUserStats();
