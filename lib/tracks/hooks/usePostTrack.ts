@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Track } from "@/domain/Track.schema";
 import { postNewTrack } from "../actions/postTrack";
-import { postPhoto } from "../actions/postTrackImage";
+import { postTrackImage } from "../actions/postTrackImage";
 
 export const usePostTracks = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -26,7 +26,7 @@ export const usePostTracks = () => {
 
       if (photo) {
         setLoadingMessage('Uploading image...');
-        const photoUrl = await postPhoto(formData);
+        const photoUrl = await postTrackImage(formData);
         formData.set('imageUrl', photoUrl);
       }
       setLoadingMessage('Posting block...');

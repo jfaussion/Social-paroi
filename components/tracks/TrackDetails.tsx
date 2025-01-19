@@ -134,7 +134,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
           {/* Name and Done button row */}
           <div className="flex justify-between items-center mb-3">
             <h1 className="text-xl font-bold">{track.name}</h1>
-            <ToggleButton isActive={track.trackProgress?.status === TrackStatus.DONE} isLoading={false} onChange={handleStatusChange} />
+            <ToggleButton isActive={track.trackProgress?.status === TrackStatus.DONE} isDisabled={false} onChange={handleStatusChange} />
           </div>
 
           {/* Zone and Date row */}
@@ -181,17 +181,17 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
             <h2 className="text-lg font-bold mb-3">Editor zone</h2>
 
             <div className='flex flex-wrap justify-between gap-2'>
-              <Button btnStyle={track.removed ? 'primary' : 'secondary'} className='grow'
+              <Button btnType={track.removed ? 'primary' : 'secondary'} className='grow'
                 disabled={isLoadingRemove} onClick={() => changeMountedStatus(!track.removed)} >
                 Mark as {track.removed ? 'mounted' : 'removed'}
               </Button>
 
-              <Button btnStyle='primary' className='grow'
+              <Button btnType='primary' className='grow'
                 onClick={() => router.push(`${track.id}/edit`)} >
                 Edit Block
               </Button>
 
-              <Button btnStyle='danger' className='grow'
+              <Button btnType='danger' className='grow'
                 onClick={() => setDeleteDialogOpen(true)} >
                 Delete Block
               </Button>

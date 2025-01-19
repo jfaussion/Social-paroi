@@ -2,12 +2,12 @@ import React from 'react';
 
 interface ToggleProps {
   isActive: boolean;
-  isLoading: boolean;
+  isDisabled: boolean;
   onChange: () => void;
   style?: 'small';
 }
 
-const ToggleButton = ({ isActive, isLoading, onChange, style }: ToggleProps) => {
+const ToggleButton = ({ isActive, isDisabled, onChange, style }: ToggleProps) => {
 
   // Tailwind classes for button base styling
   const baseClasses = "rounded-full p-2 cursor-pointer border border-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300 ease-in-out";
@@ -20,7 +20,7 @@ const ToggleButton = ({ isActive, isLoading, onChange, style }: ToggleProps) => 
   return (
     <button
       onClick={onChange}
-      disabled={isLoading}
+      disabled={isDisabled}
       className={`${baseClasses} ${activeClasses} ${animationClass}`}
     >
       <svg className={`${sizeClass} ${textClass}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">

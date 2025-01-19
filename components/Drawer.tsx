@@ -15,7 +15,7 @@ const Drawer = () => {
   const [isOpen, setIsOpen] = useState(false);
   const toggleDrawer = () => setIsOpen(!isOpen);
   const pathname = usePathname()
-  const session = useSession();
+  const { data: session } = useSession();
   const router = useRouter();
 
   const showBackButtonInsteadOfMenu = () => pathname.startsWith('/dashboard/track/') || pathname.startsWith('/opener/create');
@@ -64,6 +64,11 @@ const Drawer = () => {
             <li>
               <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href="/ranking">Ranking</Link>
             </li>
+            {isOpener(session) && (
+              <li>
+                <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href="/contests">Contests</Link>
+              </li>
+            )}
           </ul>
 
           {/* Footer links */}

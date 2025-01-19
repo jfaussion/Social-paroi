@@ -20,8 +20,8 @@ const ConfirmationDialog: React.FC<ConfirmProps> = ({ isOpen, text, title, onCan
     <Popin isOpen={isOpen} onClose={onCancel} title={title}>
       <p>{text}</p>
       <div className="mt-4 flex justify-end space-x-2">
-        <Button btnStyle='secondary' onClick={onConfirm}>Confirm</Button>
-        <Button btnStyle='primary' onClick={onCancel}>Cancel</Button>
+        <Button btnType='secondary' onClick={onConfirm}>Confirm</Button>
+        <Button btnType='primary' onClick={onCancel}>Cancel</Button>
       </div>
       <Loader isLoading={isLoading ?? false} text={loadingMessage ?? 'Deleting...'} ></Loader>
       {error && <p className="text-red-500 text-sm mt-2">{error}</p>}

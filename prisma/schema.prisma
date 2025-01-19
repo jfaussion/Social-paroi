@@ -49,7 +49,8 @@ model User {
   Authenticator     Authenticator[]
   UserTrackProgress UserTrackProgress[]
   role              String?             @default("user")
-  news              News[]              
+  news              News[]
+  contestUsers      ContestUser[]       @relation("UserContestUsers")
 
   @@map("users")
 }
@@ -89,8 +90,10 @@ model Track {
   removed       Boolean?            @default(false)
   trackProgress UserTrackProgress[]
 
-  locationId    Int?                
-  location      Location?           @relation("LocationTracks", fields: [locationId], references: [id], onDelete: Cascade)
+  locationId Int?
+  location   Location? @relation("LocationTracks", fields: [locationId], references: [id], onDelete: Cascade)
+
+  contestTracks ContestTrack[] @relation("TrackContestTracks")
 
   @@index([id], name: "idx_tracks_id")
   @@index([name], name: "idx_tracks_name")
@@ -113,15 +116,14 @@ model UserTrackProgress {
   @@index([trackId], name: "idx_usertrackprogress_track_id")
 }
 
-
 model News {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String
-  date      DateTime @default(now())
-  deleted   Boolean  @default(false)
-  userId    String
-  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id      Int      @id @default(autoincrement())
+  title   String
+  content String
+  date    DateTime @default(now())
+  deleted Boolean  @default(false)
+  userId  String
+  user    User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([id], name: "idx_news_id")
   @@index([userId], name: "idx_news_user_id")
@@ -129,17 +131,148 @@ model News {
 }
 
 model Location {
-  id          Int      @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   name        String
-  type        String   // Should be validated as 'gym' or 'outdoor'
+  type        String // Should be validated as 'gym' or 'outdoor'
   address     String?
   website     String?
-  mapImageUrl String?  @map(name: "map_image_url")
+  mapImageUrl String? @map(name: "map_image_url")
 
-  createdAt   DateTime @default(now()) @map(name: "created_at")
-  updatedAt   DateTime @updatedAt @map(name: "updated_at") 
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
 
-  tracks      Track[]  @relation("LocationTracks")
+  tracks Track[] @relation("LocationTracks")
 
   @@map("locations")
 }
+
+model Contest {
+  id                Int             @id @default(autoincrement())
+  name              String
+  date              DateTime
+  coverImage        String?
+  status            String          @default("Created")
+  contestTracks     ContestTrack[]  @relation("ContestContestTracks")
+  contestUsers      ContestUser[]   @relation("ContestContestUsers")
+  contestActivities ContestActivity[] @relation("ContestContestActivities")
+  rankings         ContestRanking[] @relation("ContestRankings")
+
+  @@index([date], name: "idx_contests_date")
+}
+
+model ContestTrack {
+  id        Int @id @default(autoincrement())
+  contestId Int
+  trackId   Int
+
+  contest Contest @relation(name: "ContestContestTracks", fields: [contestId], references: [id], onDelete: Cascade)
+  track   Track   @relation(name: "TrackContestTracks", fields: [trackId], references: [id], onDelete: Cascade)
+  
+  userResults ContestUserTrack[]
+
+  @@map("contest_tracks")
+}
+
+model ContestActivity {
+  id          Int    @id @default(autoincrement())
+  name        String
+  image       String?
+  description String
+  contestId   Int
+
+  contest Contest @relation(name: "ContestContestActivities", fields: [contestId], references: [id], onDelete: Cascade)
+  
+  userResults ContestUserActivity[]
+
+  @@map("contest_activities")
+}
+
+model ContestUser {
+  id        Int     @id @default(autoincrement())
+  contestId Int
+  userId    String? // Foreign key to User, can be NULL for temporary users
+  name      String? // Name for temporary users
+  gender    String?
+  isTemp    Boolean @default(false) // True for temporary users
+
+  contest Contest @relation(name: "ContestContestUsers", fields: [contestId], references: [id], onDelete: Cascade)
+  user    User?   @relation(name: "UserContestUsers", fields: [userId], references: [id], onDelete: Cascade)
+
+  trackResults     ContestUserTrack[]     @relation("ContestUserTracks")
+  activityResults  ContestUserActivity[]  @relation("ContestUserActivities")
+  rankingResults   ContestRankingResult[]
+
+  @@map("contest_users")
+}
+
+model ContestUserTrack {
+  id            Int         @id @default(autoincrement())
+  contestUserId Int
+  contestTrackId Int
+  status        String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  contestUser   ContestUser   @relation("ContestUserTracks", fields: [contestUserId], references: [id], onDelete: Cascade)
+  contestTrack  ContestTrack  @relation(fields: [contestTrackId], references: [id], onDelete: Cascade)
+
+  @@unique([contestUserId, contestTrackId])
+  @@index([contestUserId], name: "idx_contestusertrack_user_id")
+  @@index([contestTrackId], name: "idx_contestusertrack_track_id")
+  @@map("contest_user_tracks")
+}
+
+model ContestUserActivity {
+  id              Int              @id @default(autoincrement())
+  contestUserId   Int
+  contestActivityId Int
+  score           Int              @default(0)
+  notes           String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  contestUser     ContestUser      @relation("ContestUserActivities", fields: [contestUserId], references: [id], onDelete: Cascade)
+  contestActivity ContestActivity  @relation(fields: [contestActivityId], references: [id], onDelete: Cascade)
+
+  @@unique([contestUserId, contestActivityId])
+  @@index([contestUserId], name: "idx_contestuseractivity_user_id")
+  @@index([contestActivityId], name: "idx_contestuseractivity_activity_id")
+  @@map("contest_user_activities")
+}
+
+model ContestRanking {
+  id        Int      @id @default(autoincrement())
+  contestId Int
+  type      String   // "men" | "women" | "overall"
+  generatedAt DateTime @default(now())
+  csvContent String  @db.Text // Store the CSV content directly
+  
+  contest   Contest  @relation("ContestRankings", fields: [contestId], references: [id], onDelete: Cascade)
+  results   ContestRankingResult[]
+
+  @@unique([contestId, type])
+  @@index([contestId], name: "idx_contestranking_contest_id")
+  @@map("contest_rankings")
+}
+
+model ContestRankingResult {
+  id              Int      @id @default(autoincrement())
+  contestRankingId Int
+  contestUserId   Int
+  rank            Int
+  totalScore      Float    
+  trackScore      Float    
+  activityScore   Int      
+  completedTracks Int      
+  trackDetails    Json     // Store track completion details as JSON: [{ trackId, name, points, status }]
+  activityDetails Json     // Store activity scores as JSON: [{ activityId, name, score }]
+  
+  contestRanking ContestRanking @relation(fields: [contestRankingId], references: [id], onDelete: Cascade)
+  contestUser    ContestUser    @relation(fields: [contestUserId], references: [id], onDelete: Cascade)
+
+  @@unique([contestRankingId, contestUserId])
+  @@index([contestRankingId], name: "idx_contestrankingresult_ranking_id")
+  @@index([contestUserId], name: "idx_contestrankingresult_user_id")
+  @@map("contest_ranking_results")
+}
+

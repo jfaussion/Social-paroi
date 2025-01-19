@@ -1,7 +1,7 @@
 "use client"
 
 import { signOut, useSession } from "next-auth/react";
-import { Button } from "./ui/Button";
+import { Button } from "../ui/Button";
 import Image from 'next/image';
 import { useEffect, useRef, useState } from "react";
 import DefaultAvatarImage from '@/public/default-avatar.svg';
@@ -54,7 +54,7 @@ export default function UserMenu() {
                 <div className="text-gray-600 dark:text-gray-400">{session.user?.email}</div>
               </div>
               <div className="flex justify-center mt-2 w-full px-4 py-2">
-                <Button className="w-full" btnStyle="secondary" onClick={handleSignOut}>Sign Out</Button>
+                <Button className="w-full" btnType="secondary" onClick={handleSignOut}>Sign Out</Button>
               </div>
             </div>
           )}

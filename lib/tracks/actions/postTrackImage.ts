@@ -4,6 +4,10 @@ import { auth } from '@/auth';
 import { isOpener } from '@/utils/session.utils';
 import { uploadImageToCloudinary } from '@/lib/cloudinary/uploadToCloudinary';
 import { deleteImageFromCloudinary } from '@/lib/cloudinary/deleteFromCloudinary';
+import { CloudinarySubfolders } from '@/lib/cloudinary/cloudinarySubfolders';
+
+const trackSubfolder = 'Tracks';
+
 
 /**
  * Uploads a new photo to Cloudinary and deletes the previous one if necessary.
@@ -13,7 +17,7 @@ import { deleteImageFromCloudinary } from '@/lib/cloudinary/deleteFromCloudinary
  * @throws Error - If the user is not an Admin or Opener.
  * @returns The URL of the uploaded image.
  */
-export async function postPhoto(
+export async function postTrackImage(
   track: FormData
 ) {
   const user = await auth();
@@ -33,7 +37,7 @@ export async function postPhoto(
     // Upload new image
     if (track.get('photo')) {
       const file: File | null = track.get('photo') as unknown as File
-      uploadedImageUrl = await uploadImageToCloudinary(file);
+      uploadedImageUrl = await uploadImageToCloudinary(file, CloudinarySubfolders.TRACKS);
     }
     return uploadedImageUrl;
   } catch (err) {

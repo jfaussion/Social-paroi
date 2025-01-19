@@ -1,5 +1,4 @@
 'use client'
-import TrackCard from "./TrackCard";
 import { Track } from "../../domain/Track.schema";
 import { useEffect, useState } from "react";
 import { useFetchTracks } from "@/lib/tracks/hooks/useFetchTracks";
@@ -11,6 +10,7 @@ import { isOpener } from "@/utils/session.utils";
 import { Button } from "../ui/Button";
 import { useSession } from "next-auth/react";
 import TrackBulkRemove from "./TrackBulkRemove";
+import RegularTrackCard from "./RegularTrackCard";
 
 type TracksProps = {
   userId: string;
@@ -134,7 +134,7 @@ const TrackList: React.FC<TracksProps> = ({ userId }) => {
         </>
       ) : (
         trackList.map((track: Track) => (
-          <TrackCard key={track.id} {...track} />
+          <RegularTrackCard key={track.id} {...track} />
         ))
       )}
       {error && <p className="text-red-500">Error: {error}</p>}

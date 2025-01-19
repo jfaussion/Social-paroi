@@ -236,10 +236,10 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack }) => {
       <Loader isLoading={isLoading} text={loadingMessage} />
       {error && <p className="text-red-500">Error: {error}</p>}
 
-      <Button type="submit" className="py-2" btnStyle='secondary' disabled={isLoading}>Submit</Button>
+      <Button type="submit" className="py-2" btnType='secondary' disabled={isLoading}>Submit</Button>
 
       {!isLoading && newTrack && (
-        <Button className="py-2" btnStyle='primary'
+        <Button className="py-2" btnType='primary'
           onClick={() => router.push(`dashboard/track/${newTrack.id}`)}>View new block
         </Button>
       )}
