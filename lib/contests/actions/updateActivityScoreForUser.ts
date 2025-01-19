@@ -5,6 +5,7 @@ import { auth } from '@/auth';
 import { isOpener } from '@/utils/session.utils';
 import { Session } from 'next-auth';
 import { revalidatePath } from 'next/cache';
+import { ContestStatusEnum } from '@/domain/ContestStatus.enum';
 
 const prisma = new PrismaClient();
 
@@ -69,6 +70,18 @@ export const updateActivityScoreForUser = async (
     const userSession = await auth();
     if (!userSession?.user?.id) {
       throw new Error('User not authenticated');
+    }
+
+    const contest = await prisma.contest.findUnique({
+      where: { id: contestId },
+    });
+
+    if (!contest) {
+      throw new Error('Contest not found');
+    }
+
+    if (contest.status !== ContestStatusEnum.Enum.InProgress) {
+      throw new Error('Contest is not in progress');
     }
 
     return await prisma.$transaction(async (tx) => {

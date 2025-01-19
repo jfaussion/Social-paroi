@@ -237,6 +237,7 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contest, isOpener, onRe
                       key={activity.id}
                       activity={activity}
                       contestUser={selectedContestUser ?? undefined}
+                      contestStatus={contest.status}
                       displayImageAndDesc={false}
                       onScoreUpdate={async (activityId, newScore) => {
                         if (selectedContestUser) {

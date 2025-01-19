@@ -11,6 +11,7 @@ import ToggleMenu from '../ui/ToggleMenu';
 import { ContestUser } from '@/domain/ContestUser.schema';
 import { isOpener } from '@/utils/session.utils';
 import { useSession } from 'next-auth/react';
+import { ContestStatusEnum, ContestStatusType } from '@/domain/ContestStatus.enum';
 
 interface ActivityCardProps {
   activity: ContestActivity;
@@ -20,6 +21,7 @@ interface ActivityCardProps {
   onDelete?: (activity: ContestActivity) => void;
   displayToggleMenu: boolean;
   displayImageAndDesc: boolean;
+  contestStatus: ContestStatusType;
 }
 
 const ActivityCard: React.FC<ActivityCardProps> = ({ 
@@ -29,7 +31,8 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
   onEdit,
   onDelete,
   displayToggleMenu,
-  displayImageAndDesc = true
+  displayImageAndDesc = true,
+  contestStatus
 }) => {
   const [isScorePopinOpen, setIsScorePopinOpen] = useState(false);
   const [currentScore, setCurrentScore] = useState<string>(activity.userScore?.toString() || '');
@@ -85,7 +88,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
               {activity.userScore > 0 ? activity.userScore : '-'}
             </span>
           </div>
-          {isSelfOrOpener && (
+          {isSelfOrOpener && contestStatus === ContestStatusEnum.Enum.InProgress && (
             <Button 
               onClick={() => {
                 setCurrentScore(activity.userScore?.toString() || '');

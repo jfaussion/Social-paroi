@@ -99,6 +99,7 @@ const ActivityTabContent: React.FC<ActivityTabContentProps> = ({
             onDelete={handleDeleteActivity}
             displayToggleMenu={isOpener}
             displayImageAndDesc={true}
+            contestStatus={contest.status}
           />
         ))
       )}
