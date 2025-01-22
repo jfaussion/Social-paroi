@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { auth } from '@/auth';
 import { isOpener } from '@/utils/session.utils';
 import { Session } from 'next-auth';
+import { ContestStatusEnum } from '@/domain/ContestStatus.enum';
 
 const prisma = new PrismaClient();
 
@@ -15,30 +16,41 @@ async function getFinalContestUserId(
   contestId: number,
   contestUserId: number,
 ): Promise<number> {
-  if (!isOpener(user)) {
+  if (isOpener(user)) {
+    // Check if user is participating in the contest
+    const contestUser = await tx.contestUser.findUnique({
+      where: { id: contestUserId },
+    });
+
+    if (!contestUser) {
+      throw new Error('Contest user not found');
+    }
+
+    return contestUserId;
+    
+  } else {
+    // Check contest status
+    const contest = await tx.contest.findFirst({
+      where: {
+        id: contestId
+      }
+    });
+
+    if (contest?.status != ContestStatusEnum.Enum.InProgress) {
+      throw new Error('User cannot update track if contest not in progress')
+    }
+    // Check if user is participating in the contest
     const userContestParticipation = await tx.contestUser.findFirst({
       where: {
         contestId,
         userId: user.user!.id,
       },
     });
-
     if (!userContestParticipation) {
       throw new Error('User not participating in this contest');
     }
-
     return userContestParticipation.id;
-  } 
-  
-  const contestUser = await tx.contestUser.findUnique({
-    where: { id: contestUserId },
-  });
-
-  if (!contestUser) {
-    throw new Error('Contest user not found');
   }
-
-  return contestUserId;
 }
 
 async function getContestTrack(

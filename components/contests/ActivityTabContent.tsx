@@ -8,13 +8,14 @@ import { ContestActivity } from '@/domain/ContestActivity.schema';
 import ActivityForm from '../activities/ActivityForm';
 import ConfirmationDialog from '../ui/ConfirmDialog';
 import { Contest } from '@/domain/Contest.schema';
-import { ContestUser } from '@/domain/ContestUser.schema';
 import { toast } from 'sonner';
+import { ContestStatusEnum } from '@/domain/ContestStatus.enum';
+import { Session } from 'next-auth';
+import { isOpener } from '@/utils/session.utils';
 
 interface ActivityTabContentProps {
   contest: Contest;
-  isOpener: boolean;
-  contestUser: ContestUser | undefined;
+  session: Session | null;
   onPostActivity: (activityToAddOrUpdate: ContestActivity) => void;
   onRemoveActivity: (activityToRemove: ContestActivity) => void;
   onUpdateScore: (activityId: number, newScore: number) => void;
@@ -22,8 +23,7 @@ interface ActivityTabContentProps {
 
 const ActivityTabContent: React.FC<ActivityTabContentProps> = ({
   contest,
-  contestUser,
-  isOpener,
+  session,
   onPostActivity,
   onRemoveActivity,
   onUpdateScore
@@ -40,12 +40,16 @@ const ActivityTabContent: React.FC<ActivityTabContentProps> = ({
     error 
   } = useManageContestActivities();
 
+  const contestUser = contest.users.find(contestUser => contestUser.user?.id === session?.user?.id)
+  const isSelfContester = contestUser && session?.user?.id === contestUser.user?.id;
+  const isSelfAndInProgress = isSelfContester && contest.status === ContestStatusEnum.Enum.InProgress;
+
   const handleScoreUpdate = async (activityId: number, newScore: number, contestUserId: number) => {
     const success = await updateActivityScore(contest.id, activityId, newScore, contestUserId);
     if (success) {
       onUpdateScore(activityId, newScore);
     } else {
-      toast.error('Failed to update score');
+      toast.error(error);
     }
   };
 
@@ -91,20 +95,21 @@ const ActivityTabContent: React.FC<ActivityTabContentProps> = ({
       ) : (
         contest.activities.map(activity => (
           <ActivityCard
+            isLoading={isLoading}
             key={activity.id}
             activity={activity}
             contestUser={contestUser}
             onScoreUpdate={handleScoreUpdate}
             onEdit={handleEditActivity}
             onDelete={handleDeleteActivity}
-            displayToggleMenu={isOpener}
+            displayEditButton={!!isSelfAndInProgress}
+            displayToggleMenu={isOpener(session)}
             displayImageAndDesc={true}
-            contestStatus={contest.status}
           />
         ))
       )}
 
-      {isOpener && (
+      {isOpener(session) && (
         <Button 
           onClick={() => {
             setSelectedActivity(null);

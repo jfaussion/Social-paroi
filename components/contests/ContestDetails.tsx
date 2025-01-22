@@ -25,6 +25,7 @@ import customSelectClassName from '../ui/customSelectClassName';
 import Select from 'react-select';
 import { useContestRankings } from '@/lib/contests/hooks/useContestRankings';
 import { ContestRankingType, ContestRankingTypeEnum } from '@/domain/ContestRankingType.enum';
+import { TrackStatus } from '@/domain/TrackStatus.enum';
 
 type StatusOption = {
   value: ContestStatusType;
@@ -89,11 +90,37 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
     }
   };
 
+  const handleTrackStatusUpdate = (trackId: number, newStatus: TrackStatus) => {
+    console.log('Updating track status:', trackId, newStatus);
+    setContest(prevContest => ({
+      ...prevContest,
+      tracks: prevContest.tracks.map(track =>
+        track.id === trackId ? {
+          ...track,
+          contestProgress: track.contestProgress
+            ? {
+              ...track.contestProgress,
+              status: newStatus
+            }
+            : {
+              id: 0,
+              contestUserId: contest.users.find(contestUser => contestUser.user?.id === session?.user?.id)?.id ?? 0,
+              contestTrackId: trackId,
+              status: newStatus,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }
+        }
+          : track
+      )
+    }));
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'users':
         return <UserTabContent
-          isOpener={isOpener(session)}
+          session={session}
           contest={contest}
           onAddUser={handleAddUser}
           onRemoveUser={handleRemoveUser}
@@ -101,19 +128,18 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
       case 'tracks':
         return (
           <TrackTabContent
-            isOpener={isOpener(session)}
-            contestUser={contest.users.find(contestUser => contestUser.user?.id === session?.user?.id)}
+            session={session}
             contest={contest}
             onAddTrack={handleAddTrack}
             onRemoveTrack={handleRemoveTrack}
+            onStatusUpdate={handleTrackStatusUpdate}
           />
         );
       case 'bonus':
         return (
           <ActivityTabContent
             contest={contest}
-            isOpener={isOpener(session)}
-            contestUser={contest.users.find(contestUser => contestUser.user?.id === session?.user?.id)}
+            session={session}
             onPostActivity={handlePostActivity}
             onRemoveActivity={handleRemoveActivity}
             onUpdateScore={handleUpdateActivityScore}
