@@ -61,13 +61,11 @@ async function generateCsvContent(
     'Rank',
     'Name',
     'Total Score',
-    'Track Score',
-    'Activity Score',
-    'Completed Tracks',
+    'Completed Blocks',
     // Add all track names with points
     ...contestTracks.map(ct => {
       const points = trackPoints.get(ct.id) || POINTS_PER_TRACK;
-      return `${ct.track.name || `Track_${ct.track.id}`} (${points.toFixed(0)}pts)`;
+      return `${ct.track.name || `Block ${ct.track.id}`} (${points.toFixed(0)}pts)`;
     }),
     // Add all activity names
     ...contestActivities.map(ca => ca.name)
@@ -87,8 +85,6 @@ async function generateCsvContent(
       (index + 1).toString(),
       score.name || 'Unknown',
       score.totalScore.toFixed(0),
-      score.trackScore.toFixed(0),
-      score.activityScore.toString(),
       score.completedTracks.toString(),
       // Add status for each track (empty string if not DONE)
       ...contestTracks.map(ct => 

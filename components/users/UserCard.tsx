@@ -3,6 +3,9 @@ import Image from 'next/image';
 import DefaultAvatar from "@/public/default-avatar.svg";
 import ToggleMenu from '../ui/ToggleMenu';
 import { MenuAction } from '@/domain/MenuAction.type';
+import { FaVenus } from 'react-icons/fa';
+import { FaMars } from 'react-icons/fa';
+import { GenderEnum } from '@/domain/ContestUser.schema';
 
 interface UserCardProps {
   rank?: number;
@@ -43,7 +46,11 @@ const UserCard: React.FC<UserCardProps> = ({
         <span className="text-md">{name}</span>
       </div>
       <div className="flex items-center justify-self-end gap-2">
-        {gender && <span className="text-md mr-2">{gender}</span>}
+        {gender && (
+          <span className="text-md mr-2">
+            {gender === GenderEnum.enum.Man ? <FaMars className="w-6 h-6 text-blue-500" /> : <FaVenus className="w-6 h-6 text-pink-500" />}
+          </span>
+        )}
         {score && <span className="text-md font-bold mr-2">{score}</span>}
         {children}
         {actions && actions.length > 0 && (

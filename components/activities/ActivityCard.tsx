@@ -9,9 +9,6 @@ import { ContestActivity } from '@/domain/ContestActivity.schema';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import ToggleMenu from '../ui/ToggleMenu';
 import { ContestUser } from '@/domain/ContestUser.schema';
-import { isOpener } from '@/utils/session.utils';
-import { useSession } from 'next-auth/react';
-import { ContestStatusEnum, ContestStatusType } from '@/domain/ContestStatus.enum';
 
 interface ActivityCardProps {
   activity: ContestActivity;
@@ -19,9 +16,10 @@ interface ActivityCardProps {
   onScoreUpdate: (activityId: number, newScore: number, contestUserId: number) => void;
   onEdit?: (activity: ContestActivity) => void;
   onDelete?: (activity: ContestActivity) => void;
+  isLoading: boolean;
+  displayEditButton: boolean
   displayToggleMenu: boolean;
   displayImageAndDesc: boolean;
-  contestStatus: ContestStatusType;
 }
 
 const ActivityCard: React.FC<ActivityCardProps> = ({ 
@@ -30,17 +28,14 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
   onScoreUpdate,
   onEdit,
   onDelete,
+  isLoading,
+  displayEditButton,
   displayToggleMenu,
   displayImageAndDesc = true,
-  contestStatus
 }) => {
   const [isScorePopinOpen, setIsScorePopinOpen] = useState(false);
   const [currentScore, setCurrentScore] = useState<string>(activity.userScore?.toString() || '');
-  const { data: session } = useSession();
-
-  const isSelfContester = contestUser && session?.user?.id === contestUser.user?.id;
-  const isSelfOrOpener = isSelfContester || isOpener(session);
-
+  
   const handleScoreSubmit = () => {
     const numScore = parseFloat(currentScore);
     if (!isNaN(numScore) && contestUser) {
@@ -88,8 +83,9 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
               {activity.userScore > 0 ? activity.userScore : '-'}
             </span>
           </div>
-          {isSelfOrOpener && contestStatus === ContestStatusEnum.Enum.InProgress && (
+          {displayEditButton && (
             <Button 
+              disabled={isLoading}
               onClick={() => {
                 setCurrentScore(activity.userScore?.toString() || '');
                 setIsScorePopinOpen(true);

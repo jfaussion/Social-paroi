@@ -68,6 +68,9 @@ export async function searchTrackForContest(contestId: number, filters: Filters)
         },
       },
     },
+    orderBy: {
+      date: 'desc',
+    },
   });
   if (tracks) {
     return tracks.map(track => mergeTrackWithContest(track, contestId));

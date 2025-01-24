@@ -2,6 +2,8 @@
 import { PrismaClient } from '@prisma/client/edge';
 import { TrackStatus } from '@/domain/TrackStatus.enum';
 import { ContestStatusEnum } from '@/domain/ContestStatus.enum';
+import { isOpener } from '@/utils/session.utils';
+import { auth } from '@/auth';
 
 const prisma = new PrismaClient()
 
@@ -27,7 +29,7 @@ async function updateRegularTrackStatus(
   });
 }
 
-async function findActiveContestTracks(
+async function findContestTracksWhereUserParticipating(
   tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>,
   trackId: number,
   userId: string,
@@ -36,7 +38,6 @@ async function findActiveContestTracks(
     where: {
       trackId,
       contest: {
-        status: ContestStatusEnum.Enum.InProgress,
         contestUsers: {
           some: { userId },
         },
@@ -85,16 +86,24 @@ export async function updateTrackStatusForUser(
   newStatus: TrackStatus,
 ): Promise<boolean> {
   try {
+    const user = await auth();
+    if (!user?.user?.id) {
+      throw new Error('User not authenticated');
+    }
+    
     return await prisma.$transaction(async (tx) => {
       // Update regular track status
       await updateRegularTrackStatus(tx, trackId, userId, newStatus);
 
       // Find and update related contest tracks
-      const activeContestTracks = await findActiveContestTracks(tx, trackId, userId);
+      const activeContestTracks = await findContestTracksWhereUserParticipating(tx, trackId, userId);
       
       for (const contestTrack of activeContestTracks) {
         const contestUser = contestTrack.contest.contestUsers[0];
-        if (contestUser) {
+        const isSelfContester = contestUser?.userId === user.user?.id;
+        const canUpdateContestTrack = isOpener(user) || (isSelfContester && contestTrack.contest.status === ContestStatusEnum.Enum.InProgress)
+        
+        if (contestUser && canUpdateContestTrack) {
           await updateContestTrackStatus(tx, contestTrack, contestUser, newStatus);
         }
       }

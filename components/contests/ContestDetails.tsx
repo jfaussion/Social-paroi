@@ -25,6 +25,7 @@ import customSelectClassName from '../ui/customSelectClassName';
 import Select from 'react-select';
 import { useContestRankings } from '@/lib/contests/hooks/useContestRankings';
 import { ContestRankingType, ContestRankingTypeEnum } from '@/domain/ContestRankingType.enum';
+import { TrackStatus } from '@/domain/TrackStatus.enum';
 
 type StatusOption = {
   value: ContestStatusType;
@@ -38,7 +39,7 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
   const [selectedStatus, setSelectedStatus] = useState<ContestStatusType>(contest.status);
   const { deleteContest, isLoading: isLoadingDelete, error: errorDelete, reset: resetDelete } = useDeleteContest();
   const { changeContestStatus, isLoading: isLoadingChangeStatus, error: errorChangeStatus, reset: resetChangeStatus } = useChangeContestStatus();
-  const { 
+  const {
     isGenerating,
     isExporting,
     generateError,
@@ -89,31 +90,56 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
     }
   };
 
+  const handleTrackStatusUpdate = (trackId: number, newStatus: TrackStatus) => {
+    console.log('Updating track status:', trackId, newStatus);
+    setContest(prevContest => ({
+      ...prevContest,
+      tracks: prevContest.tracks.map(track =>
+        track.id === trackId ? {
+          ...track,
+          contestProgress: track.contestProgress
+            ? {
+              ...track.contestProgress,
+              status: newStatus
+            }
+            : {
+              id: 0,
+              contestUserId: contest.users.find(contestUser => contestUser.user?.id === session?.user?.id)?.id ?? 0,
+              contestTrackId: trackId,
+              status: newStatus,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }
+        }
+          : track
+      )
+    }));
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'users':
-        return <UserTabContent 
-          isOpener={isOpener(session)}
-          contest={contest} 
+        return <UserTabContent
+          session={session}
+          contest={contest}
           onAddUser={handleAddUser}
           onRemoveUser={handleRemoveUser}
         />;
       case 'tracks':
         return (
           <TrackTabContent
-            isOpener={isOpener(session)}
-            contestUser={contest.users.find(contestUser => contestUser.user?.id === session?.user?.id)}
+            session={session}
             contest={contest}
             onAddTrack={handleAddTrack}
             onRemoveTrack={handleRemoveTrack}
+            onStatusUpdate={handleTrackStatusUpdate}
           />
         );
       case 'bonus':
         return (
           <ActivityTabContent
             contest={contest}
-            isOpener={isOpener(session)}
-            contestUser={contest.users.find(contestUser => contestUser.user?.id === session?.user?.id)}
+            session={session}
             onPostActivity={handlePostActivity}
             onRemoveActivity={handleRemoveActivity}
             onUpdateScore={handleUpdateActivityScore}
@@ -144,9 +170,9 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
     setContest(prevContest => ({
       ...prevContest,
       activities: prevContest.activities.some(activity => activity.id === activityToAddOrUpdate.id)
-        ? prevContest.activities.map(activity => 
-            activity.id === activityToAddOrUpdate.id ? activityToAddOrUpdate : activity
-          )
+        ? prevContest.activities.map(activity =>
+          activity.id === activityToAddOrUpdate.id ? activityToAddOrUpdate : activity
+        )
         : [...prevContest.activities, activityToAddOrUpdate]
     }));
   };
@@ -188,7 +214,7 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
   const handleRemoveTrack = (trackToRemove: Track) => {
     console.log('Removing track:', trackToRemove);
     setContest(prevContest => ({
-      ...prevContest, 
+      ...prevContest,
       tracks: prevContest.tracks.filter(track => track.id !== trackToRemove.id)
     }));
   };
@@ -271,6 +297,38 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
           {/* Tab content */}
           <div className="my-4">{renderTabContent()}</div>
 
+          {contest.status === ContestStatusEnum.Enum.Over && (
+            <div className='flex flex-wrap justify-between gap-2 mt-2 mb-4 '>
+              <Button
+                className='grow'
+                btnType='secondary'
+                onClick={() => handleExportRanking(ContestRankingTypeEnum.Enum.Men)}
+                disabled={isExporting}
+              >
+                {isExporting ? 'Exporting...' : 'Export Men\'s Ranking'}
+              </Button>
+              <Button
+                className='grow'
+                btnType='secondary'
+                onClick={() => handleExportRanking(ContestRankingTypeEnum.Enum.Women)}
+                disabled={isExporting}
+              >
+                {isExporting ? 'Exporting...' : 'Export Women\'s Ranking'}
+              </Button>
+              <Button
+                className='grow'
+                btnType='secondary'
+                onClick={() => handleExportRanking(ContestRankingTypeEnum.Enum.Overall)}
+                disabled={isExporting}
+              >
+                {isExporting ? 'Exporting...' : 'Export Overall Ranking'}
+              </Button>
+              {exportError && (
+                <p className="text-red-500 text-sm w-full mt-1">{exportError}</p>
+              )}
+            </div>
+          )}
+
           {/* Editor zone for admin actions */}
           {isOpener(session) && (
             <div className='p-4 w-full border-t-2 border-gray-600 sm:border sm:border-gray-600 sm:rounded-lg dark:bg-gray-900 sm:m-4 sm:mt-0 space-y-2'>
@@ -282,9 +340,9 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
                 <Button className='grow bg-red-500 text-white' btnType='danger' onClick={() => setDeleteDialogOpen(true)}>Delete Contest</Button>
               </div>
               <div className='flex flex-wrap justify-between gap-2'>
-                <Button 
-                  className='grow' 
-                  btnType={contest.status === ContestStatusEnum.Enum.Over ? 'primary' : 'secondary'} 
+                <Button
+                  className='grow'
+                  btnType={contest.status === ContestStatusEnum.Enum.Over ? 'primary' : 'secondary'}
                   onClick={handleGenerateRanking}
                   disabled={isGenerating}
                 >
@@ -292,38 +350,6 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
                 </Button>
                 {generateError && (
                   <p className="text-red-500 text-sm w-full mt-1">{generateError}</p>
-                )}
-                  
-                {contest.status === ContestStatusEnum.Enum.Over && (
-                  <>
-                    <Button 
-                      className='grow' 
-                      btnType='secondary' 
-                      onClick={() => handleExportRanking(ContestRankingTypeEnum.Enum.Men)}
-                      disabled={isExporting}
-                    >
-                      {isExporting ? 'Exporting...' : 'Export Men\'s Ranking'}
-                    </Button>
-                    <Button 
-                      className='grow' 
-                      btnType='secondary' 
-                      onClick={() => handleExportRanking(ContestRankingTypeEnum.Enum.Women)}
-                      disabled={isExporting}
-                    >
-                      {isExporting ? 'Exporting...' : 'Export Women\'s Ranking'}
-                    </Button>
-                    <Button 
-                      className='grow' 
-                      btnType='secondary' 
-                      onClick={() => handleExportRanking(ContestRankingTypeEnum.Enum.Overall)}
-                      disabled={isExporting}
-                    >
-                      {isExporting ? 'Exporting...' : 'Export Overall Ranking'}
-                    </Button>
-                    {exportError && (
-                      <p className="text-red-500 text-sm w-full mt-1">{exportError}</p>
-                    )}
-                  </>
                 )}
               </div>
             </div>
