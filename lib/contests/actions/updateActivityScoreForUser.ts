@@ -80,8 +80,8 @@ export const updateActivityScoreForUser = async (
       throw new Error('Contest not found');
     }
 
-    if (contest.status !== ContestStatusEnum.Enum.InProgress) {
-      throw new Error('Contest is not in progress');
+    if (!isOpener(userSession) && contest.status !== ContestStatusEnum.Enum.InProgress) {
+      throw new Error('Contest is not in progress and user not an opener');
     }
 
     return await prisma.$transaction(async (tx) => {

@@ -15,15 +15,17 @@ import ActivityCard from '../activities/ActivityCard';
 import { useContestUserDetails } from '@/lib/contests/hooks/useContestUserDetails';
 import { Contest } from '@/domain/Contest.schema';
 import { useManageContestActivities } from '@/lib/contests/hooks/useManageContestActivities';
+import { Session } from 'next-auth';
+import { isOpener } from '@/utils/session.utils';
 
 interface UserTabContentProps {
   contest: Contest;
-  isOpener: boolean;
+  session: Session | null;
   onRemoveUser: (user: ContestUser) => void;
   onAddUser: (user: ContestUser) => void;
 }
 
-const UserTabContent: React.FC<UserTabContentProps> = ({ contest, isOpener, onRemoveUser, onAddUser }) => {
+const UserTabContent: React.FC<UserTabContentProps> = ({ contest, session, onRemoveUser, onAddUser }) => {
   const [isUserPopinOpen, setUserPopinOpen] = useState<boolean>(false);
   const [isTempUserPopinOpen, setTempUserPopinOpen] = useState<boolean>(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
@@ -42,7 +44,7 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contest, isOpener, onRe
     fetchDetails,
     setActivities 
   } = useContestUserDetails();
-  const { updateActivityScore } = useManageContestActivities();
+  const { updateActivityScore, isLoading: isLoadingUpdateActivityScore } = useManageContestActivities();
 
 
   const handleAddUserInApp = async (user: User, gender: GenderType) => {
@@ -116,14 +118,14 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contest, isOpener, onRe
             contestUser={contestUser}
             onRemove={handleRemoveContestUser}
             onViewScoreAction={handleViewScoreAction}
-            isRemovable={isOpener}
-            isOpener={isOpener}
+            isRemovable={isOpener(session)}
+            isOpener={isOpener(session)}
           />
         ))}
       </div>
 
       {/* Only show buttons if user is opener or admin */}
-      {isOpener && (
+      {isOpener(session) && (
         <div className="flex space-x-2 mt-4 justify-center">
           <div className="flex-1">
             <Button className="w-full" onClick={() => { setUserPopinOpen(true); loadUsers(); }}>Add user in app</Button>
@@ -219,7 +221,9 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contest, isOpener, onRe
                       key={track.id}
                       {...track}
                       contest={contest}
+                      canUpdateTrackStatus={isOpener(session)}
                       contestUser={selectedContestUser ?? undefined}
+                      disableNavigation={true}
                     />
                   ))}
                   {userTracks.length === 0 && (
@@ -236,8 +240,9 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contest, isOpener, onRe
                     <ActivityCard
                       key={activity.id}
                       activity={activity}
+                      isLoading={isLoadingUpdateActivityScore}
                       contestUser={selectedContestUser ?? undefined}
-                      contestStatus={contest.status}
+                      displayEditButton={isOpener(session)}
                       displayImageAndDesc={false}
                       onScoreUpdate={async (activityId, newScore) => {
                         if (selectedContestUser) {
