@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import TrackCard from "./TrackCard";
 import { useState } from "react";
 
-const RegularTrackCard: React.FC<Track> = (track) => {
+const RegularTrackCard: React.FC<Track & { trackList: Track[] }> = ({ trackList, ...track }) => {
   const { updateTrackStatus, isLoading } = useUpdateTrackProgress();
   const { data: session } = useSession();
   const [localStatus, setLocalStatus] = useState<TrackStatus | undefined>(
@@ -33,7 +33,7 @@ const RegularTrackCard: React.FC<Track> = (track) => {
     onStatusChange: handleStatusChange
   };
 
-  return <TrackCard {...track} statusHandler={statusHandler} hideToggleButton={!session?.user?.id}/>;
+  return <TrackCard {...track} statusHandler={statusHandler} hideToggleButton={!session?.user?.id} trackList={trackList}/>;
 };
 
 export default RegularTrackCard; 

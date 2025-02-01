@@ -1,4 +1,3 @@
-
 "use client";
 import React, { useState } from 'react';
 import Image from 'next/image';
@@ -15,11 +14,11 @@ import { getBgColor } from '@/utils/color.utils';
 import { Button } from '../ui/Button';
 import { isOpener } from '@/utils/session.utils';
 import { useChangeMountedTrackStatus } from '@/lib/tracks/hooks/useChangeMountedTrackStatus';
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import ConfirmationDialog from '../ui/ConfirmDialog';
 import { useDeleteTrack } from '@/lib/tracks/hooks/useDeleteTrack';
 import { Zone } from '../Zone';
-import { FaUserCheck } from 'react-icons/fa6';
+import { FaChevronLeft, FaChevronRight, FaUserCheck } from 'react-icons/fa6';
 import TrackCompletionList from './TrackCompletionList';
 
 
@@ -34,7 +33,20 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
   const holdClass = getBgColor(track.holdColor);
   const router = useRouter();
   const [isCompletionListOpen, setCompletionListOpen] = useState<boolean>(false);
+  const searchParams = useSearchParams();
 
+  // Parse trackList from URL query params
+  const trackListParam = searchParams.get("trackList");
+  const trackList = trackListParam ? JSON.parse(decodeURIComponent(trackListParam)) : [];
+
+  // Find current track position in list
+  const currentIndex = trackList.indexOf(track.id);
+  const prevTrackId = trackList[currentIndex - 1] ?? null;
+  const nextTrackId = trackList[currentIndex + 1] ?? null;
+
+  const navigateToTrack = (trackId: number) => {
+    router.push(`/dashboard/track/${trackId}?trackList=${encodeURIComponent(JSON.stringify(trackList))}`);
+  };
 
   const handleStatusChange = async () => {
     const previousStatus = track.trackProgress?.status ?? TrackStatus.TO_DO;
@@ -102,7 +114,25 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
 
 
   return (
-    <main className="flex flex-col items-center justify-between sm:pr-24 sm:pl-24 sm:pt-0">
+    <main className="relative flex flex-col items-center justify-between sm:pr-24 sm:pl-24 sm:pt-0">
+      {/* Floating Navigation Buttons */}
+      {prevTrackId && (
+        <button
+          className="absolute left-2 sm:top-1/2 top-1/4 -translate-y-1/2 bg-gray-800/50 hover:bg-gray-700 text-white p-3 rounded-full shadow-md transition-all"
+          onClick={() => navigateToTrack(prevTrackId)}
+        >
+          <FaChevronLeft size={20} />
+        </button>
+      )}
+      {nextTrackId && (
+        <button
+          className="absolute right-2 sm:top-1/2 top-1/4 -translate-y-1/2 bg-gray-800/50 hover:bg-gray-700 text-white p-3 rounded-full shadow-md transition-all"
+          onClick={() => navigateToTrack(nextTrackId)}
+        >
+          <FaChevronRight size={20} />
+        </button>
+      )}
+
       <div className="flex flex-col items-center dark:text-white w-full max-w-3xl">
         <div className="flex w-full dark:bg-black snap-x snap-mandatory overflow-x-auto scrollbar-custom">
           {track?.imageUrl ? (
