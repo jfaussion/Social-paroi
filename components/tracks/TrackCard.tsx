@@ -15,12 +15,14 @@ interface TrackCardProps extends Track {
   statusHandler?: TrackStatusHandler;
   disableNavigation?: boolean;
   hideToggleButton?: boolean;
+  trackList?: Track[];
 }
 
 const TrackCard: React.FC<TrackCardProps> = ({
   statusHandler,
   disableNavigation = false,
   hideToggleButton = false,
+  trackList,
   ...propTrack
 }) => {
   const [track, setTrack] = useState<Track>(propTrack);
@@ -43,7 +45,9 @@ const TrackCard: React.FC<TrackCardProps> = ({
 
   const openTrackDetails = () => {
     if (disableNavigation) return;
-    router.push(`/dashboard/track/${track.id}`);
+    localStorage.setItem("lastTrackListUrl", window.location.href);
+    const trackIds = encodeURIComponent(JSON.stringify(trackList?.map(t => t.id))); 
+    router.push(`/dashboard/track/${track.id}?trackList=${trackIds}`);
   };
 
   return (

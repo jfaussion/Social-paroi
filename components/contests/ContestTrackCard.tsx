@@ -40,7 +40,7 @@ const ContestTrackCard: React.FC<ContestTrackCardProps> = ({ contest, contestUse
     onStatusChange: handleStatusChange
   };
 
-  return <TrackCard {...track} statusHandler={statusHandler} hideToggleButton={!contestUser} disableNavigation={disableNavigation}/>;
+  return <TrackCard {...track} statusHandler={statusHandler} hideToggleButton={!contestUser} disableNavigation={disableNavigation} trackList={contest.tracks}/>;
 };
 
 export default ContestTrackCard; 
