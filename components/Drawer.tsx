@@ -18,6 +18,18 @@ const Drawer = () => {
   const { data: session } = useSession();
   const router = useRouter();
 
+  const goBackOrToList = () => {
+    const lastTrackListUrl = localStorage.getItem("lastTrackListUrl");
+    if (lastTrackListUrl) {
+      // Go back to the list page
+      router.push(lastTrackListUrl); 
+      localStorage.removeItem("lastTrackListUrl");
+    } else {
+      // Default go back
+      router.back(); 
+    }
+  };
+
   const showBackButtonInsteadOfMenu = () => pathname.startsWith('/dashboard/track/') || pathname.startsWith('/opener/create');
 
   return (
@@ -25,7 +37,7 @@ const Drawer = () => {
       {showBackButtonInsteadOfMenu() ?
         <>
           { /* Back button */}
-          <FaArrowLeft className="h-6 w-6 hover:bg-gray-300 hover:dark:bg-gray-700 rounded-md" onClick={router.back} />
+          <FaArrowLeft className="h-6 w-6 hover:bg-gray-300 hover:dark:bg-gray-700 rounded-md" onClick={goBackOrToList} />
         </>
         :
         <>

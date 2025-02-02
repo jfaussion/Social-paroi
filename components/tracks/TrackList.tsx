@@ -134,7 +134,7 @@ const TrackList: React.FC<TracksProps> = ({ userId }) => {
         </>
       ) : (
         trackList.map((track: Track) => (
-          <RegularTrackCard key={track.id} {...track} />
+          <RegularTrackCard key={track.id} {...track} trackList={trackList} />
         ))
       )}
       {error && <p className="text-red-500">Error: {error}</p>}
