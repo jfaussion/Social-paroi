@@ -64,7 +64,8 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
     const wasSuccessful = await updateTrackStatus(track.id, session.data?.user?.id, newStatus);
 
     if (wasSuccessful) {
-      // Handle success (e.g., show a success message)
+      // Refresh the page to avoid caching issues
+      router.refresh();
     } else {
       // Handle failure (e.g., revert the status change in the UI, show an error message)
       console.error(errorTrackStatus);
