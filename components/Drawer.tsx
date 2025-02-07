@@ -76,11 +76,9 @@ const Drawer = () => {
             <li>
               <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href="/ranking">Ranking</Link>
             </li>
-            {isOpener(session) && (
-              <li>
-                <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href="/contests">Contests</Link>
-              </li>
-            )}
+            <li>
+              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href="/contests">Contests</Link>
+            </li>
           </ul>
 
           {/* Footer links */}
