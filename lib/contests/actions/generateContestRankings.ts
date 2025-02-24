@@ -37,24 +37,18 @@ async function generateCsvContent(
   contestId: number,
   trackPoints: Map<number, number>
 ): Promise<string> {
-  // Get all contest tracks in order
-  const contestTracks = await prisma.contestTrack.findMany({
-    where: { contestId },
-    include: {
-      track: true
-    },
-    orderBy: {
-      id: 'asc'
-    }
-  });
-
-  // Get all contest activities in order
-  const contestActivities = await prisma.contestActivity.findMany({
-    where: { contestId },
-    orderBy: {
-      id: 'asc'
-    }
-  });
+  // Get all tracks and activities in order, concurrently
+  const [contestTracks, contestActivities] = await Promise.all([
+    prisma.contestTrack.findMany({
+      where: { contestId },
+      include: { track: true },
+      orderBy: { id: 'asc' }
+    }),
+    prisma.contestActivity.findMany({
+      where: { contestId },
+      orderBy: { id: 'asc' }
+    })
+  ]);
 
   // Generate headers
   const headers = [
@@ -238,6 +232,7 @@ async function generateRanking(tx: any, contestId: number, type: ContestRankingT
 }
 
 export async function generateContestRankings(contestId: number) {
+  console.log(`[${new Date().toISOString()}] Generating contest rankings for contestId:`, contestId);
   const user = await auth();
   if (!isOpener(user)) {
     throw new Error('Only openers can generate rankings');
@@ -250,17 +245,27 @@ export async function generateContestRankings(contestId: number) {
       await tx.contestRanking.deleteMany({
         where: { contestId }
       });
+      console.log(`[${new Date().toISOString()}] Deleted existing rankings for contestId:`, contestId);
 
-      // Generate all three rankings
-      await generateRanking(tx, contestId, ContestRankingTypeEnum.Enum.Men);
-      await generateRanking(tx, contestId, ContestRankingTypeEnum.Enum.Women);
-      await generateRanking(tx, contestId, ContestRankingTypeEnum.Enum.Overall);
+      // Define the ranking types
+      const rankingTypes = [
+        ContestRankingTypeEnum.Enum.Men,
+        ContestRankingTypeEnum.Enum.Women,
+        ContestRankingTypeEnum.Enum.Overall
+      ];
+
+      // Process ranking generations concurrently
+      await Promise.all(
+        rankingTypes.map((type) => generateRanking(tx, contestId, type))
+      );
+      console.log(`[${new Date().toISOString()}] Rankings generated successfully for contestId:`, contestId);
 
       // Update contest status to "over"
       await tx.contest.update({
         where: { id: contestId },
         data: { status: ContestStatusEnum.Enum.Over }
       });
+      console.log(`[${new Date().toISOString()}] Contest status updated to "over" for contestId:`, contestId);
 
       return true;
     });

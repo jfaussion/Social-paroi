@@ -171,6 +171,7 @@ model ContestTrack {
   userResults ContestUserTrack[]
 
   @@map("contest_tracks")
+  @@index([contestId], name: "idx_contesttrack_contest_id")
 }
 
 model ContestActivity {
@@ -219,6 +220,7 @@ model ContestUserTrack {
   @@unique([contestUserId, contestTrackId])
   @@index([contestUserId], name: "idx_contestusertrack_user_id")
   @@index([contestTrackId], name: "idx_contestusertrack_track_id")
+  @@index([status], name: "idx_contestusertrack_status")
   @@map("contest_user_tracks")
 }
 
