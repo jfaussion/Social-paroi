@@ -126,7 +126,7 @@ The complete project documentation is available in the `docs/bootstrap` director
 | [Security](docs/bootstrap/7-security.md) | Security policies and best practices |
 | [Observability](docs/bootstrap/8-observability.md) | Logging, monitoring, and debugging |
 | [Architecture](docs/bootstrap/9-architecture.md) | System architecture overview |
-| [Next Steps](docs/bootstrap/10-next-steps.md) | Future improvements and roadmap |
+| [Next Steps](docs/bootstrap/10-nextSteps.md) | Future improvements and roadmap |
 
 ## 🤝 Contributing
 
