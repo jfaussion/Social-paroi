@@ -46,7 +46,7 @@ const TrackCard: React.FC<TrackCardProps> = ({
   const openTrackDetails = () => {
     if (disableNavigation) return;
     localStorage.setItem("lastTrackListUrl", window.location.href);
-    const trackIds = encodeURIComponent(JSON.stringify(trackList?.map(t => t.id))); 
+    const trackIds = encodeURIComponent(JSON.stringify(trackList?.map(t => t.id)));
     router.push(`/dashboard/track/${track.id}?trackList=${trackIds}`);
   };
 
@@ -86,7 +86,7 @@ const TrackCard: React.FC<TrackCardProps> = ({
 
         <div className="flex justify-between items-center mt-2">
           <div className="inline-flex items-center space-x-2">
-            <Zone zone={track.zone} width={60} height={50} />
+            <Zone zone={track.zone} className="w-12 h-7 sm:w-22 sm:h-16" />
             {track.removed && <RemovedLabel />}
           </div>
           {statusHandler && !hideToggleButton && (

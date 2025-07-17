@@ -277,4 +277,3 @@ model ContestRankingResult {
   @@index([contestUserId], name: "idx_contestrankingresult_user_id")
   @@map("contest_ranking_results")
 }
-

@@ -12,6 +12,7 @@ const prisma = new PrismaClient();
  * @param userId - The ID of the user to add.
  * @param name - The name of the user.
  * @returns A Promise that resolves to the ID of the created ContestUser, or null if an error occurs.
+ * @throws An error if the userId is already used by another contestUser.
  */
 export async function addContestUser(
   contestId: number,
@@ -20,6 +21,19 @@ export async function addContestUser(
   name?: string
 ): Promise<number | null> {
   try {
+    // Check if the userId is already used by another contestUser
+    if (userId) {
+      const existingUser = await prisma.contestUser.findFirst({
+        where: {
+          userId: userId,
+          contestId: contestId,
+        },
+      });
+      if (existingUser) {
+        throw new Error(`User with ID ${userId} is already added to the contest.`);
+      }
+    }
+
     const contestUser = await prisma.contestUser.create({
       data: {
         contestId: contestId,
