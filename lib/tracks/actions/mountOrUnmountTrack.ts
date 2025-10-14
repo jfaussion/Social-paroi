@@ -2,8 +2,10 @@
 import { PrismaClient } from '@prisma/client/edge';
 import { auth } from '@/auth';
 import { isOpener } from '@/utils/session.utils';
+import { createActionLogger } from '@/utils/logger';
 
 const prisma = new PrismaClient();
+const logger = createActionLogger('mountOrUnmountTrack');
 
 /**
  * Mounts or unmounts tracks.
@@ -18,9 +20,11 @@ export async function mountOrUnmountTrack(
 ) {
   const session = await auth();
   if (isOpener(session) === false) {
-    throw new Error('You must be Admin or Opener in to perform this action. User id: ' + session?.user?.id);
+    const error = new Error('You must be Admin or Opener in to perform this action.');
+    logger.error(error, { trackIds, removeTrack, userId: session?.user?.id });
+    throw error;
   }
-  console.log(`mountOrUnmountTrack - Remove Track: ${removeTrack}, Track IDs: ${trackIds}`);
+  logger.start({ trackIdsCount: trackIds.length, removeTrack });
   try {
     await prisma.track.updateMany({
       where: { id: { in: trackIds } },
@@ -28,9 +32,10 @@ export async function mountOrUnmountTrack(
         removed: removeTrack,
       },
     });
+    logger.success({ trackIdsCount: trackIds.length, removeTrack });
     return true;
   } catch (err) {
-    console.error('Error updating the tracks', err);
+    logger.error(err, { trackIdsCount: trackIds.length, removeTrack });
     return false;
   }
 }

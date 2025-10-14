@@ -2,8 +2,10 @@
 import { Track } from '@/domain/Track.schema';
 import { PrismaClient } from '@prisma/client/edge';
 import { processTrackStats } from './userStatsProcessor';
+import { createActionLogger } from '@/utils/logger';
 
 const prisma = new PrismaClient();
+const logger = createActionLogger('getUserStats');
 
 /**
  * Retrieves the statistics for a given user.
@@ -11,37 +13,48 @@ const prisma = new PrismaClient();
  * @returns The processed statistics for the user.
  */
 export async function getUserStats(userId: string) {
-  // Query to get tracks and done by the user, and total done by the user
-  const userTrackStats = await prisma.userTrackProgress.findMany({
-    where: {
-      userId,
-      status: 'DONE',
-      track: {
-        locationId: 1, // TODO: Remove this once we have a real location
-      }
-    },
-    select: {
-      track: {
-        select: {
-          level: true,
-          removed: true,
+  logger.start({ userId });
+  try {
+    // Query to get tracks and done by the user, and total done by the user
+    const userTrackStats = await prisma.userTrackProgress.findMany({
+      where: {
+        userId,
+        status: 'DONE',
+        track: {
+          locationId: 1, // TODO: Remove this once we have a real location
+        }
+      },
+      select: {
+        track: {
+          select: {
+            level: true,
+            removed: true,
+          },
         },
       },
-    },
-  });
+    });
 
-  // Query to get total number of tracks mounted by difficulty
-  const totalMountedTracksByDifficulty = await prisma.track.groupBy({
-    by: ['level'],
-    where: {
-      removed: false,
-      locationId: 1, // TODO: Remove this once we have a real location
-    },
-    _count: {
-      _all: true,
-    },
-  });
-  const processStats = processTrackStats(userTrackStats as { track: Track }[], totalMountedTracksByDifficulty as { _count: { _all: number }, level: string }[]);
+    // Query to get total number of tracks mounted by difficulty
+    const totalMountedTracksByDifficulty = await prisma.track.groupBy({
+      by: ['level'],
+      where: {
+        removed: false,
+        locationId: 1, // TODO: Remove this once we have a real location
+      },
+      _count: {
+        _all: true,
+      },
+    });
+    const processStats = processTrackStats(userTrackStats as { track: Track }[], totalMountedTracksByDifficulty as { _count: { _all: number }, level: string }[]);
 
-  return processStats;
+    logger.success({
+      userId,
+      trackCount: userTrackStats.length,
+      groupedLevels: totalMountedTracksByDifficulty.length,
+    });
+    return processStats;
+  } catch (error) {
+    logger.error(error, { userId });
+    throw error;
+  }
 };

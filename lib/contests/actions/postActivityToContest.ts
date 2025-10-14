@@ -4,8 +4,10 @@ import { ContestActivity } from "@/domain/ContestActivity.schema";
 import { PrismaClient } from '@prisma/client/edge';
 import { auth } from "@/auth";
 import { isOpener } from "@/utils/session.utils";
+import { createActionLogger } from '@/utils/logger';
 
 const prisma = new PrismaClient();
+const logger = createActionLogger('postActivityToContest');
 
 /**
  * Adds or updates an activity to a contest
@@ -19,11 +21,18 @@ export const postActivityToContest = async (
 ): Promise<ContestActivity | null> => {
   const user = await auth();
   if (!isOpener(user)) {
-    throw new Error('You must be Admin or Opener to perform this action.');
+    const error = new Error('You must be Admin or Opener to perform this action.');
+    logger.error(error, { contestId, userId: user?.user?.id });
+    throw error;
   }
 
   try {
     const activityId = parseInt(formData.get('id') as string) || -1;
+    logger.start({
+      contestId,
+      activityId,
+      hasImage: Boolean(formData.get('imageFileUrl')),
+    });
 
     const newActivity = await prisma.contestActivity.upsert({
       where: { 
@@ -42,9 +51,17 @@ export const postActivityToContest = async (
       },
     });
     
+    logger.success({
+      contestId,
+      activityId: newActivity.id,
+      hasImage: Boolean(newActivity.image),
+    });
     return newActivity as ContestActivity;
   } catch (error) {
-    console.error('Error adding/updating activity:', error);
+    logger.error(error, {
+      contestId,
+      formActivityId: formData.get('id'),
+    });
     return null;
   }
 }; 

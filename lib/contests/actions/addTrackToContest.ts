@@ -1,7 +1,9 @@
 'use server';
 import { PrismaClient } from '@prisma/client/edge';
+import { createActionLogger } from '@/utils/logger';
 
 const prisma = new PrismaClient();
+const logger = createActionLogger('addTrackToContest');
 
 /**
  * Adds a track to a contest using the ContestTrack join table.
@@ -11,6 +13,7 @@ const prisma = new PrismaClient();
  * @returns A Promise that resolves to true if the track was added successfully, or false if an error occurs.
  */
 export async function addTrackToContest(contestId: number, trackId: number): Promise<boolean> {
+  logger.start({ contestId, trackId });
   try {
     await prisma.contestTrack.create({
       data: {
@@ -18,9 +21,10 @@ export async function addTrackToContest(contestId: number, trackId: number): Pro
         trackId: trackId,
       },
     });
+    logger.success({ contestId, trackId });
     return true;
   } catch (err) {
-    console.error('Error adding track to contest', err);
+    logger.error(err, { contestId, trackId });
     return false;
   }
 } 

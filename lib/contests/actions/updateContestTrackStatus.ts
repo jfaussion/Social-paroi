@@ -7,8 +7,10 @@ import { auth } from '@/auth';
 import { isOpener } from '@/utils/session.utils';
 import { Session } from 'next-auth';
 import { ContestStatusEnum } from '@/domain/ContestStatus.enum';
+import { createActionLogger } from '@/utils/logger';
 
 const prisma = new PrismaClient();
+const logger = createActionLogger('updateContestTrackStatus');
 
 async function getFinalContestUserId(
   tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>,
@@ -16,19 +18,31 @@ async function getFinalContestUserId(
   contestId: number,
   contestUserId: number,
 ): Promise<number> {
+  logger.info('resolveContestUserId', {
+    contestId,
+    requestedContestUserId: contestUserId,
+    isOpener: isOpener(user),
+    userId: user.user?.id,
+  });
+
   if (isOpener(user)) {
+    logger.info('openerProvidedContestUser', { contestId, contestUserId });
     // Check if user is participating in the contest
     const contestUser = await tx.contestUser.findUnique({
       where: { id: contestUserId },
     });
 
     if (!contestUser) {
-      throw new Error('Contest user not found');
+      const error = new Error('Contest user not found');
+      logger.error(error, { contestId, contestUserId });
+      throw error;
     }
 
+    logger.info('contestUserValidated', { contestId, contestUserId });
     return contestUserId;
     
   } else {
+    logger.info('nonOpenerContestUserResolution', { contestId, userId: user.user?.id });
     // Check contest status
     const contest = await tx.contest.findFirst({
       where: {
@@ -37,7 +51,9 @@ async function getFinalContestUserId(
     });
 
     if (contest?.status != ContestStatusEnum.Enum.InProgress) {
-      throw new Error('User cannot update track if contest not in progress')
+      const error = new Error('User cannot update track if contest not in progress');
+      logger.error(error, { contestId, contestStatus: contest?.status });
+      throw error;
     }
     // Check if user is participating in the contest
     const userContestParticipation = await tx.contestUser.findFirst({
@@ -47,8 +63,11 @@ async function getFinalContestUserId(
       },
     });
     if (!userContestParticipation) {
-      throw new Error('User not participating in this contest');
+      const error = new Error('User not participating in this contest');
+      logger.error(error, { contestId, userId: user.user?.id });
+      throw error;
     }
+    logger.info('participantContestUserResolved', { contestId, contestUserId: userContestParticipation.id });
     return userContestParticipation.id;
   }
 }
@@ -58,6 +77,7 @@ async function getContestTrack(
   contestId: number,
   trackId: number,
 ) {
+  logger.info('fetchContestTrack', { contestId, trackId });
   const contestTrack = await tx.contestTrack.findFirst({
     where: {
       contestId,
@@ -66,9 +86,12 @@ async function getContestTrack(
   });
 
   if (!contestTrack) {
-    throw new Error('Contest track not found');
+    const error = new Error('Contest track not found');
+    logger.error(error, { contestId, trackId });
+    throw error;
   }
 
+  logger.info('contestTrackResolved', { contestId, trackId, contestTrackId: contestTrack.id });
   return contestTrack;
 }
 
@@ -78,7 +101,8 @@ async function updateContestUserTrack(
   contestTrackId: number,
   status: TrackStatus,
 ) {
-  return tx.contestUserTrack.upsert({
+  logger.info('updateContestUserTrack', { contestUserId, contestTrackId, status });
+  const result = await tx.contestUserTrack.upsert({
     where: {
       contestUserId_contestTrackId: {
         contestUserId,
@@ -95,6 +119,13 @@ async function updateContestUserTrack(
       status,
     },
   });
+  logger.info('contestUserTrackUpserted', {
+    contestUserId,
+    contestTrackId,
+    status: result.status,
+    contestUserTrackId: result.id,
+  });
+  return result;
 }
 
 async function updateRegularTrackProgress(
@@ -103,6 +134,7 @@ async function updateRegularTrackProgress(
   trackId: number,
   status: TrackStatus,
 ) {
+  logger.info('updateRegularTrackProgress', { finalContestUserId, trackId, status });
   const contestUser = await tx.contestUser.findUnique({
     where: { id: finalContestUserId },
     select: { userId: true },
@@ -123,6 +155,16 @@ async function updateRegularTrackProgress(
         status,
       },
     });
+    logger.info('userTrackProgressUpserted', {
+      userId: contestUser.userId,
+      trackId,
+      status,
+    });
+  } else {
+    logger.info('userTrackProgressSkipped', {
+      finalContestUserId,
+      trackId,
+    });
   }
 }
 
@@ -132,6 +174,7 @@ export async function updateContestTrackStatus(
   trackId: number,
   status: TrackStatus,
 ) {
+  logger.start({ contestId, contestUserId, trackId, status });
   try {
     const user = await auth();
     if (!user?.user?.id) {
@@ -146,10 +189,17 @@ export async function updateContestTrackStatus(
       await updateRegularTrackProgress(tx, finalContestUserId, trackId, status);
 
       revalidatePath('/contests/[id]', 'page');
+      logger.success({
+        contestId,
+        contestUserId: finalContestUserId,
+        trackId,
+        status,
+        contestUserTrackId: result.id,
+      });
       return result;
     });
   } catch (error) {
-    console.error('Error updating contest track status:', error);
+    logger.error(error, { contestId, contestUserId, trackId, status });
     return null;
   }
 } 

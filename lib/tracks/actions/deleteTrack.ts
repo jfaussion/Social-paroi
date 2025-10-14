@@ -4,8 +4,10 @@ import { PrismaClient } from '@prisma/client/edge';
 import { auth } from '@/auth';
 import { isOpener } from '@/utils/session.utils';
 import { deleteImageFromCloudinary } from '@/lib/cloudinary/deleteFromCloudinary';
+import { createActionLogger } from '@/utils/logger';
 
 const prisma = new PrismaClient();
+const logger = createActionLogger('deleteTrackAndImage');
 
 /**
  * Deletes a track and its image from the database and cloudinary.
@@ -16,17 +18,20 @@ const prisma = new PrismaClient();
 export async function deleteTrackAndImage(track: Track) {
   const session = await auth();
   if (isOpener(session) === false) {
-    throw new Error('You must be Admin or Opener in to perform this action. User id: ' + session?.user?.id);
+    const error = new Error('You must be Admin or Opener in to perform this action.');
+    logger.error(error, { trackId: track.id, userId: session?.user?.id });
+    throw error;
   }
   try {
+    logger.start({ trackId: track.id, hasImage: Boolean(track?.imageUrl) });
     if (track?.imageUrl) {
       await deleteImageFromCloudinary(track.imageUrl);
     }
     await prisma.track.delete({
       where: { id: track.id },
     });
-    console.log('Track deleted, id:', track.id, 'name:', track.name);
+    logger.success({ trackId: track.id, trackName: track.name });
   } catch (err) {
-    console.error('Error deleting the track', err);
+    logger.error(err, { trackId: track.id });
   }
 }

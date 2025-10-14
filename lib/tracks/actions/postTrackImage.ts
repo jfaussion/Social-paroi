@@ -5,8 +5,10 @@ import { isOpener } from '@/utils/session.utils';
 import { uploadImageToCloudinary } from '@/lib/cloudinary/uploadToCloudinary';
 import { deleteImageFromCloudinary } from '@/lib/cloudinary/deleteFromCloudinary';
 import { CloudinarySubfolders } from '@/lib/cloudinary/cloudinarySubfolders';
+import { createActionLogger } from '@/utils/logger';
 
 const trackSubfolder = 'Tracks';
+const logger = createActionLogger('postTrackImage');
 
 
 /**
@@ -22,26 +24,36 @@ export async function postTrackImage(
 ) {
   const user = await auth();
   if (isOpener(user) === false){
-    throw new Error('You must be Admin or Opener in to perform this action. User: \n' + user);
+    const error = new Error('You must be Admin or Opener in to perform this action.');
+    logger.error(error, { userId: user?.user?.id });
+    throw error;
   }
 
   try {
+    const photoEntry = track.get('photo') as unknown as File | null;
+    const oldImageUrl = track.get('imageUrl') as string | null;
+    const hasPhoto = Boolean(photoEntry);
+    const hadExistingImage = Boolean(oldImageUrl);
+
+    logger.start({ hasPhoto, hadExistingImage });
+
     let uploadedImageUrl = '';
 
     // Delete previous image
-    const oldImageUrl = track.get('imageUrl') as string;
-    if (oldImageUrl && track.get('photo')) {
+    if (oldImageUrl && photoEntry) {
       await deleteImageFromCloudinary(oldImageUrl);
     }
 
     // Upload new image
-    if (track.get('photo')) {
-      const file: File | null = track.get('photo') as unknown as File
-      uploadedImageUrl = await uploadImageToCloudinary(file, CloudinarySubfolders.TRACKS);
+    if (photoEntry) {
+      uploadedImageUrl = await uploadImageToCloudinary(photoEntry, CloudinarySubfolders.TRACKS);
     }
+    logger.success({ uploaded: Boolean(uploadedImageUrl), hadExistingImage });
     return uploadedImageUrl;
   } catch (err) {
-    console.error('Error uploading image', err);
+    const hasPhoto = Boolean(track.get('photo'));
+    const hadExistingImage = Boolean(track.get('imageUrl'));
+    logger.error(err, { hasPhoto, hadExistingImage });
     return '';
   }
 }
