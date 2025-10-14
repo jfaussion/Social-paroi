@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Track } from "@/domain/Track.schema";
 import { postNewTrack } from "../actions/postTrack";
-import { postTrackImage } from "../actions/postTrackImage";
+import { deletePreviousTrackImage } from "../actions/deletePreviousTrackImage";
+import { compressImage, directUploadToCloudinary } from "@/utils/clientUpload";
 
 export const usePostTracks = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -22,12 +23,21 @@ export const usePostTracks = () => {
       formData.append('zone', track.zone.toString());
       formData.append('points', track.points.toString());
       formData.append('removed', track.removed.toString());
-      formData.append('photo', photo);
-
+      // direct upload flow (client -> Cloudinary)
       if (photo) {
+        setLoadingMessage('Compressing image...');
+        const compressed = await compressImage(photo, { maxWidth: 1600, quality: 0.8, type: 'image/webp' });
         setLoadingMessage('Uploading image...');
-        const photoUrl = await postTrackImage(formData);
-        formData.set('imageUrl', photoUrl);
+        const result = await directUploadToCloudinary(compressed, 'Tracks');
+        // result.publicId is what backend expects (we store public_id)
+        // send oldImageUrl for deletion if present
+        const oldImageUrl = track.imageUrl?.toString() ?? '';
+        const imageUrl = result.publicId;
+        const imageForm = new FormData();
+        imageForm.append('imageUrl', imageUrl);
+        if (oldImageUrl) imageForm.append('oldImageUrl', oldImageUrl);
+        await deletePreviousTrackImage(imageForm);
+        formData.set('imageUrl', imageUrl);
       }
       setLoadingMessage('Posting block...');
       const newTrack = await postNewTrack(track.id, formData) as Track;
