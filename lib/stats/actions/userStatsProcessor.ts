@@ -1,6 +1,9 @@
 import { difficultyOrder } from "@/domain/Difficulty.enum";
 import { Track } from "@/domain/Track.schema";
 import { TrackStats } from "@/domain/TrackStats.schema";
+import { createActionLogger } from '@/utils/logger';
+
+const logger = createActionLogger('processTrackStats');
 
 /**
  * Processes the track stats for a user.
@@ -13,6 +16,10 @@ export const processTrackStats = (
   userTrackProgress: { track: Track }[], 
   totalMountedTracksByDifficulty: { _count: { _all: number }, level: string }[]
 ) => {
+  logger.start({
+    progressCount: userTrackProgress.length,
+    mountedGroups: totalMountedTracksByDifficulty.length,
+  });
   const stats: Record<string, TrackStats> = {};
 
   // Initialize stats structure with totalMounted from the second dataset
@@ -52,7 +59,9 @@ export const processTrackStats = (
     }
   });
 
-  return sortTrackStatsByDifficulty(Object.values(stats));
+  const sortedStats = sortTrackStatsByDifficulty(Object.values(stats));
+  logger.success({ levelCount: sortedStats.length });
+  return sortedStats;
 };
 
 const sortTrackStatsByDifficulty: (stats: TrackStats[]) => TrackStats[] = (stats) => {

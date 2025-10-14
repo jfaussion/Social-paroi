@@ -2,8 +2,10 @@
 import { PrismaClient } from '@prisma/client/edge';
 import { mergeTrackWithProgress } from './mergeTrackWithProgress';
 import { TrackStatus } from '@/domain/TrackStatus.enum';
+import { createActionLogger } from '@/utils/logger';
 
 const prisma = new PrismaClient();
+const logger = createActionLogger('getTrackDetails');
 
 /**
  * Retrieves the details of a track.
@@ -15,6 +17,7 @@ export async function getTrackDetails(
   trackId: number,
   userId: string
 ) {
+  logger.start({ trackId, userId });
   try {
     const track = await prisma.track.findUnique({
       where: { id: trackId },
@@ -39,11 +42,18 @@ export async function getTrackDetails(
     });
 
     if (track) {
-      return mergeTrackWithProgress(track, userId);
+      const mergedTrack = mergeTrackWithProgress(track, userId);
+      logger.success({
+        trackId,
+        userId,
+        progressItems: track.trackProgress.length,
+      });
+      return mergedTrack;
     }
+    logger.info('trackNotFound', { trackId, userId });
     return null;
   } catch (err) {
-    console.error('Error fetching track details', err);
+    logger.error(err, { trackId, userId });
     return null;
   }
 }

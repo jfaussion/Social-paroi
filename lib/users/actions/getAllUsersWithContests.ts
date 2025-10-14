@@ -1,32 +1,41 @@
 'use server';
 import { PrismaClient } from '@prisma/client/edge';
+import { createActionLogger } from '@/utils/logger';
 
 const prisma = new PrismaClient();
+const logger = createActionLogger('getAllUsersWithContests');
 
 /**
  * Retrieves all users and their contest participation.
  * @returns A Promise that resolves to an array of users with their contest participation.
  */
 export async function getAllUsersWithContests() {
-  const users = await prisma.user.findMany({
-    select: {
-      id: true,
-      name: true,
-      image: true,
-      contestUsers: {
-        select: {
-          isTemp: true,
-          contest: {
-            select: {
-              id: true,
-              name: true,
-              date: true,
+  logger.start();
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        image: true,
+        contestUsers: {
+          select: {
+            isTemp: true,
+            contest: {
+              select: {
+                id: true,
+                name: true,
+                date: true,
+              },
             },
           },
         },
       },
-    },
-  });
+    });
 
-  return users;
+    logger.success({ userCount: users.length });
+    return users;
+  } catch (error) {
+    logger.error(error);
+    throw error;
+  }
 }

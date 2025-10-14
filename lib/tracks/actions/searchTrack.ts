@@ -5,8 +5,10 @@ import { RemovedEnum } from "@/domain/Removed.enum";
 import { mergeTrackWithProgress } from "./mergeTrackWithProgress";
 import { Track } from '@/domain/Track.schema';
 import { TrackStatus } from '@/domain/TrackStatus.enum';
+import { createActionLogger } from '@/utils/logger';
 
 const prisma = new PrismaClient();
+const logger = createActionLogger('searchTrackForUser');
 
 /**
  * Searches for tracks that match the provided filters.
@@ -15,77 +17,92 @@ const prisma = new PrismaClient();
  * @returns A Promise that resolves to the tracks that match the provided filters.
  */
 export async function searchTrackForUser(userId: string, filters: Filters): Promise<Track[]> {
-  // Initialize an empty array for dynamic AND conditions
-  let andConditions = [];
-  // If zones are provided and not empty, add zone condition
-  if (filters.zones && filters.zones.length > 0) {
-    andConditions.push({
-      zone: {
-        in: filters.zones,
-      },
-    });
-  }
-  // If levels are provided and not empty, add level condition
-  if (filters.difficulties && filters.difficulties.length > 0) {
-    andConditions.push({
-      level: {
-        in: filters.difficulties,
-      },
-    });
-  }
-  // If holdColor is provided and not empty, add holdColor condition
-  if (filters.holdColor) {
-    andConditions.push({
-      holdColor: filters.holdColor,
-    });
-  }
-  // If showRemoved is provided, add removed condition
-  if (!filters.showRemoved || filters.showRemoved === RemovedEnum.Enum.NO) {
-    // Default to not showing removed tracks
-    andConditions.push({
-      removed: false,
-    });
-  } else if (filters.showRemoved === RemovedEnum.Enum.ONLY) {
-    andConditions.push({
-      removed: true,
-    });
-  } else {
-    // showRemoved === 'YES'
-    // No filter needed
-  }
-
-  andConditions.push({
-    locationId: 1, // TODO: Remove this once we have a real location
+  logger.start({
+    userId,
+    zoneFilters: filters.zones?.length ?? 0,
+    difficultyFilters: filters.difficulties?.length ?? 0,
+    holdColorFilter: Boolean(filters.holdColor),
+    showRemoved: filters.showRemoved ?? RemovedEnum.Enum.NO,
   });
+  try {
+    // Initialize an empty array for dynamic AND conditions
+    let andConditions = [];
+    // If zones are provided and not empty, add zone condition
+    if (filters.zones && filters.zones.length > 0) {
+      andConditions.push({
+        zone: {
+          in: filters.zones,
+        },
+      });
+    }
+    // If levels are provided and not empty, add level condition
+    if (filters.difficulties && filters.difficulties.length > 0) {
+      andConditions.push({
+        level: {
+          in: filters.difficulties,
+        },
+      });
+    }
+    // If holdColor is provided and not empty, add holdColor condition
+    if (filters.holdColor) {
+      andConditions.push({
+        holdColor: filters.holdColor,
+      });
+    }
+    // If showRemoved is provided, add removed condition
+    if (!filters.showRemoved || filters.showRemoved === RemovedEnum.Enum.NO) {
+      // Default to not showing removed tracks
+      andConditions.push({
+        removed: false,
+      });
+    } else if (filters.showRemoved === RemovedEnum.Enum.ONLY) {
+      andConditions.push({
+        removed: true,
+      });
+    } else {
+      // showRemoved === 'YES'
+      // No filter needed
+    }
 
-  let whereCondition = andConditions.length > 0 ? { AND: andConditions } : {};
+    andConditions.push({
+      locationId: 1, // TODO: Remove this once we have a real location
+    });
 
-  const tracks = await prisma.track.findMany({
-    where: whereCondition,
-    include: {
-      trackProgress: {
-        select: {
-          status: true,
-          dateCompleted: true,
-          user: {
-            select: {
-              id: true,
-              name: true,
-              image: true,
+    let whereCondition = andConditions.length > 0 ? { AND: andConditions } : {};
+
+    const tracks = await prisma.track.findMany({
+      where: whereCondition,
+      include: {
+        trackProgress: {
+          select: {
+            status: true,
+            dateCompleted: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+              },
             },
           },
-        },
-        where: { 
-          status: TrackStatus.DONE,
+          where: { 
+            status: TrackStatus.DONE,
+          },
         },
       },
-    },
-    orderBy: {
-      date: 'desc',
-    },
-  });
-  if (tracks) {
-    return tracks.map(track => mergeTrackWithProgress(track, userId));
+      orderBy: {
+        date: 'desc',
+      },
+    });
+    if (tracks) {
+      const mergedTracks = tracks.map(track => mergeTrackWithProgress(track, userId));
+      logger.success({ userId, trackCount: mergedTracks.length });
+      return mergedTracks;
+    }
+    logger.info('noTracksMatchedFilters', { userId });
+    return [] as Track[];
+  } catch (error) {
+    logger.error(error, { userId });
+    throw error;
   }
-  return [] as Track[];
 }

@@ -4,8 +4,10 @@ import { TrackStatus } from '@/domain/TrackStatus.enum';
 import { ContestStatusEnum } from '@/domain/ContestStatus.enum';
 import { isOpener } from '@/utils/session.utils';
 import { auth } from '@/auth';
+import { createActionLogger } from '@/utils/logger';
 
 const prisma = new PrismaClient()
+const logger = createActionLogger('updateTrackStatusForUser');
 
 async function updateRegularTrackStatus(
   tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>,
@@ -13,7 +15,8 @@ async function updateRegularTrackStatus(
   userId: string,
   status: TrackStatus,
 ) {
-  return tx.userTrackProgress.upsert({
+  logger.info('updateRegularTrackStatus', { trackId, userId, status });
+  const result = await tx.userTrackProgress.upsert({
     where: {
       user_track_unique_constraint: {
         trackId,
@@ -27,6 +30,8 @@ async function updateRegularTrackStatus(
       status,
     },
   });
+  logger.info('regularTrackStatusUpserted', { trackId, userId, status: result.status });
+  return result;
 }
 
 async function findContestTracksWhereUserParticipating(
@@ -34,7 +39,8 @@ async function findContestTracksWhereUserParticipating(
   trackId: number,
   userId: string,
 ) {
-  return tx.contestTrack.findMany({
+  logger.info('findContestTracksWhereUserParticipating', { trackId, userId });
+  const contestTracks = await tx.contestTrack.findMany({
     where: {
       trackId,
       contest: {
@@ -53,6 +59,8 @@ async function findContestTracksWhereUserParticipating(
       },
     },
   });
+  logger.info('contestTracksFetched', { trackId, userId, contestTrackCount: contestTracks.length });
+  return contestTracks;
 }
 
 async function updateContestTrackStatus(
@@ -61,7 +69,12 @@ async function updateContestTrackStatus(
   contestUser: any,
   status: TrackStatus,
 ) {
-  return tx.contestUserTrack.upsert({
+  logger.info('updateContestTrackStatus', {
+    contestTrackId: contestTrack.id,
+    contestUserId: contestUser.id,
+    status,
+  });
+  const result = await tx.contestUserTrack.upsert({
     where: {
       contestUserId_contestTrackId: {
         contestUserId: contestUser.id,
@@ -78,6 +91,12 @@ async function updateContestTrackStatus(
       status,
     },
   });
+  logger.info('contestUserTrackStatusUpserted', {
+    contestTrackId: contestTrack.id,
+    contestUserId: contestUser.id,
+    status: result.status,
+  });
+  return result;
 }
 
 export async function updateTrackStatusForUser(
@@ -85,18 +104,29 @@ export async function updateTrackStatusForUser(
   userId: string,
   newStatus: TrackStatus,
 ): Promise<boolean> {
+  logger.start({ trackId, userId, newStatus });
   try {
     const user = await auth();
     if (!user?.user?.id) {
-      throw new Error('User not authenticated');
+      const error = new Error('User not authenticated');
+      logger.error(error, { trackId, userId });
+      throw error;
     }
     
     return await prisma.$transaction(async (tx) => {
       // Update regular track status
       await updateRegularTrackStatus(tx, trackId, userId, newStatus);
+      logger.info('regularTrackUpdateCompleted', { trackId, userId, newStatus });
 
       // Find and update related contest tracks
       const activeContestTracks = await findContestTracksWhereUserParticipating(tx, trackId, userId);
+      logger.info('contestTracksToUpdate', {
+        trackId,
+        userId,
+        newStatus,
+        contestTrackCount: activeContestTracks.length,
+      });
+      let updatedContestTracks = 0;
       
       for (const contestTrack of activeContestTracks) {
         const contestUser = contestTrack.contest.contestUsers[0];
@@ -105,13 +135,29 @@ export async function updateTrackStatusForUser(
         
         if (contestUser && canUpdateContestTrack) {
           await updateContestTrackStatus(tx, contestTrack, contestUser, newStatus);
+          updatedContestTracks += 1;
+        } else {
+          logger.info('contestTrackUpdateSkipped', {
+            contestTrackId: contestTrack.id,
+            contestId: contestTrack.contestId,
+            contestStatus: contestTrack.contest.status,
+            contestUserId: contestUser?.id,
+            isSelfContester,
+            canUpdateContestTrack,
+          });
         }
       }
 
+      logger.success({
+        trackId,
+        userId,
+        newStatus,
+        updatedContestTracks,
+      });
       return true;
     });
   } catch (err) {
-    console.error('Error updating the track for user', err);
+    logger.error(err, { trackId, userId, newStatus });
     return false;
   }
 }

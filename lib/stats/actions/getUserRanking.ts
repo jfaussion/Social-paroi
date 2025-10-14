@@ -1,47 +1,56 @@
 'use server';
 import { PrismaClient } from '@prisma/client/edge';
+import { createActionLogger } from '@/utils/logger';
 
 const prisma = new PrismaClient();
+const logger = createActionLogger('getUserRankings');
 
 /**
  * Retrieves the user rankings.
  * @returns A Promise that resolves to an array of user rankings.
  */
 export async function getUserRankings() {
-  const rankings = await prisma.user.findMany({
-    select: {
-      id: true,
-      name: true,
-      image: true,
-      UserTrackProgress: {
-        select: {
-          track: {
-            select: {
-              points: true,
+  logger.start();
+  try {
+    const rankings = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        image: true,
+        UserTrackProgress: {
+          select: {
+            track: {
+              select: {
+                points: true,
+              },
+              where: {
+                removed: false, // Filter out removed tracks
+                locationId: 1, // TODO: Remove this once we have a real location
+              }
             },
-            where: {
-              removed: false, // Filter out removed tracks
-              locationId: 1, // TODO: Remove this once we have a real location
-            }
-          },
-        }
+          }
+        },
       },
-    },
-  });
+    });
 
-  // Calculate the total score for each user
-  const userScores = rankings.map(user => {
-    const totalScore = user.UserTrackProgress.reduce((acc, progress) => acc + (progress.track?.points || 0), 0);
-    return {
-      id: user.id,
-      name: user.name,
-      image: user.image,
-      score: totalScore,
-    };
-  });
+    // Calculate the total score for each user
+    const userScores = rankings.map(user => {
+      const totalScore = user.UserTrackProgress.reduce((acc, progress) => acc + (progress.track?.points || 0), 0);
+      return {
+        id: user.id,
+        name: user.name,
+        image: user.image,
+        score: totalScore,
+      };
+    });
 
-  // Sort users by score in descending order
-  userScores.sort((a, b) => b.score - a.score);
+    // Sort users by score in descending order
+    userScores.sort((a, b) => b.score - a.score);
 
-  return userScores;
+    logger.success({ rankingCount: userScores.length });
+    return userScores;
+  } catch (error) {
+    logger.error(error);
+    throw error;
+  }
 }

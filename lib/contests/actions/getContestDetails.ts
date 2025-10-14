@@ -1,8 +1,10 @@
 'use server';
 import { ContestSchema } from '@/domain/Contest.schema';
 import { PrismaClient } from '@prisma/client/edge';
+import { createActionLogger } from '@/utils/logger';
 
 const prisma = new PrismaClient();
+const logger = createActionLogger('getContestDetails');
 
 /**
  * Retrieves the details of a contest.
@@ -14,6 +16,7 @@ export async function getContestDetails(
   contestId: number,
   userId: string
 ) {
+  logger.start({ contestId, userId });
   try {
     const contest = await prisma.contest.findUnique({
       where: { id: contestId },
@@ -58,7 +61,7 @@ export async function getContestDetails(
 
     if (contest) {
       // Validate and return the contest details using the schema
-      return ContestSchema.parse({
+      const parsedContest = ContestSchema.parse({
         ...contest,
         activities: contest.contestActivities.map(activity => ({
           ...activity,
@@ -70,10 +73,19 @@ export async function getContestDetails(
           contestProgress: ct.userResults[0] || null
         })),
       });
+      logger.success({
+        contestId,
+        userId,
+        activityCount: contest.contestActivities.length,
+        trackCount: contest.contestTracks.length,
+        userCount: contest.contestUsers.length
+      });
+      return parsedContest;
     }
+    logger.info('contestNotFound', { contestId, userId });
     return null;
   } catch (err) {
-    console.error('Error fetching contest details', err);
+    logger.error(err, { contestId, userId });
     return null;
   }
 }

@@ -1,7 +1,9 @@
 'use server';
 import { PrismaClient } from '@prisma/client/edge';
+import { createActionLogger } from '@/utils/logger';
 
 const prisma = new PrismaClient();
+const logger = createActionLogger('removeContestUser');
 
 /**
  * Removes a user from a contest using the ContestUser join table.
@@ -10,15 +12,17 @@ const prisma = new PrismaClient();
  * @returns A Promise that resolves to true if the user was removed successfully, or false if an error occurs.
  */
 export async function removeContestUser(contestUserId: number): Promise<boolean> {
+  logger.start({ contestUserId });
   try {
     await prisma.contestUser.deleteMany({
       where: {
         id: contestUserId,
       },
     });
+    logger.success({ contestUserId });
     return true;
   } catch (err) {
-    console.error('Error removing user from contest', err);
+    logger.error(err, { contestUserId });
     return false;
   }
 } 
