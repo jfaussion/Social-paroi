@@ -7,8 +7,10 @@ import { ContestStatusEnum } from '@/domain/ContestStatus.enum';
 import { TrackStatus } from '@/domain/TrackStatus.enum';
 import { GenderEnum } from '@/domain/ContestUser.schema';
 import { ContestRankingType, ContestRankingTypeEnum } from '@/domain/ContestRankingType.enum';
+import { createActionLogger } from '@/utils/logger';
 
 const prisma = new PrismaClient();
+const logger = createActionLogger('generateContestRankings');
 
 const POINTS_PER_TRACK = 1000;
 
@@ -232,10 +234,12 @@ async function generateRanking(tx: any, contestId: number, type: ContestRankingT
 }
 
 export async function generateContestRankings(contestId: number) {
-  console.log(`[${new Date().toISOString()}] Generating contest rankings for contestId:`, contestId);
+  logger.start({ contestId });
   const user = await auth();
   if (!isOpener(user)) {
-    throw new Error('Only openers can generate rankings');
+    const error = new Error('Only openers can generate rankings');
+    logger.error(error, { contestId, userId: user?.user?.id });
+    throw error;
   }
 
   try {
@@ -245,7 +249,7 @@ export async function generateContestRankings(contestId: number) {
       await tx.contestRanking.deleteMany({
         where: { contestId }
       });
-      console.log(`[${new Date().toISOString()}] Deleted existing rankings for contestId:`, contestId);
+      logger.info('existingRankingsDeleted', { contestId });
 
       // Define the ranking types
       const rankingTypes = [
@@ -258,19 +262,19 @@ export async function generateContestRankings(contestId: number) {
       await Promise.all(
         rankingTypes.map((type) => generateRanking(tx, contestId, type))
       );
-      console.log(`[${new Date().toISOString()}] Rankings generated successfully for contestId:`, contestId);
+      logger.info('rankingsGenerated', { contestId, rankingTypes });
 
       // Update contest status to "over"
       await tx.contest.update({
         where: { id: contestId },
         data: { status: ContestStatusEnum.Enum.Over }
       });
-      console.log(`[${new Date().toISOString()}] Contest status updated to "over" for contestId:`, contestId);
+      logger.success({ contestId, rankingTypes });
 
       return true;
     });
   } catch (error) {
-    console.error('Error generating rankings:', error);
+    logger.error(error, { contestId });
     return false;
   }
 } 

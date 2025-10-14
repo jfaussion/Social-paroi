@@ -2,8 +2,10 @@
 import { auth } from "@/auth";
 import { isOpener } from "@/utils/session.utils";
 import { PrismaClient } from '@prisma/client/edge';
+import { createActionLogger } from '@/utils/logger';
 
 const prisma = new PrismaClient()
+const logger = createActionLogger('markNewsAsDeleted');
 
 /**
  * Marks a news as deleted.
@@ -14,10 +16,13 @@ const prisma = new PrismaClient()
 export async function markNewsAsDeleted(newsId: number) {
   const user = await auth();
   if (isOpener(user) === false) {
-    throw new Error('You must be an admin to perform this action. User: \n' + user);
+    const error = new Error('You must be an admin to perform this action.');
+    logger.error(error, { newsId, userId: user?.user?.id });
+    throw error;
   }
 
   try {
+    logger.start({ newsId });
     await prisma.news.update({
       where: { id: newsId },
       data: {
@@ -25,8 +30,8 @@ export async function markNewsAsDeleted(newsId: number) {
       },
     });
 
-    console.log('News marked as deleted, id:', newsId);
+    logger.success({ newsId });
   } catch (err) {
-    console.error('Error marking the news as deleted', err);
+    logger.error(err, { newsId });
   }
 }

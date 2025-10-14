@@ -1,5 +1,8 @@
 import { Track } from "@/domain/Track.schema";
 import { UserTrackProgress } from "@/domain/UserTrackProgress.schema";
+import { createActionLogger } from '@/utils/logger';
+
+const logger = createActionLogger('mergeTrackWithProgress');
 
 /**
  * Merges the track with the user progress.

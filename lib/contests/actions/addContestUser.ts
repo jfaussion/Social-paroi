@@ -1,8 +1,10 @@
 'use server';
 import { PrismaClient } from '@prisma/client/edge';
 import { GenderType } from '@/domain/ContestUser.schema';
+import { createActionLogger } from '@/utils/logger';
 
 const prisma = new PrismaClient();
+const logger = createActionLogger('addContestUser');
 
 /**
  * Adds a user to a contest using the ContestUser join table.
@@ -19,6 +21,7 @@ export async function addContestUser(
   userId?: string,
   name?: string
 ): Promise<number | null> {
+  logger.start({ contestId, gender, userId, name });
   try {
     const contestUser = await prisma.contestUser.create({
       data: {
@@ -29,9 +32,10 @@ export async function addContestUser(
         isTemp: !!name,
       },
     });
+    logger.success({ contestUserId: contestUser.id, contestId, userId });
     return contestUser.id;
   } catch (err) {
-    console.error('Error adding user to contest', err);
+    logger.error(err, { contestId, gender, userId, name });
     return null;
   }
 } 

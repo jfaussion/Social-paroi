@@ -4,8 +4,10 @@ import { PrismaClient } from '@prisma/client/edge';
 import { auth } from '@/auth';
 import { isOpener } from '@/utils/session.utils';
 import { ContestStatusType } from '@/domain/ContestStatus.enum';
+import { createActionLogger } from '@/utils/logger';
 
 const prisma = new PrismaClient();
+const logger = createActionLogger('callChangeContestStatus');
 
 /**
  * Change the status of an existing contest.
@@ -20,6 +22,7 @@ export async function callChangeContestStatus(contest: Contest, newStatus: Conte
     throw new Error('You must be Admin or Opener to perform this action. User id: ' + session?.user?.id);
   }
   
+  logger.start({ contestId: contest.id, newStatus });
   try {
     await prisma.contest.update({
       where: {
@@ -30,8 +33,8 @@ export async function callChangeContestStatus(contest: Contest, newStatus: Conte
       }
     });
 
-    console.log('Contest status updated, id:', contest.id, 'name:', contest.name, 'newStatus', newStatus);
+    logger.success({ contestId: contest.id, contestName: contest.name, newStatus });
   } catch (err) {
-    console.error('Error updating the contest status', err);
+    logger.error(err, { contestId: contest.id, newStatus });
   }
 }

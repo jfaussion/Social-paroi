@@ -6,8 +6,10 @@ import { isOpener } from '@/utils/session.utils';
 import { Session } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { ContestStatusEnum } from '@/domain/ContestStatus.enum';
+import { createActionLogger } from '@/utils/logger';
 
 const prisma = new PrismaClient();
+const logger = createActionLogger('updateActivityScoreForUser');
 
 async function getFinalContestUserId(
   tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>,
@@ -15,8 +17,18 @@ async function getFinalContestUserId(
   contestId: number,
   contestUserId: number,
 ): Promise<number> {
+  logger.info('resolveContestUserId', {
+    contestId,
+    requestedContestUserId: contestUserId,
+    isOpener: isOpener(user),
+    userId: user.user?.id,
+  });
+
   if (!isOpener(user)) {
-    console.log('not', user);
+    logger.info('usingParticipantContestUser', {
+      contestId,
+      userId: user.user?.id,
+    });
     const userContestParticipation = await tx.contestUser.findFirst({
       where: {
         AND: [
@@ -27,9 +39,15 @@ async function getFinalContestUserId(
     });
 
     if (!userContestParticipation) {
-      throw new Error('User not participating in this contest');
+      const error = new Error('User not participating in this contest');
+      logger.error(error, { contestId, userId: user.user?.id });
+      throw error;
     }
 
+    logger.info('participantContestUserResolved', {
+      contestId,
+      contestUserId: userContestParticipation.id,
+    });
     return userContestParticipation.id;
   } 
   
@@ -42,13 +60,14 @@ async function getFinalContestUserId(
       ]
     },
   });
-  console.log('contestUserId', contestUserId);
-  console.log('contestUser', contestUser);
 
   if (!contestUser) {
-    throw new Error('Contest user not found');
+    const error = new Error('Contest user not found');
+    logger.error(error, { contestId, contestUserId });
+    throw error;
   }
 
+  logger.info('contestUserValidated', { contestId, contestUserId });
   return contestUserId;
 }
 
@@ -66,6 +85,7 @@ export const updateActivityScoreForUser = async (
   score: number,
   contestUserId: number
 ): Promise<boolean> => {
+  logger.start({ contestId, activityId, score, contestUserId });
   try {
     const userSession = await auth();
     if (!userSession?.user?.id) {
@@ -119,11 +139,17 @@ export const updateActivityScoreForUser = async (
       });
 
       revalidatePath('/contests/[id]', 'page');
+      logger.success({
+        contestId,
+        activityId,
+        contestUserId: finalContestUserId,
+        score,
+      });
       return true;
     });
 
   } catch (error) {
-    console.error('Error updating activity score:', error);
+    logger.error(error, { contestId, activityId, score, contestUserId });
     return false;
   }
 }; 

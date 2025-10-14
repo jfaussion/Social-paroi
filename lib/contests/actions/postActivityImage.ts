@@ -4,6 +4,9 @@ import { isOpener } from '@/utils/session.utils';
 import { uploadImageToCloudinary } from '@/lib/cloudinary/uploadToCloudinary';
 import { deleteImageFromCloudinary } from '@/lib/cloudinary/deleteFromCloudinary';
 import { CloudinarySubfolders } from '@/lib/cloudinary/cloudinarySubfolders';
+import { createActionLogger } from '@/utils/logger';
+
+const logger = createActionLogger('postActivityImage');
 
 /**
  * Uploads a new activity image to Cloudinary and deletes the previous one if necessary.
@@ -15,26 +18,36 @@ import { CloudinarySubfolders } from '@/lib/cloudinary/cloudinarySubfolders';
 export async function postActivityImage(activity: FormData) {
   const user = await auth();
   if (!isOpener(user)) {
-    throw new Error('You must be Admin or Opener to perform this action.');
+    const error = new Error('You must be Admin or Opener to perform this action.');
+    logger.error(error, { userId: user?.user?.id });
+    throw error;
   }
 
   try {
+    const photoEntry = activity.get('activityPhoto') as unknown as File | null;
+    const oldImageUrl = activity.get('imageFileUrl') as string | null;
+    const hasPhoto = Boolean(photoEntry);
+    const hadExistingImage = Boolean(oldImageUrl);
+
+    logger.start({ hasPhoto, hadExistingImage });
+
     let uploadedImageUrl = '';
 
     // Delete previous image if it exists
-    const oldImageUrl = activity.get('imageFileUrl') as string;
-    if (oldImageUrl && activity.get('activityPhoto')) {
+    if (oldImageUrl && hasPhoto) {
       await deleteImageFromCloudinary(oldImageUrl);
     }
 
     // Upload new image
-    if (activity.get('activityPhoto')) {
-      const file: File | null = activity.get('activityPhoto') as unknown as File;
-      uploadedImageUrl = await uploadImageToCloudinary(file, CloudinarySubfolders.ACTIVITIES);
+    if (photoEntry) {
+      uploadedImageUrl = await uploadImageToCloudinary(photoEntry, CloudinarySubfolders.ACTIVITIES);
     }
+    logger.success({ uploaded: Boolean(uploadedImageUrl), hadExistingImage });
     return uploadedImageUrl;
   } catch (err) {
-    console.error('Error uploading activity image', err);
+    const photoPresent = Boolean(activity.get('activityPhoto'));
+    const imagePresent = Boolean(activity.get('imageFileUrl'));
+    logger.error(err, { hasPhoto: photoPresent, hadExistingImage: imagePresent });
     return '';
   }
 } 

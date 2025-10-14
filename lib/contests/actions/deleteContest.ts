@@ -4,8 +4,10 @@ import { PrismaClient } from '@prisma/client/edge';
 import { auth } from '@/auth';
 import { isOpener } from '@/utils/session.utils';
 import { deleteImageFromCloudinary } from '@/lib/cloudinary/deleteFromCloudinary'; // Adjust the import based on your cloudinary utility
+import { createActionLogger } from '@/utils/logger';
 
 const prisma = new PrismaClient();
+const logger = createActionLogger('callDeleteContest');
 
 /**
  * Deletes a contest and its image from the database and Cloudinary.
@@ -19,6 +21,7 @@ export async function callDeleteContest(contest: Contest) {
     throw new Error('You must be Admin or Opener to perform this action. User id: ' + session?.user?.id);
   }
   
+  logger.start({ contestId: contest.id, hasCoverImage: Boolean(contest?.coverImage) });
   try {
     if (contest?.coverImage) {
       await deleteImageFromCloudinary(contest.coverImage); // Delete the associated image from Cloudinary
@@ -26,8 +29,8 @@ export async function callDeleteContest(contest: Contest) {
     await prisma.contest.delete({
       where: { id: contest.id },
     });
-    console.log('Contest deleted, id:', contest.id, 'name:', contest.name);
+    logger.success({ contestId: contest.id, contestName: contest.name, hadCoverImage: Boolean(contest?.coverImage) });
   } catch (err) {
-    console.error('Error deleting the contest', err);
+    logger.error(err, { contestId: contest.id });
   }
 }

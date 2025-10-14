@@ -4,8 +4,10 @@ import { auth } from '@/auth';
 import { deleteImageFromCloudinary } from '@/lib/cloudinary/deleteFromCloudinary';
 import { isOpener } from '@/utils/session.utils';
 import { ContestActivity, PrismaClient } from '@prisma/client/edge';
+import { createActionLogger } from '@/utils/logger';
 
 const prisma = new PrismaClient();
+const logger = createActionLogger('removeActivity');
 
 /**
  * Removes an activity
@@ -17,10 +19,13 @@ export const removeActivity = async (
 ): Promise<boolean> => {
   const user = await auth();
   if (isOpener(user) === false) {
-    throw new Error('You must be Admin or Opener to perform this action. User: \n' + user);
+    const error = new Error('You must be Admin or Opener to perform this action.');
+    logger.error(error, { activityId: activity.id, userId: user?.user?.id });
+    throw error;
   }
   
   try {
+    logger.start({ activityId: activity.id, hasImage: Boolean(activity?.image) });
     if (activity?.image) {
       await deleteImageFromCloudinary(activity.image);
     }
@@ -29,9 +34,10 @@ export const removeActivity = async (
         id: activity.id,
       },
     });
+    logger.success({ activityId: activity.id });
     return true;
   } catch (error) {
-    console.error('Error removing activity from contest:', error);
+    logger.error(error, { activityId: activity.id });
     return false;
   }
 }; 
