@@ -81,7 +81,7 @@ async function generateCsvContent(
       score.totalScore.toFixed(0),
       score.completedTracks.toString(),
       // Add status for each track (empty string if not DONE)
-      ...contestTracks.map(ct => 
+      ...contestTracks.map(ct =>
         trackStatusMap.get(ct.id) === TrackStatus.DONE ? 'X' : ''
       ),
       // Add score for each activity (0 if not found)
@@ -96,9 +96,8 @@ async function generateCsvContent(
   ].join('\n');
 }
 
-async function calculateTrackScores(contestId: number, gender?: string): Promise<Map<number, number>> {
-  // Get all tracks and their completion counts
-  const trackCompletions = await prisma.contestUserTrack.groupBy({
+async function fetchTrackCompletions(contestId: number, gender?: string) {
+  return prisma.contestUserTrack.groupBy({
     by: ['contestTrackId'],
     where: {
       status: TrackStatus.DONE,
@@ -113,22 +112,10 @@ async function calculateTrackScores(contestId: number, gender?: string): Promise
       contestTrackId: true
     }
   });
-
-  // Calculate points per track based on completion count
-  const trackPoints = new Map<number, number>();
-  trackCompletions.forEach(track => {
-    trackPoints.set(
-      track.contestTrackId,
-      POINTS_PER_TRACK / track._count.contestTrackId
-    );
-  });
-
-  return trackPoints;
 }
 
-async function calculateUserScores(contestId: number, trackPoints: Map<number, number>, gender?: string): Promise<UserScore[]> {
-  // Get all users and their completed tracks
-  const users = await prisma.contestUser.findMany({
+async function fetchContestUsers(contestId: number, gender?: string) {
+  return prisma.contestUser.findMany({
     where: {
       contestId,
       gender: gender || undefined
@@ -151,7 +138,22 @@ async function calculateUserScores(contestId: number, trackPoints: Map<number, n
       }
     }
   });
+}
 
+export function calculateTrackScores(trackCompletions: Awaited<ReturnType<typeof fetchTrackCompletions>>): Map<number, number> {
+  // Calculate points per track based on completion count
+  const trackPoints = new Map<number, number>();
+  trackCompletions.forEach(track => {
+    trackPoints.set(
+      track.contestTrackId,
+      POINTS_PER_TRACK / Math.max(1, track._count.contestTrackId)
+    );
+  });
+
+  return trackPoints;
+}
+
+export function calculateUserScores(users: Awaited<ReturnType<typeof fetchContestUsers>>, trackPoints: Map<number, number>): UserScore[] {
   return users.map(user => {
     // Calculate track score and details
     let trackScore = 0;
@@ -196,19 +198,25 @@ function getRankingGender(type: ContestRankingType): string | undefined {
 
 async function generateRanking(tx: any, contestId: number, type: ContestRankingType) {
   const gender = getRankingGender(type);
-  
+
+  // Fetch raw data from database
+  const [trackCompletions, users] = await Promise.all([
+    fetchTrackCompletions(contestId, gender),
+    fetchContestUsers(contestId, gender)
+  ]);
+
   // Calculate points per track based on completion count
-  const trackPoints = await calculateTrackScores(contestId, gender);
-  
+  const trackPoints = calculateTrackScores(trackCompletions);
+
   // Calculate scores for each user
-  const userScores = await calculateUserScores(contestId, trackPoints, gender);
-  
+  const userScores = calculateUserScores(users, trackPoints);
+
   // Sort users by total score
   userScores.sort((a, b) => b.totalScore - a.totalScore);
-  
+
   // Generate CSV content with all tracks and activities
   const csvContent = await generateCsvContent(userScores, contestId, trackPoints);
-  
+
   // Create ranking entry with all details
   return await tx.contestRanking.create({
     data: {
@@ -275,4 +283,4 @@ export async function generateContestRankings(contestId: number) {
     logger.error(error, { contestId });
     return false;
   }
-} 
+}
