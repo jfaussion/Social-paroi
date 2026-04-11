@@ -1,6 +1,6 @@
 'use server';
 
-import { PrismaClient } from '@prisma/client/edge';
+import prisma from '@/prisma';
 import { auth } from '@/auth';
 import { isOpener } from '@/utils/session.utils';
 import { ContestStatusEnum } from '@/domain/ContestStatus.enum';
@@ -8,8 +8,6 @@ import { TrackStatus } from '@/domain/TrackStatus.enum';
 import { GenderEnum } from '@/domain/ContestUser.schema';
 import { ContestRankingType, ContestRankingTypeEnum } from '@/domain/ContestRankingType.enum';
 import { createActionLogger } from '@/utils/logger';
-
-const prisma = new PrismaClient();
 const logger = createActionLogger('generateContestRankings');
 
 const POINTS_PER_TRACK = 1000;

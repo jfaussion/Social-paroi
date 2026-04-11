@@ -1,11 +1,9 @@
 'use server'
+import prisma from '@/prisma';
 import { auth } from "@/auth";
 import { Contest } from "@/domain/Contest.schema"; // Adjust the import based on your schema
 import { isOpener } from "@/utils/session.utils";
-import { PrismaClient } from '@prisma/client/edge';
 import { createActionLogger } from '@/utils/logger';
-
-const prisma = new PrismaClient();
 const logger = createActionLogger('postContest');
 
 /**

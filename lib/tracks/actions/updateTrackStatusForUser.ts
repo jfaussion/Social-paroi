@@ -1,12 +1,11 @@
 'use server';
-import { PrismaClient } from '@prisma/client/edge';
+import prisma from '@/prisma';
+import type { PrismaClient } from '@prisma/client';
 import { TrackStatus } from '@/domain/TrackStatus.enum';
 import { ContestStatusEnum } from '@/domain/ContestStatus.enum';
 import { isOpener } from '@/utils/session.utils';
 import { auth } from '@/auth';
 import { createActionLogger } from '@/utils/logger';
-
-const prisma = new PrismaClient()
 const logger = createActionLogger('updateTrackStatusForUser');
 
 async function updateRegularTrackStatus(

@@ -1,13 +1,11 @@
 'use server';
-import { PrismaClient } from '@prisma/client/edge';
+import prisma from '@/prisma';
 import { Filters } from "@/domain/Filters";
 import { RemovedEnum } from "@/domain/Removed.enum";
 import { mergeTrackWithProgress } from "./mergeTrackWithProgress";
 import { Track } from '@/domain/Track.schema';
 import { TrackStatus } from '@/domain/TrackStatus.enum';
 import { createActionLogger } from '@/utils/logger';
-
-const prisma = new PrismaClient();
 const logger = createActionLogger('searchTrackForUser');
 
 /**

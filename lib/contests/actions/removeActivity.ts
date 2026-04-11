@@ -3,10 +3,9 @@
 import { auth } from '@/auth';
 import { deleteImageFromCloudinary } from '@/lib/cloudinary/deleteFromCloudinary';
 import { isOpener } from '@/utils/session.utils';
-import { ContestActivity, PrismaClient } from '@prisma/client/edge';
+import prisma from '@/prisma';
+import { ContestActivity } from '@prisma/client/edge';
 import { createActionLogger } from '@/utils/logger';
-
-const prisma = new PrismaClient();
 const logger = createActionLogger('removeActivity');
 
 /**
