@@ -1,23 +1,5 @@
-import { describe, it, expect, vi } from 'vitest'
-
-vi.mock('@/prisma', () => ({
-  default: {}
-}))
-
-vi.mock('@/auth', () => ({
-  auth: vi.fn()
-}))
-
-vi.mock('@/utils/logger', () => ({
-  createActionLogger: () => ({
-    start: vi.fn(),
-    info: vi.fn(),
-    error: vi.fn(),
-    success: vi.fn()
-  })
-}))
-
-import { calculateTrackScores, calculateUserScores } from './generateContestRankings'
+import { describe, it, expect } from 'vitest'
+import { calculateTrackScores, calculateUserScores } from '@/lib/contests/scoring'
 import { TrackStatus } from '@/domain/TrackStatus.enum'
 
 type TestUser = Parameters<typeof calculateUserScores>[0][number]

@@ -8,29 +8,8 @@ import { TrackStatus } from '@/domain/TrackStatus.enum';
 import { GenderEnum } from '@/domain/ContestUser.schema';
 import { ContestRankingType, ContestRankingTypeEnum } from '@/domain/ContestRankingType.enum';
 import { createActionLogger } from '@/utils/logger';
+import { calculateTrackScores, calculateUserScores, POINTS_PER_TRACK, UserScore } from '@/lib/contests/scoring';
 const logger = createActionLogger('generateContestRankings');
-
-const POINTS_PER_TRACK = 1000;
-
-interface UserScore {
-  contestUserId: number;
-  name?: string;
-  trackScore: number;
-  activityScore: number;
-  completedTracks: number;
-  totalScore: number;
-  trackDetails: Array<{
-    trackId: number;
-    name: string;
-    points: number;
-    status: string;
-  }>;
-  activityDetails: Array<{
-    activityId: number;
-    name: string;
-    score: number;
-  }>;
-}
 
 async function generateCsvContent(
   userScores: UserScore[],
@@ -137,57 +116,6 @@ async function fetchContestUsers(contestId: number, gender?: string) {
         }
       }
     }
-  });
-}
-
-export function calculateTrackScores(trackCompletions: Awaited<ReturnType<typeof fetchTrackCompletions>>): Map<number, number> {
-  // Calculate points per track based on completion count
-  const trackPoints = new Map<number, number>();
-  trackCompletions.forEach(track => {
-    trackPoints.set(
-      track.contestTrackId,
-      POINTS_PER_TRACK / Math.max(1, track._count.contestTrackId)
-    );
-  });
-
-  return trackPoints;
-}
-
-export function calculateUserScores(users: Awaited<ReturnType<typeof fetchContestUsers>>, trackPoints: Map<number, number>): UserScore[] {
-  return users.map(user => {
-    // Calculate track score and details
-    let trackScore = 0;
-    const trackDetails = user.trackResults.map(tr => {
-      const points = trackPoints.get(tr.contestTrackId) || POINTS_PER_TRACK;
-      if (tr.status === TrackStatus.DONE) {
-        trackScore += points;
-      }
-      return {
-        trackId: tr.contestTrackId,
-        name: tr.contestTrack.track.name || `Track_${tr.contestTrack.track.id}`,
-        points,
-        status: tr.status
-      };
-    });
-
-    // Calculate activity score and details
-    const activityDetails = user.activityResults.map(ar => ({
-      activityId: ar.contestActivityId,
-      name: ar.contestActivity.name,
-      score: ar.score
-    }));
-    const activityScore = activityDetails.reduce((sum, a) => sum + a.score, 0);
-
-    return {
-      contestUserId: user.id,
-      name: user.name || user.user?.name || undefined,
-      trackScore,
-      activityScore,
-      completedTracks: trackDetails.filter(td => td.status === TrackStatus.DONE).length,
-      totalScore: trackScore + activityScore,
-      trackDetails,
-      activityDetails
-    };
   });
 }
 
