@@ -1,12 +1,10 @@
 'use server';
+import prisma from '@/prisma';
 import { Contest } from '@/domain/Contest.schema'; // Adjust the import based on your schema
-import { PrismaClient } from '@prisma/client/edge';
 import { auth } from '@/auth';
 import { isOpener } from '@/utils/session.utils';
 import { deleteImageFromCloudinary } from '@/lib/cloudinary/deleteFromCloudinary'; // Adjust the import based on your cloudinary utility
 import { createActionLogger } from '@/utils/logger';
-
-const prisma = new PrismaClient();
 const logger = createActionLogger('callDeleteContest');
 
 /**

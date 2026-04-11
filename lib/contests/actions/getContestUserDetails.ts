@@ -1,11 +1,9 @@
 'use server'
-import { PrismaClient } from '@prisma/client/edge';
+import prisma from '@/prisma';
 import { Track } from "@/domain/Track.schema";
 import { ContestActivity } from "@/domain/ContestActivity.schema";
 import { TrackStatusEnum } from '@/domain/TrackStatus.enum';
 import { createActionLogger } from '@/utils/logger';
-
-const prisma = new PrismaClient();
 const logger = createActionLogger('getContestUserDetails');
 
 export interface ContestUserDetails {

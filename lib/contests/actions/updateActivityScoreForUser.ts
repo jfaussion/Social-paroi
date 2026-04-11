@@ -1,14 +1,13 @@
 'use server';
 
-import { PrismaClient } from '@prisma/client/edge';
+import prisma from '@/prisma';
+import type { PrismaClient } from '@prisma/client';
 import { auth } from '@/auth';
 import { isOpener } from '@/utils/session.utils';
 import { Session } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { ContestStatusEnum } from '@/domain/ContestStatus.enum';
 import { createActionLogger } from '@/utils/logger';
-
-const prisma = new PrismaClient();
 const logger = createActionLogger('updateActivityScoreForUser');
 
 async function getFinalContestUserId(

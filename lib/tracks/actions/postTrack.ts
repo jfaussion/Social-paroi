@@ -1,10 +1,8 @@
 'use server';
-import { PrismaClient } from '@prisma/client/edge';
+import prisma from '@/prisma';
 import { auth } from '@/auth';
 import { isOpener } from '@/utils/session.utils';
 import { createActionLogger } from '@/utils/logger';
-
-const prisma = new PrismaClient();
 const logger = createActionLogger('postNewTrack');
 
 /**

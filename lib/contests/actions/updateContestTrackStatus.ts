@@ -1,6 +1,7 @@
 'use server';
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/prisma';
+import type { PrismaClient } from '@prisma/client';
 import { TrackStatus } from '@/domain/TrackStatus.enum';
 import { revalidatePath } from 'next/cache';
 import { auth } from '@/auth';
@@ -8,8 +9,6 @@ import { isOpener } from '@/utils/session.utils';
 import { Session } from 'next-auth';
 import { ContestStatusEnum } from '@/domain/ContestStatus.enum';
 import { createActionLogger } from '@/utils/logger';
-
-const prisma = new PrismaClient();
 const logger = createActionLogger('updateContestTrackStatus');
 
 async function getFinalContestUserId(

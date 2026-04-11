@@ -1,9 +1,7 @@
 'use server'
+import prisma from '@/prisma';
 import { News } from "@/domain/News.schema";
-import { PrismaClient } from '@prisma/client/edge';
 import { createActionLogger } from '@/utils/logger';
-
-const prisma = new PrismaClient()
 const logger = createActionLogger('getAllActiveNews');
 
 /**

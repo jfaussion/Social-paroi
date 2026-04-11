@@ -1,10 +1,8 @@
 'use server';
+import prisma from '@/prisma';
 import { Track } from '@/domain/Track.schema';
-import { PrismaClient } from '@prisma/client/edge';
 import { processTrackStats } from './userStatsProcessor';
 import { createActionLogger } from '@/utils/logger';
-
-const prisma = new PrismaClient();
 const logger = createActionLogger('getUserStats');
 
 /**

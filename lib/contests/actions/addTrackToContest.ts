@@ -1,8 +1,6 @@
 'use server';
-import { PrismaClient } from '@prisma/client/edge';
+import prisma from '@/prisma';
 import { createActionLogger } from '@/utils/logger';
-
-const prisma = new PrismaClient();
 const logger = createActionLogger('addTrackToContest');
 
 /**
