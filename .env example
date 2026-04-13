@@ -1,0 +1,29 @@
+# Database — Neon dev branch (local dev, direct connection, no Prisma Accelerate)
+# Get these from Neon Console → dev branch → Connect
+DATABASE_URL="postgresql://<user>:<password>@<host>/<database>?sslmode=require"
+POSTGRES_URL_NON_POOLING="postgresql://<user>:<password>@<host-direct>/<database>?sslmode=require"
+# Note: on Vercel (dev + prod), DATABASE_URL uses Prisma Accelerate (prisma://accelerate...)
+# and PRISMA_GENERATE_NO_ENGINE=true — set those in Vercel Dashboard, not here
+
+# Cloudinary
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="xxxx"
+CLOUDINARY_API_KEY=xxxx
+CLOUDINARY_API_SECRET=xxxx
+CLOUDINARY_URL="cloudinary://xxxx"
+CLOUDINARY_UPLOAD_PRESET=socialparoi_signed
+
+LOG_LEVEL=debug
+
+NEXT_PUBLIC_HOME_URL="http://localhost:3000"
+NEXT_PUBLIC_CONTACT="xxx@xxx.com"
+NEXT_PUBLIC_FEEDBACK_FORM="https://xxxxx"
+
+# auth providers
+AUTH_SECRET= xxxxx # Linux: `openssl rand -hex 32` or go to https://generate-secret.vercel.app/32
+AUTH_URL=http://localhost:3000/api/auth
+
+AUTH_GITHUB_ID="xxxx"
+AUTH_GITHUB_SECRET="xxxx"
+AUTH_GOOGLE_ID="xxxx.apps.googleusercontent.com"
+AUTH_GOOGLE_SECRET="xxxx"
+
