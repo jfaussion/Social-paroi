@@ -27,6 +27,13 @@ export const TrackSchema = z.object({
   removed: z.boolean().default(false),
   usersWhoCompleted: z.array(UserSchema).optional(),
   locationId: z.number().optional(),
+  difficultyLevelId: z.number().nullable().optional(),
+  zoneId: z.number().nullable().optional(),
+  zoneRef: z.object({
+    id: z.number(),
+    name: z.string(),
+    miniMapUrl: z.string().nullable(),
+  }).nullable().optional(),
 });
 
 export type Track = z.infer<typeof TrackSchema>;

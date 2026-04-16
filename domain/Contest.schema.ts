@@ -10,6 +10,7 @@ export const ContestSchema = z.object({
   date: z.date(),
   coverImage: z.string().nullish(),
   status: ContestStatusEnum,
+  locationId: z.number().optional(),
   activities: z.array(ContestActivitySchema),
   users: z.array(ContestUserSchema),
   tracks: z.array(TrackSchema),

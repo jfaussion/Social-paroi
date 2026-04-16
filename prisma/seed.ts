@@ -1,0 +1,112 @@
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
+
+async function main() {
+  console.log('Starting seed...')
+
+  // Step 1: Set location 1's slug to 'default' and status to 'published'
+  await prisma.location.update({
+    where: { id: 1 },
+    data: { slug: 'pic-paroi', name: 'Pic & Paroi', status: 'published' },
+  })
+  console.log('Updated location 1')
+
+  // Step 2: Upsert DifficultyLevel rows for location 1 (8 levels in order)
+  const difficultyLevels = [
+    { order: 1, name: 'Unknown', color: '#9E9E9E' },
+    { order: 2, name: 'Beginner', color: '#4CAF50' },
+    { order: 3, name: 'Easy', color: '#FFEB3B' },
+    { order: 4, name: 'Intermediate', color: '#FF9800' },
+    { order: 5, name: 'Advanced', color: '#F44336' },
+    { order: 6, name: 'Difficult', color: '#9C27B0' },
+    { order: 7, name: 'FuckingHard', color: '#795548' },
+    { order: 8, name: 'Legendary', color: '#212121' },
+  ]
+
+  for (const level of difficultyLevels) {
+    await prisma.difficultyLevel.upsert({
+      where: { locationId_order: { locationId: 1, order: level.order } },
+      create: { locationId: 1, name: level.name, color: level.color, order: level.order },
+      update: { name: level.name, color: level.color },
+    })
+  }
+  console.log('Upserted 8 difficulty levels for location 1')
+
+  // Step 3: Backfill contests with locationId = 0 (defensive)
+  await prisma.contest.updateMany({
+    where: { locationId: 0 },
+    data: { locationId: 1 },
+  })
+  console.log('Backfilled contests with locationId=0')
+
+  // Step 4: Backfill news with locationId = 0 (defensive)
+  await prisma.news.updateMany({
+    where: { locationId: 0 },
+    data: { locationId: 1 },
+  })
+  console.log('Backfilled news with locationId=0')
+
+  // Step 5: Create 10 Zone rows for location 1 (Zone 1 to Zone 10)
+  for (let n = 1; n <= 10; n++) {
+    await prisma.zone.upsert({
+      where: { locationId_order: { locationId: 1, order: n } },
+      create: { locationId: 1, name: `Zone ${n}`, order: n, miniMapUrl: null },
+      update: { name: `Zone ${n}` },
+    })
+  }
+  console.log('Upserted 10 zones for location 1')
+
+  // Step 6: Backfill Track.zoneId from Track.zone for tracks belonging to location 1
+  for (let n = 1; n <= 10; n++) {
+    const zone = await prisma.zone.findUnique({
+      where: { locationId_order: { locationId: 1, order: n } },
+    })
+    if (zone) {
+      await prisma.track.updateMany({
+        where: {
+          zone: n,
+          OR: [{ locationId: 1 }, { locationId: null }],
+          zoneId: null,
+        },
+        data: { zoneId: zone.id },
+      })
+    }
+  }
+  console.log('Backfilled Track.zoneId from Track.zone for location 1 tracks')
+
+  // Step 7: Migrate existing User.role values to UserLocationRole
+  const users = await prisma.user.findMany({
+    where: { role: { in: ['opener', 'admin'] } },
+  })
+  for (const user of users) {
+    await prisma.userLocationRole.upsert({
+      where: { userId_locationId: { userId: user.id, locationId: 1 } },
+      create: { userId: user.id, locationId: 1, role: user.role as string },
+      update: { role: user.role as string },
+    })
+  }
+  console.log(`Migrated ${users.length} user roles to UserLocationRole`)
+
+  // Step 8: Create UserLocation rows for ALL existing users
+  const allUsers = await prisma.user.findMany()
+  for (const user of allUsers) {
+    await prisma.userLocation.upsert({
+      where: { userId_locationId: { userId: user.id, locationId: 1 } },
+      create: { userId: user.id, locationId: 1 },
+      update: {},
+    })
+  }
+  console.log(`Created UserLocation rows for ${allUsers.length} users`)
+
+  console.log('Seed completed successfully!')
+}
+
+main()
+  .catch((e) => {
+    console.error(e)
+    process.exit(1)
+  })
+  .finally(async () => {
+    await prisma.$disconnect()
+  })
