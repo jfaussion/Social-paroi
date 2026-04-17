@@ -5,12 +5,13 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('Starting seed...')
 
-  // Step 1: Set location 1's slug to 'default' and status to 'published'
-  await prisma.location.update({
+  // Step 1: Ensure location 1 exists (upsert handles both fresh DB and existing data)
+  await prisma.location.upsert({
     where: { id: 1 },
-    data: { slug: 'pic-paroi', name: 'Pic & Paroi', status: 'published' },
+    create: { id: 1, name: 'Pic & Paroi', type: 'gym', slug: 'pic-paroi', status: 'published' },
+    update: { slug: 'pic-paroi', name: 'Pic & Paroi', status: 'published' },
   })
-  console.log('Updated location 1')
+  console.log('Upserted location 1')
 
   // Step 2: Upsert DifficultyLevel rows for location 1 (8 levels in order)
   const difficultyLevels = [
