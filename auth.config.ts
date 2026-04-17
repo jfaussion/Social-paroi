@@ -1,5 +1,13 @@
 import type { NextAuthConfig } from 'next-auth';
 
+const PUBLIC_PATHS = ['/', '/login', '/privacy'];
+const PUBLIC_PREFIXES = ['/api/'];
+
+function isPublicPath(pathname: string): boolean {
+  if (PUBLIC_PATHS.includes(pathname)) return true;
+  return PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+}
+
 export const authConfig = {
   pages: {
     signIn: '/login',
@@ -7,27 +15,23 @@ export const authConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
+      const { pathname } = nextUrl;
 
-      // Protect dashboard routes
-      const isProtectedRoute = nextUrl.pathname.startsWith('/dashboard') || 
-                               nextUrl.pathname.startsWith('/news') || 
-                               nextUrl.pathname.startsWith('/opener') || 
-                               nextUrl.pathname.startsWith('/stats') || 
-                               nextUrl.pathname.startsWith('/ranking') || 
-                               nextUrl.pathname.startsWith('/contests') || 
-                               nextUrl.pathname.startsWith('/admin');
-      const isOpenRoute = nextUrl.pathname.startsWith('/privacy')
-      if (isProtectedRoute) {
-        if (isLoggedIn) return true;
-        return false; // Redirect unauthenticated users to login page
-      } else if (isOpenRoute) {
+      if (isPublicPath(pathname)) {
+        // Authenticated users visiting / or /login are redirected to /locations
+        if (isLoggedIn && (pathname === '/' || pathname === '/login')) {
+          return Response.redirect(new URL('/locations', nextUrl));
+        }
         return true;
-      } else if (isLoggedIn) {
-        // Default redirect for authenticated users
-        return Response.redirect(new URL('/dashboard', nextUrl));
       }
+
+      // Everything else requires authentication
+      if (!isLoggedIn) {
+        return false; // Redirects to signIn page
+      }
+
       return true;
     },
   },
-  providers: [], // Add providers with an empty array for now
+  providers: [],
 } satisfies NextAuthConfig;

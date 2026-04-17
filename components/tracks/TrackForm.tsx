@@ -7,7 +7,7 @@ import { DifficultyEnum } from "@/domain/Difficulty.enum";
 import { HoldColorEnum } from "@/domain/HoldColor.enum";
 import { difficultyCustomSelectClass, getPointsForDifficulty } from "@/utils/difficulty.utils";
 import Select from 'react-select';
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { holdColorCustomSelectClass } from "@/utils/hold.utils";
 import { CldImage } from "next-cloudinary";
 import { Button } from "../ui/Button";
@@ -44,6 +44,8 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack }) => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const pathname = usePathname();
+  const locationSlug = pathname.split('/')[1] ?? '';
 
   const { postTrack, isLoading, error, loadingMessage } = usePostTracks();
   const [newTrack, setNewTrack] = useState<Track | null>(null);
@@ -240,7 +242,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack }) => {
 
       {!isLoading && newTrack && (
         <Button className="py-2" btnType='primary'
-          onClick={() => router.push(`dashboard/track/${newTrack.id}`)}>View new block
+          onClick={() => router.push(`/${locationSlug}/tracks/track/${newTrack.id}`)}>View new block
         </Button>
       )}
 

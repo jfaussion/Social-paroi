@@ -4,7 +4,7 @@ import { Contest } from '@/domain/Contest.schema';
 import { isOpener } from '@/utils/session.utils';
 import { useSession } from 'next-auth/react';
 import { CldImage } from 'next-cloudinary';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import React from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import ToggleMenu from '../ui/ToggleMenu';
@@ -19,12 +19,14 @@ interface ContestCardProps {
 const ContestCard: React.FC<ContestCardProps> = ({ contest, editContest, deleteContest }) => {
   const { data: session } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
+  const locationSlug = pathname.split('/')[1] ?? '';
   const isOpenerOrAdmin = isOpener(session);
 
   const handleClick = () => {
     // Only allow navigation if contest is InProgress or if user is opener/admin
     if (contest.status !== 'Created' || isOpenerOrAdmin) {
-      router.push(`/contests/${contest.id}`);
+      router.push(`/${locationSlug}/contests/${contest.id}`);
     }
   };
 

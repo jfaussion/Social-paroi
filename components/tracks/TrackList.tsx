@@ -21,6 +21,7 @@ const TrackList: React.FC<TracksProps> = ({ userId }) => {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const locationSlug = pathname.split('/')[1] ?? '';
   const [trackList, setTrackList] = useState<Track[]>([]);
   const [selectedDifficulties, setSelectedDifficulties] = useState<string[]>([]);
   const [selectedZones, setSelectedZones] = useState<number[]>([]);
@@ -110,7 +111,7 @@ const TrackList: React.FC<TracksProps> = ({ userId }) => {
       {
         isOpener(session.data) && (
           <div className="w-full flex justify-between">
-            <Button onClick={() => router.push('/opener/create')}>Create new Block</Button>
+            <Button onClick={() => router.push(`/${locationSlug}/opener/create`)}>Create new Block</Button>
             <TrackBulkRemove trackList={trackList} isRemoveDisabled={isRemoveDisabled()} onRemoveAllSuccess={() => handleRemoveAllSuccess()}/>
           </div>
         )

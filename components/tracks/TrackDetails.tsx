@@ -14,7 +14,7 @@ import { getBgColor } from '@/utils/color.utils';
 import { Button } from '../ui/Button';
 import { isOpener } from '@/utils/session.utils';
 import { useChangeMountedTrackStatus } from '@/lib/tracks/hooks/useChangeMountedTrackStatus';
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import ConfirmationDialog from '../ui/ConfirmDialog';
 import { useDeleteTrack } from '@/lib/tracks/hooks/useDeleteTrack';
 import { Zone } from '../Zone';
@@ -32,6 +32,8 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
   const levelClass = getBgColorForDifficulty(track.level);
   const holdClass = getBgColor(track.holdColor);
   const router = useRouter();
+  const pathname = usePathname();
+  const locationSlug = pathname.split('/')[1] ?? '';
   const [isCompletionListOpen, setCompletionListOpen] = useState<boolean>(false);
   const searchParams = useSearchParams();
 
@@ -45,7 +47,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
   const nextTrackId = trackList[currentIndex + 1] ?? null;
 
   const navigateToTrack = (trackId: number) => {
-    router.push(`/dashboard/track/${trackId}?trackList=${encodeURIComponent(JSON.stringify(trackList))}`);
+    router.push(`/${locationSlug}/tracks/track/${trackId}?trackList=${encodeURIComponent(JSON.stringify(trackList))}`);
   };
 
   const handleStatusChange = async () => {

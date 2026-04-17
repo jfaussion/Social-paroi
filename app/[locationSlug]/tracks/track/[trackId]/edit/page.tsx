@@ -4,14 +4,14 @@ import { getTrackDetails } from "@/lib/tracks/actions/getTrackDetails";
 import { SessionProvider } from "next-auth/react";
 import { redirect } from "next/navigation";
 
-export default async function TrackEditPage({ params }: { params: { trackId: string } }) {
+export default async function TrackEditPage({ params }: { params: { locationSlug: string; trackId: string } }) {
   const session = await auth();
 
   const userId = session?.user?.id ?? "";
   const track = await getTrackDetails(parseInt(params.trackId), userId);
   if (!track) {
-    console.log('No track found, redirecting to dashboard');
-    redirect('/dashboard');
+    console.log('No track found, redirecting to tracks list');
+    redirect(`/${params.locationSlug}/tracks`);
   }
 
   return (

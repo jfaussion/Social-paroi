@@ -8,14 +8,14 @@ import { getContestDetails } from "@/lib/contests/actions/getContestDetails";
 
 export const dynamic = 'force-dynamic';
 
-export default async function ContestDetailsPage({ params }: { params: { contestId: string } }) {
+export default async function ContestDetailsPage({ params }: { params: { locationSlug: string; contestId: string } }) {
   const session = await auth();
   const userId = session?.user?.id ?? "";
   const contest = await getContestDetails(parseInt(params.contestId), userId);
-  
+
   if (!contest) {
     console.log('No contest found, redirecting to contests list');
-    redirect('/contests');
+    redirect(`/${params.locationSlug}/contests`);
   }
 
   return (

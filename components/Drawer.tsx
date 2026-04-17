@@ -1,7 +1,5 @@
 "use client";
 
-import { isOpener } from '@/utils/session.utils';
-import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 import { IoClose } from 'react-icons/io5';
 import { LuMenu } from 'react-icons/lu';
@@ -15,7 +13,6 @@ const Drawer = () => {
   const [isOpen, setIsOpen] = useState(false);
   const toggleDrawer = () => setIsOpen(!isOpen);
   const pathname = usePathname()
-  const { data: session } = useSession();
   const router = useRouter();
 
   const goBackOrToList = () => {
@@ -30,7 +27,10 @@ const Drawer = () => {
     }
   };
 
-  const showBackButtonInsteadOfMenu = () => pathname.startsWith('/dashboard/track/') || pathname.startsWith('/opener/create');
+  const locationSlug = pathname.split('/')[1] ?? '';
+
+  const showBackButtonInsteadOfMenu = () =>
+    pathname.includes('/tracks/track/') || pathname.includes('/opener/create');
 
   return (
     <div>
@@ -65,19 +65,19 @@ const Drawer = () => {
           {/* Navigation links */}
           <ul className="p-5 space-y-3 flex-grow">
             <li>
-              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href="/dashboard">Dashboard</Link>
+              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/tracks`}>Tracks</Link>
             </li>
             <li>
-              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href="/news">News</Link>
+              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/news`}>News</Link>
             </li>
             <li>
-              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href="/stats">My stats</Link>
+              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/stats`}>My stats</Link>
             </li>
             <li>
-              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href="/ranking">Ranking</Link>
+              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/ranking`}>Ranking</Link>
             </li>
             <li>
-              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href="/contests">Contests</Link>
+              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/contests`}>Contests</Link>
             </li>
           </ul>
 

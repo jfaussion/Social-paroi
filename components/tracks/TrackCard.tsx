@@ -4,7 +4,7 @@ import Image from "next/image";
 import { CldImage } from "next-cloudinary";
 import { Track } from "../../domain/Track.schema";
 import placeholderImage from "@/public/bouldering-placeholder.jpeg";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import ToggleButton from "../ui/ToggleButton";
 import RemovedLabel from "../ui/RemovedLabel";
 import { getBorderColorForDifficulty } from "@/utils/difficulty.utils";
@@ -28,6 +28,8 @@ const TrackCard: React.FC<TrackCardProps> = ({
   const [track, setTrack] = useState<Track>(propTrack);
   const levelBorderColor = getBorderColorForDifficulty(track.level);
   const router = useRouter();
+  const pathname = usePathname();
+  const locationSlug = pathname.split('/')[1] ?? '';
   const prevPropTrackRef = useRef<Track | null>(propTrack);
 
   useEffect(() => {
@@ -47,7 +49,7 @@ const TrackCard: React.FC<TrackCardProps> = ({
     if (disableNavigation) return;
     localStorage.setItem("lastTrackListUrl", window.location.href);
     const trackIds = encodeURIComponent(JSON.stringify(trackList?.map(t => t.id))); 
-    router.push(`/dashboard/track/${track.id}?trackList=${trackIds}`);
+    router.push(`/${locationSlug}/tracks/track/${track.id}?trackList=${trackIds}`);
   };
 
   return (
