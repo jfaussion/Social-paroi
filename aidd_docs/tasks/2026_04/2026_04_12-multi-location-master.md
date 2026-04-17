@@ -47,6 +47,17 @@ All Prisma migrations run against the shared database. Rules:
 - Never add a NOT NULL column without a `@default(...)` or a pre-baked SQL UPDATE in the migration
 - Part 4 must be deployed as one atomic push: slug must be set on location 1 before the new routes go live
 
+## MEP (Mise En Production)
+
+> Migrations run automatically via `prisma migrate deploy` in the build command — no manual migration step needed.
+
+**Order:**
+1. Run seed once on prod DB (direct connection, not Accelerate): `DATABASE_URL=<prod-direct-url> npx prisma db seed`
+2. Merge `feature/multi-location-2` → `main` — Vercel auto-deploys and applies migrations during build
+3. Verify post-deploy: no 404 on `/[slug]/tracks`, location 1 data intact
+
+> ⚠️ Seed **must run before** users hit the new routes — `location.slug` must exist in DB or all `[slug]` pages 404. Run it during the ~2 min deploy window or immediately before merging.
+
 ## User Journey
 
 ```mermaid

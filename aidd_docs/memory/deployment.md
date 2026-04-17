@@ -9,7 +9,7 @@ scope: all
 ## CI/CD Pipeline
 
 - **Platform**: Vercel (auto-deploy on push to main)
-- **Build command**: `prisma generate && next build`
+- **Build command**: `prisma migrate deploy && prisma generate && next build`
 - No explicit CI config file found (Vercel handles it)
 
 ## Monitoring & Logging
