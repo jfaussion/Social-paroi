@@ -15,7 +15,8 @@ const logger = createActionLogger('postNewTrack');
  */
 export async function postNewTrack(
   trackId: number | undefined,
-  track: FormData
+  track: FormData,
+  locationId: number
 ) {
   const user = await auth();
   if (isOpener(user) === false){
@@ -27,6 +28,7 @@ export async function postNewTrack(
   try {
     const name = track.get('name') as string;
     const zone = parseInt(track.get('zone') as string);
+    const zoneId = parseInt(track.get('zoneId') as string);
     const level = track.get('level') as string;
     const holdColor = track.get('holdColor') as string;
     const points = parseInt(track.get('points') as string);
@@ -48,6 +50,7 @@ export async function postNewTrack(
       update: {
         name,
         zone,
+        zoneId,
         level,
         holdColor,
         points,
@@ -57,13 +60,14 @@ export async function postNewTrack(
       create: {
         name,
         zone,
+        zoneId,
         level,
         holdColor,
         points,
         date: new Date(),
         imageUrl,
         removed: false,
-        locationId: 1, // TODO: Remove this once we have a real location
+        locationId,
       },
     });
     logger.success({ trackId: newTrack.id, level: newTrack.level, zone: newTrack.zone });

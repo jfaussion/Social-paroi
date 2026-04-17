@@ -7,7 +7,7 @@ const logger = createActionLogger('getUserRankings');
  * Retrieves the user rankings.
  * @returns A Promise that resolves to an array of user rankings.
  */
-export async function getUserRankings() {
+export async function getUserRankings(locationId: number) {
   logger.start();
   try {
     const rankings = await prisma.user.findMany({
@@ -22,8 +22,8 @@ export async function getUserRankings() {
                 points: true,
               },
               where: {
-                removed: false, // Filter out removed tracks
-                locationId: 1, // TODO: Remove this once we have a real location
+                removed: false,
+                locationId,
               }
             },
           }

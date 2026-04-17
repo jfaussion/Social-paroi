@@ -10,3 +10,6 @@ This file contains the key architectural decisions made during the project, alon
 | 2026-04-11 | DEC-002 | [Standard vs edge Prisma client](./decisions/DEC-002-prisma-standard-client.md) | Standard client for server actions, edge only for Edge Runtime |
 | 2026-04-11 | DEC-003 | [Pure function extraction pattern](./decisions/DEC-003-pure-function-extraction-pattern.md) | I/O in fetch helpers, compute in pure exported functions |
 | 2026-04-12 | DEC-004 | [Shared dev/prod database](./decisions/DEC-004-shared-dev-prod-database.md) | Additive migrations only, no destructive seeds, no DB in tests |
+| 2026-04-17 | DEC-005 | [Prisma column @map convention](./decisions/DEC-005-prisma-timestamp-map-convention.md) | All camelCase fields use @map to snake_case; raw SQL must match |
+| 2026-04-17 | DEC-006 | [LocationRoleEnum for role parameters](./decisions/DEC-006-location-role-enum.md) | Zod enum over string union; callers use `LocationRoleEnum.Enum.*` |
+| 2026-04-17 | DEC-007 | [checkUserLocationRole as centralized auth](./decisions/DEC-007-check-user-location-role.md) | DB-backed location auth replaces session-only `isOpener()` in mutations |

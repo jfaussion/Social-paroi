@@ -11,7 +11,7 @@ export const useFetchCotnestTracks = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const trackList = await searchTrackForContest(contestId, filters);
+      const trackList = await searchTrackForContest(contestId, filters, 1);
       setIsLoading(false);
       return trackList;
     } catch (err) {

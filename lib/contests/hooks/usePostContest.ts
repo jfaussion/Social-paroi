@@ -39,7 +39,7 @@ export const usePostContest = () => {
 
       // Handle post contest
       setLoadingMessage('Posting contest...');
-      const newContest = await postContest(contest.id, formData);
+      const newContest = await postContest(contest.id, formData, 1);
       return newContest;
     } catch (err) {
       console.error(err);

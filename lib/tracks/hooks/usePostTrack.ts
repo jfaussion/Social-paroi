@@ -21,6 +21,7 @@ export const usePostTracks = () => {
       formData.append('holdColor', track.holdColor);
       formData.append('level', track.level);
       formData.append('zone', track.zone.toString());
+      formData.append('zoneId', (track.zoneId ?? track.zone).toString());
       formData.append('points', track.points.toString());
       formData.append('removed', track.removed.toString());
       // direct upload flow (client -> Cloudinary)
@@ -40,7 +41,7 @@ export const usePostTracks = () => {
         formData.set('imageUrl', imageUrl);
       }
       setLoadingMessage('Posting block...');
-      const newTrack = await postNewTrack(track.id, formData) as Track;
+      const newTrack = await postNewTrack(track.id, formData, 1) as Track;
       return newTrack;
     } catch (err) {
       setError('An error occurred while posting the new block');

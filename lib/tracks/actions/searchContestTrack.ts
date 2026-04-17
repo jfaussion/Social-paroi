@@ -13,7 +13,7 @@ const logger = createActionLogger('searchTrackForContest');
  * @param filters - The filters to search by.
  * @returns A Promise that resolves to the tracks that match the provided filters.
  */
-export async function searchTrackForContest(contestId: number, filters: Filters): Promise<Track[]> {
+export async function searchTrackForContest(contestId: number, filters: Filters, locationId: number): Promise<Track[]> {
   logger.start({
     contestId,
     zoneFilters: filters.zones?.length ?? 0,
@@ -27,7 +27,7 @@ export async function searchTrackForContest(contestId: number, filters: Filters)
     // If zones are provided and not empty, add zone condition
     if (filters.zones && filters.zones.length > 0) {
       andConditions.push({
-        zone: {
+        zoneId: {
           in: filters.zones,
         },
       });
@@ -62,7 +62,7 @@ export async function searchTrackForContest(contestId: number, filters: Filters)
     }
 
     andConditions.push({
-      locationId: 1, // TODO: Remove this once we have a real location
+      locationId,
     });
 
     let whereCondition = andConditions.length > 0 ? { AND: andConditions } : {};

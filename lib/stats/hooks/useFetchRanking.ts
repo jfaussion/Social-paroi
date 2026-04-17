@@ -9,7 +9,7 @@ export const useFetchRanking = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const ranking = await getUserRankings();
+      const ranking = await getUserRankings(1);
       setIsLoading(false);
       return ranking;
     } catch (err) {

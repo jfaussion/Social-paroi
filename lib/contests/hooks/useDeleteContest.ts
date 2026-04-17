@@ -21,7 +21,7 @@ export const useDeleteContest = () => {
     setError(null);
 
     try {
-      await callDeleteContest(contest);
+      await callDeleteContest(contest, 1);
       return { success: true };
     } catch (error) {
       // Handle the error

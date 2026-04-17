@@ -11,7 +11,7 @@ export const useFetchTracks = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const trackList = await searchTrackForUser(userId, filters);
+      const trackList = await searchTrackForUser(userId, filters, 1);
       setIsLoading(false);
       return trackList;
     } catch (err) {

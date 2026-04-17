@@ -10,7 +10,7 @@ export const useFetchNews = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const newsList = await getAllActiveNews();
+      const newsList = await getAllActiveNews(1);
       setIsLoading(false);
       return newsList;
     } catch (err) {

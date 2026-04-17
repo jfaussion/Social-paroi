@@ -14,7 +14,7 @@ const logger = createActionLogger('searchTrackForUser');
  * @param filters - The filters to search by.
  * @returns A Promise that resolves to the tracks that match the provided filters.
  */
-export async function searchTrackForUser(userId: string, filters: Filters): Promise<Track[]> {
+export async function searchTrackForUser(userId: string, filters: Filters, locationId: number): Promise<Track[]> {
   logger.start({
     userId,
     zoneFilters: filters.zones?.length ?? 0,
@@ -28,7 +28,7 @@ export async function searchTrackForUser(userId: string, filters: Filters): Prom
     // If zones are provided and not empty, add zone condition
     if (filters.zones && filters.zones.length > 0) {
       andConditions.push({
-        zone: {
+        zoneId: {
           in: filters.zones,
         },
       });
@@ -63,7 +63,7 @@ export async function searchTrackForUser(userId: string, filters: Filters): Prom
     }
 
     andConditions.push({
-      locationId: 1, // TODO: Remove this once we have a real location
+      locationId,
     });
 
     let whereCondition = andConditions.length > 0 ? { AND: andConditions } : {};
@@ -83,8 +83,15 @@ export async function searchTrackForUser(userId: string, filters: Filters): Prom
               },
             },
           },
-          where: { 
+          where: {
             status: TrackStatus.DONE,
+          },
+        },
+        zoneRef: {
+          select: {
+            id: true,
+            name: true,
+            miniMapUrl: true,
           },
         },
       },

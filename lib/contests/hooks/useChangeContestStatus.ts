@@ -22,7 +22,7 @@ export const useChangeContestStatus = () => {
     setError(null);
 
     try {
-      await callChangeContestStatus(contest, newStatus);
+      await callChangeContestStatus(contest, newStatus, 1);
       return { success: true };
     } catch (error) {
       // Handle the error

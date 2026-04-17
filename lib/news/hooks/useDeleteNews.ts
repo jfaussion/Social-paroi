@@ -20,7 +20,7 @@ export const useDeleteNews = () => {
     setError(null);
 
     try {
-      await markNewsAsDeleted(id);
+      await markNewsAsDeleted(id, 1);
       return { success: true };
     } catch (error) {
       // Handle the error

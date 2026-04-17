@@ -9,7 +9,7 @@ export const useFetchUserStats = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const userStats = await getUserStats(userId);
+      const userStats = await getUserStats(userId, 1);
       setIsLoading(false);
       return userStats;
     } catch (err) {

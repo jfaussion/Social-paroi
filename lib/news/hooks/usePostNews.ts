@@ -20,7 +20,7 @@ export const usePostNews = () => {
     setError(null);
 
     try {
-      return await postNews(news);
+      return await postNews(news, 1);
     } catch (err) {
       console.error(err);
       setError("An error occurred while posting the news");

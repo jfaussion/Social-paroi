@@ -10,7 +10,7 @@ export const useFetchContests = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const contestsList = await getAllContests(); // Fetch all active contests
+      const contestsList = await getAllContests(1);
       setIsLoading(false);
       return contestsList;
     } catch (err) {
