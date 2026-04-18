@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import { LocationStatus } from '../domain/LocationStatus.enum'
 
 const prisma = new PrismaClient()
 
@@ -8,8 +9,8 @@ async function main() {
   // Step 1: Ensure location 1 exists (upsert handles both fresh DB and existing data)
   await prisma.location.upsert({
     where: { id: 1 },
-    create: { id: 1, name: 'Pic & Paroi', type: 'gym', slug: 'pic-paroi', status: 'published' },
-    update: { slug: 'pic-paroi', name: 'Pic & Paroi', status: 'published' },
+    create: { id: 1, name: 'Pic & Paroi', type: 'gym', slug: 'pic-paroi', status: LocationStatus.published },
+    update: { slug: 'pic-paroi', name: 'Pic & Paroi', status: LocationStatus.published },
   })
   console.log('Upserted location 1')
 

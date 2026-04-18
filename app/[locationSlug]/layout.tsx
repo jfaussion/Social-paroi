@@ -3,6 +3,7 @@ import { auth } from '@/auth';
 import NavBar from '@/components/Navbar';
 import { getLocationBySlug } from '@/lib/locations/actions/getLocationBySlug';
 import { getUserLocations } from '@/lib/locations/actions/getUserLocations';
+import { LocationStatus } from '@/domain/LocationStatus.enum';
 
 export default async function LocationLayout({
   children,
@@ -18,7 +19,7 @@ export default async function LocationLayout({
     notFound();
   }
 
-  if (location.status === 'hidden') {
+  if (location.status === LocationStatus.hidden) {
     const session = await auth();
     const userId = session?.user?.id;
 

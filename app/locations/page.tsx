@@ -6,6 +6,7 @@ import Link from 'next/link';
 import prisma from '@/prisma';
 import { getUserLocations } from '@/lib/locations/actions/getUserLocations';
 import { joinLocation } from '@/lib/locations/actions/joinLocation';
+import { LocationStatus } from '@/domain/LocationStatus.enum';
 
 export default async function LocationsPage() {
   const session = await auth();
@@ -13,7 +14,7 @@ export default async function LocationsPage() {
 
   const [userMemberships, publishedLocations] = await Promise.all([
     getUserLocations(session.user.id),
-    prisma.location.findMany({ where: { status: 'published' } }),
+    prisma.location.findMany({ where: { status: LocationStatus.published } }),
   ]);
 
   const joinedLocationIds = new Set(userMemberships.map((m) => m.locationId));

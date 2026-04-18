@@ -13,3 +13,5 @@ This file contains the key architectural decisions made during the project, alon
 | 2026-04-17 | DEC-005 | [Prisma column @map convention](./decisions/DEC-005-prisma-timestamp-map-convention.md) | All camelCase fields use @map to snake_case; raw SQL must match |
 | 2026-04-17 | DEC-006 | [LocationRoleEnum for role parameters](./decisions/DEC-006-location-role-enum.md) | Zod enum over string union; callers use `LocationRoleEnum.Enum.*` |
 | 2026-04-17 | DEC-007 | [checkUserLocationRole as centralized auth](./decisions/DEC-007-check-user-location-role.md) | DB-backed location auth replaces session-only `isOpener()` in mutations |
+| 2026-04-18 | DEC-008 | [LocationStatus Zod enum](./decisions/DEC-008-location-status-enum.md) | Lowercase Zod enum in `domain/`; no raw status strings in app code |
+| 2026-04-18 | DEC-009 | [last-location cookie for post-login redirect](./decisions/DEC-009-last-location-cookie.md) | Edge-safe auto-redirect to last gym; `/locations` stays accessible via Drawer |

@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { getLocationByInviteToken } from '@/lib/locations/actions/getLocationByInviteToken';
 import { joinLocation } from '@/lib/locations/actions/joinLocation';
 import { getUserLocations } from '@/lib/locations/actions/getUserLocations';
+import { LocationStatus } from '@/domain/LocationStatus.enum';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,7 +40,7 @@ export default async function JoinPage({ params }: JoinPageProps) {
     );
   }
 
-  if (location.status !== 'published') {
+  if (location.status !== LocationStatus.published && location.status !== LocationStatus.hidden) {
     return (
       <main className="flex flex-col items-center justify-center min-h-screen p-4">
         <div className="text-center max-w-md">
