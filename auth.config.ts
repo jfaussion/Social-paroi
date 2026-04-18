@@ -5,6 +5,7 @@ const PUBLIC_PREFIXES = ['/api/'];
 
 function isPublicPath(pathname: string): boolean {
   if (PUBLIC_PATHS.includes(pathname)) return true;
+  if (pathname.startsWith('/join/')) return true;
   return PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 
@@ -13,21 +14,41 @@ export const authConfig = {
     signIn: '/login',
   },
   callbacks: {
-    authorized({ auth, request: { nextUrl } }) {
+    authorized({ auth, request }) {
       const isLoggedIn = !!auth?.user;
+      const { nextUrl } = request;
       const { pathname } = nextUrl;
 
       if (isPublicPath(pathname)) {
-        // Authenticated users visiting / or /login are redirected to /locations
         if (isLoggedIn && (pathname === '/' || pathname === '/login')) {
-          return Response.redirect(new URL('/locations', nextUrl));
+          const callbackUrl = nextUrl.searchParams.get('callbackUrl');
+          // Auth.js passes callbackUrl as an absolute URL — extract pathname if same origin to prevent open redirect
+          let destination: string | null = null;
+          if (callbackUrl) {
+            if (callbackUrl.startsWith('/')) {
+              destination = callbackUrl;
+            } else {
+              try {
+                const parsed = new URL(callbackUrl);
+                if (parsed.origin === nextUrl.origin) {
+                  destination = parsed.pathname + parsed.search;
+                }
+              } catch {
+                // invalid URL, ignore
+              }
+            }
+          }
+          if (!destination) {
+            const lastLocation = request.cookies.get('last-location')?.value;
+            destination = lastLocation ? `/${lastLocation}/tracks` : '/locations';
+          }
+          return Response.redirect(new URL(destination, nextUrl));
         }
         return true;
       }
 
-      // Everything else requires authentication
       if (!isLoggedIn) {
-        return false; // Redirects to signIn page
+        return false;
       }
 
       return true;

@@ -70,8 +70,8 @@ flowchart TD
 
   Root -- redirect authenticated --> Locations
   Login -- post-login --> Locations
-  Locations -- has memberships --> Tracks
-  Locations -- no memberships --> Locations
+  Locations -- click location card --> Tracks
+  Locations -- click join --> Tracks
   Join --> Tracks
   LocationLayout --> Tracks
   LocationLayout --> Contests
@@ -144,22 +144,32 @@ flowchart TD
 
 ### Phase 6: Post-login redirect logic
 
-> After OAuth login, land user in the right place.
+> After OAuth login, auto-redirect to last visited location (cookie-based). `/locations` remains always accessible via the Drawer.
 
-1. In `auth.ts` or post-login page, after session is established:
-   - Fetch `getUserLocations(userId)`
-   - If no memberships → redirect to `/locations`
-   - If has memberships → redirect to `/[lastVisitedSlug]/tracks` (last visited stored in cookie or DB, falls back to first membership)
+1. In `Drawer.tsx` (client component):
+   - On mount and when `locationSlug` changes, write `document.cookie = 'last-location=[slug]; path=/; max-age=2592000; SameSite=Lax'`
+   - Add a "Change location" link → `/locations` in the nav list
+
+2. In `auth.config.ts` `authorized` callback:
+   - If no explicit `callbackUrl`, read `request.cookies.get('last-location')`
+   - If cookie present → redirect to `/[slug]/tracks`
+   - If no cookie (first login) → redirect to `/locations`
+
+3. `/locations` page behavior:
+   - Always accessible, never auto-redirects
+   - Shows "Your locations" + "Join a location" sections
+   - Users can switch location freely from the Drawer at any time
 
 ## Validation flow
 
 1. Run `npm run build` — no TypeScript errors, no missing route references
 2. Visit `/dashboard` — redirects to `/locations`
 3. Log in as user with no location — lands on `/locations` picker
-4. Click "Join" on location 1 — instant membership, redirected to `/default/tracks`
-5. Tracks display correctly at `/default/tracks`
-6. Visit `/default/contests` — contests display correctly
-7. Visit `/default/ranking` — leaderboard displays correctly
+4. Click "Join" on location 1 — instant membership, redirected to `/pic-paroi/tracks`
+5. Tracks display correctly at `/pic-paroi/tracks`
+6. Visit `/pic-paroi/contests` — contests display correctly
+7. Visit `/pic-paroi/ranking` — leaderboard displays correctly
 8. Visit `/join/[validToken]` — joins hidden location, redirects to its tracks page
 9. Visit `/join/[invalidToken]` — shows error page, no crash
-10. Log in as existing user with location 1 membership — goes directly to `/default/tracks`
+10. Log in as existing user with prior visit — auto-redirected to `/pic-paroi/tracks` via `last-location` cookie
+11. Open Drawer → "Change location" → `/locations` picker accessible at any time

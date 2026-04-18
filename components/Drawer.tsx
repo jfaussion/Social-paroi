@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IoClose } from 'react-icons/io5';
 import { LuMenu } from 'react-icons/lu';
 import Image from 'next/image';
@@ -28,6 +28,12 @@ const Drawer = () => {
   };
 
   const locationSlug = pathname.split('/')[1] ?? '';
+
+  useEffect(() => {
+    if (locationSlug) {
+      document.cookie = `last-location=${locationSlug}; path=/; max-age=2592000; SameSite=Lax`;
+    }
+  }, [locationSlug]);
 
   const showBackButtonInsteadOfMenu = () =>
     pathname.includes('/tracks/track/') || pathname.includes('/opener/create');
@@ -65,19 +71,22 @@ const Drawer = () => {
           {/* Navigation links */}
           <ul className="p-5 space-y-3 flex-grow">
             <li>
-              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/tracks`}>Tracks</Link>
+              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/tracks`} onClick={() => setIsOpen(false)}>Tracks</Link>
             </li>
             <li>
-              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/news`}>News</Link>
+              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md text-blue-500" href="/locations" onClick={() => setIsOpen(false)}>Change location</Link>
             </li>
             <li>
-              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/stats`}>My stats</Link>
+              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/news`} onClick={() => setIsOpen(false)}>News</Link>
             </li>
             <li>
-              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/ranking`}>Ranking</Link>
+              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/stats`} onClick={() => setIsOpen(false)}>My stats</Link>
             </li>
             <li>
-              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/contests`}>Contests</Link>
+              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/ranking`} onClick={() => setIsOpen(false)}>Ranking</Link>
+            </li>
+            <li>
+              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/contests`} onClick={() => setIsOpen(false)}>Contests</Link>
             </li>
           </ul>
 
