@@ -79,9 +79,6 @@ const Drawer = ({ isLocationAdmin = false }: { isLocationAdmin?: boolean }) => {
               <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/tracks`} onClick={() => setIsOpen(false)}>Tracks</Link>
             </li>
             <li>
-              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md text-blue-500" href="/locations" onClick={() => setIsOpen(false)}>Change location</Link>
-            </li>
-            <li>
               <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/news`} onClick={() => setIsOpen(false)}>News</Link>
             </li>
             <li>
@@ -93,8 +90,11 @@ const Drawer = ({ isLocationAdmin = false }: { isLocationAdmin?: boolean }) => {
             <li>
               <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/contests`} onClick={() => setIsOpen(false)}>Contests</Link>
             </li>
+            <li className="pt-3 mt-3 border-t border-gray-400 dark:border-gray-600">
+              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md text-blue-500" href="/locations" onClick={() => setIsOpen(false)}>Change location</Link>
+            </li>
             {isLocationAdmin && (
-              <li>
+              <li className="pt-3 mt-3 border-t border-gray-400 dark:border-gray-600">
                 <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/admin`} onClick={() => setIsOpen(false)}>Admin</Link>
               </li>
             )}

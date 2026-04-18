@@ -89,7 +89,8 @@ const TrackCard: React.FC<TrackCardProps> = ({
 
         <div className="flex justify-between items-center mt-2">
           <div className="inline-flex items-center space-x-2">
-            <Zone zone={track.zone} width={60} height={50} />
+            <Zone miniMapUrl={track.zoneRef?.miniMapUrl} zoneName={track.zoneRef?.name} width={60} height={50} />
+            {track.zoneRef?.name && <span className="text-sm dark:text-gray-300">{track.zoneRef.name}</span>}
             {track.removed && <RemovedLabel />}
           </div>
           {statusHandler && !hideToggleButton && (

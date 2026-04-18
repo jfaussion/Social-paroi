@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import TrackForm from "@/components/tracks/TrackForm";
 import { getTrackDetails } from "@/lib/tracks/actions/getTrackDetails";
+import { getLocationBySlug } from "@/lib/locations/actions/getLocationBySlug";
 import { SessionProvider } from "next-auth/react";
 import { redirect } from "next/navigation";
 
@@ -14,6 +15,11 @@ export default async function TrackEditPage({ params }: { params: { locationSlug
     redirect(`/${params.locationSlug}/tracks`);
   }
 
+  const location = await getLocationBySlug(params.locationSlug);
+  if (!location) {
+    redirect(`/${params.locationSlug}/tracks`);
+  }
+
   return (
     <SessionProvider session={session}>
       <main className="flex flex-col items-center justify-between p-4 sm:p-24 sm:pt-4 sm:pb-4">
@@ -24,7 +30,7 @@ export default async function TrackEditPage({ params }: { params: { locationSlug
             </span>
             {track &&
               (
-                <TrackForm key={track.id} initialTrack={track} />
+                <TrackForm key={track.id} initialTrack={track} locationId={location.id} />
               )}
           </div>
         </div>

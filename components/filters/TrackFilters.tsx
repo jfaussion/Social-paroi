@@ -6,6 +6,7 @@ import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import HoldColorFilter from "./HoldColorFilter";
 
 type TrackFiltersProps = {
+  zones: Array<{ id: number; name: string }>;
   selectedZones: number[];
   selectedDifficulties: string[];
   selectedShowRemoved: string | undefined;
@@ -17,6 +18,7 @@ type TrackFiltersProps = {
 };
 
 const TrackFilters: React.FC<TrackFiltersProps> = ({
+  zones,
   selectedZones,
   selectedDifficulties,
   selectedShowRemoved,
@@ -44,7 +46,7 @@ const TrackFilters: React.FC<TrackFiltersProps> = ({
   return (
     <div>
       <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mt-2">
-        <ZoneFilter selectedFilters={selectedZones} onChange={onZoneChange} />
+        <ZoneFilter zones={zones} selectedFilters={selectedZones} onChange={onZoneChange} />
         <div className="flex inline sm:w-100 sm:space-x-2">
           <div className="grow">
             <DifficultyFilter selectedFilters={selectedDifficulties} onChange={onDifficultyChange} />

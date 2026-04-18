@@ -16,6 +16,7 @@ export const mergeTrackWithProgress = (track: any, userId?: string): Track => {
     ...track,
     trackProgress: { ...userProgress },
     usersWhoCompleted: getUsersWhoCompleted(track.trackProgress),
+    zoneRef: track.zoneRef ?? null,
   };
   return result;
 }

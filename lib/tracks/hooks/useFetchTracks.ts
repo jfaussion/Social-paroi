@@ -7,11 +7,11 @@ export const useFetchTracks = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function fetchTracks(userId: string, filters: Filters): Promise<Track[]> {
+  async function fetchTracks(userId: string, filters: Filters, locationId: number): Promise<Track[]> {
     setIsLoading(true);
     setError(null);
     try {
-      const trackList = await searchTrackForUser(userId, filters, 1);
+      const trackList = await searchTrackForUser(userId, filters, locationId);
       setIsLoading(false);
       return trackList;
     } catch (err) {

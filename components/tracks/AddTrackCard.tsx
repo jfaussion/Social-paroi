@@ -50,7 +50,7 @@ const AddTrackCard: React.FC<AddTrackCardProps> = ({ track, trackList, addTrack,
         <div className='w-full'>
           <h4 className="text-md font-semibold dark:text-white">{track.name}</h4>
           <div className="flex justify-between items-center mt-2">
-            <Zone zone={track.zone} width={60} height={50} />
+            <Zone miniMapUrl={track.zoneRef?.miniMapUrl} zoneName={track.zoneRef?.name} width={60} height={50} />
             <AddButton isActive={isTrackAlreadyAdded} isLoading={false} onChange={handleAddOrRemoveTrack} style='small' />
           </div>
         </div>

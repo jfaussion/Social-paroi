@@ -204,7 +204,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
           </div>
 
           <div className="flex justify-center sm:justify-between items-center pt-3 mb-3">
-            <Zone zone={track.zone} width={200} height={100} />
+            <Zone miniMapUrl={track.zoneRef?.miniMapUrl} zoneName={track.zoneRef?.name} width={200} height={100} />
           </div>
 
         </div>

@@ -14,9 +14,11 @@ import RegularTrackCard from "./RegularTrackCard";
 
 type TracksProps = {
   userId: string;
+  locationId: number;
+  zones: Array<{ id: number; name: string }>;
 };
 
-const TrackList: React.FC<TracksProps> = ({ userId }) => {
+const TrackList: React.FC<TracksProps> = ({ userId, locationId, zones }) => {
   const session = useSession();
   const router = useRouter()
   const pathname = usePathname()
@@ -32,7 +34,7 @@ const TrackList: React.FC<TracksProps> = ({ userId }) => {
 
   useEffect(() => {
     const getTracks = async (filters: Filters) => {
-      const tracks = await fetchTracks(userId, filters);
+      const tracks = await fetchTracks(userId, filters, locationId);
       setTrackList(tracks);
     };
     // Parse URL query parameters to get filter
@@ -46,7 +48,7 @@ const TrackList: React.FC<TracksProps> = ({ userId }) => {
     setSelectedShowRemoved(showRemoved);
     setSelectedHoldColor(holdColor);
     getTracks(filters);
-  }, [userId, searchParams]);
+  }, [userId, locationId, searchParams]);
 
   const updateFiltersInURL = (zones: any[], difficulties: any[], showRemoved: string | undefined, holdColor: string | undefined) => {
     currentUrlParams.delete('zones');
@@ -117,10 +119,12 @@ const TrackList: React.FC<TracksProps> = ({ userId }) => {
         )
       }
       <TrackFilters
+        zones={zones}
         selectedZones={selectedZones}
         selectedDifficulties={selectedDifficulties}
         selectedShowRemoved={selectedShowRemoved}
         selectedHoldColor={selectedHoldColor}
+        locationId={locationId}
         onZoneChange={handleZoneChange}
         onDifficultyChange={handleDifficultyChange}
         onShowRemovedChange={handleShowRemovedChange}

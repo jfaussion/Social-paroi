@@ -17,17 +17,20 @@ import { Zone } from "../Zone";
 
 
 type TrackFromProps = {
-  initialTrack?: Track; // Optional prop for editing
+  initialTrack?: Track;
+  zones?: Array<{ id: number; name: string; miniMapUrl?: string | null }>;
+  locationId?: number;
 };
 
-const TrackForm: React.FC<TrackFromProps> = ({ initialTrack }) => {
+const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId }) => {
   const isEditMode = Boolean(initialTrack);
+  const defaultZone = initialTrack?.zone ?? zones?.[0]?.id ?? 1;
   const [track, setTrack] = useState({
     ...initialTrack,
     name: initialTrack?.name || '',
     difficulty: initialTrack?.level || '',
     holdColor: initialTrack?.holdColor || '',
-    zone: initialTrack?.zone || 1,
+    zone: defaultZone,
     points: initialTrack?.points || 0,
     photo: null as File | null,
   });
@@ -79,7 +82,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack }) => {
       name: '',
       difficulty: DifficultyEnum.Enum.Unknown as string,
       holdColor: HoldColorEnum.Enum.Unknown as string,
-      zone: 1,
+      zone: zones?.[0]?.id ?? 1,
       points: 0,
       photo: null as File | null,
     });
@@ -133,10 +136,9 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack }) => {
     label: holdColor
   }));
 
-  const zoneOptions = Array.from({ length: 10 }, (_, i) => i + 1).map(zone => ({
-    value: zone,
-    label: `Zone ${zone}`
-  }));
+  const zoneOptions = zones
+    ? zones.map(z => ({ value: z.id, label: z.name }))
+    : Array.from({ length: 10 }, (_, i) => i + 1).map(zone => ({ value: zone, label: `Zone ${zone}` }));
 
   return (
     <form onSubmit={handleSubmit} className="p-4 space-y-4 bg-gray-100 dark:bg-gray-800 text-white flex flex-col w-full rounded">
@@ -188,7 +190,16 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack }) => {
       />
       {!!track.zone && (
         <div className="flex justify-center sm:justify-start items-center p-2 mb-3">
-          <Zone zone={track.zone} width={200} height={100}/>
+          <Zone
+            miniMapUrl={
+              zones
+                ? zones.find(z => z.id === track.zone)?.miniMapUrl
+                : initialTrack?.zoneRef?.miniMapUrl
+            }
+            zoneName={zones ? zones.find(z => z.id === track.zone)?.name : initialTrack?.zoneRef?.name}
+            width={200}
+            height={100}
+          />
         </div>
       )}
 

@@ -73,18 +73,6 @@ flowchart TD
 2. Preferred approach: store `lastVisitedLocationSlug` in a **cookie** (no schema change, fast) — set on every `[locationSlug]/layout.tsx` render
 3. In the post-login redirect (Part 4 Phase 6), read the cookie first → fall back to first membership
 
-### Phase 2: LocationSelector component
-
-> Dropdown in the navbar that lists the user's locations and lets them switch.
-
-1. Create `components/LocationSelector.tsx`:
-   - Receives `currentLocation` and `userLocations[]` as props
-   - Displays current location name with a chevron
-   - Dropdown lists other memberships — click navigates to `/[slug]/tracks`
-   - Footer item: "Join another location" → navigates to `/locations`
-2. In `app/[locationSlug]/layout.tsx`, fetch `getUserLocations(userId)` and pass to `Navbar`
-3. Update `components/Navbar.tsx` to render `LocationSelector` when user is authenticated
-
 ### Phase 3: Location picker page polish
 
 > Improve the `/locations` page UI for the self-service join flow.
@@ -135,13 +123,13 @@ flowchart TD
 
 ## Validation flow
 
-1. Log in as existing user with location 1 membership — lands on `/default/tracks` (last visited or first)
-2. Open navbar — location selector shows "Default" as current location
+1. Log in as existing user with location 1 membership — lands on `/pic-paroi/tracks` (last visited or first)
+2. Open navbar — location selector shows "Pic Paroi" as current location
 3. Join a second location via `/locations` — selector now shows both, can switch between them
 4. Switch to location 2 — URL changes to `/[slug2]/tracks`, tracks filtered to location 2
 5. Log out and log back in — lands on the last visited location (cookie persists)
-6. Log in as new user with no membership — lands on `/locations` picker, joins location 1, redirected to `/default/tracks`
-7. Open drawer — all links point to `/default/...`
+6. Log in as new user with no membership — lands on `/locations` picker, joins location 1, redirected to `/pic-paroi/tracks`
+7. Open drawer — all links point to `/pic-paroi/...`
 8. Drawer shows "Admin" link when user has admin role at current location
 9. TrackCard shows zone name (e.g. "Zone 1") and mini-map image (placeholder if not uploaded yet)
 10. ZoneFilter dropdown shows zone names from DB — not "Zone 1...10" hardcoded

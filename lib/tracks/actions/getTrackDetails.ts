@@ -20,6 +20,13 @@ export async function getTrackDetails(
     const track = await prisma.track.findUnique({
       where: { id: trackId },
       include: {
+        zoneRef: {
+          select: {
+            id: true,
+            name: true,
+            miniMapUrl: true,
+          },
+        },
         trackProgress: {
           select: {
             status: true,
