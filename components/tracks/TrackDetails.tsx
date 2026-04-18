@@ -29,7 +29,8 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
   const { deleteTrack, isLoading: isLoadingDelete, error: errorDelete, reset: resetDelete } = useDeleteTrack();
   const { changeMountedTrackStatus, isLoading: isLoadingRemove, error: errorRemove } = useChangeMountedTrackStatus();
   const session = useSession();
-  const levelClass = getBgColorForDifficulty(track.level);
+  const effectiveLevel = (track.difficultyLevel?.name ?? track.level) as import('@/domain/Difficulty.enum').DifficultyType;
+  const levelClass = getBgColorForDifficulty(effectiveLevel);
   const holdClass = getBgColor(track.holdColor);
   const router = useRouter();
   const pathname = usePathname();

@@ -26,7 +26,8 @@ const TrackCard: React.FC<TrackCardProps> = ({
   ...propTrack
 }) => {
   const [track, setTrack] = useState<Track>(propTrack);
-  const levelBorderColor = getBorderColorForDifficulty(track.level);
+  const effectiveLevel = (track.difficultyLevel?.name ?? track.level) as import('@/domain/Difficulty.enum').DifficultyType;
+  const levelBorderColor = getBorderColorForDifficulty(effectiveLevel);
   const router = useRouter();
   const pathname = usePathname();
   const locationSlug = pathname.split('/')[1] ?? '';

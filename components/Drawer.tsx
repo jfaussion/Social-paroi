@@ -8,9 +8,14 @@ import Logo from '@/public/social-paroi.png';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { FaArrowLeft } from 'react-icons/fa6';
+import { useSession } from 'next-auth/react';
+import { UserRoleEnum } from '@/domain/UserRole.enum';
+import { AdapterUserCustom } from '@/lib/users/AdapterUserCustom';
 
-const Drawer = () => {
+const Drawer = ({ isLocationAdmin = false }: { isLocationAdmin?: boolean }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { data: session } = useSession();
+  const isSuperAdmin = (session?.user as AdapterUserCustom)?.role === UserRoleEnum.Enum.super_admin;
   const toggleDrawer = () => setIsOpen(!isOpen);
   const pathname = usePathname()
   const router = useRouter();
@@ -88,6 +93,16 @@ const Drawer = () => {
             <li>
               <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/contests`} onClick={() => setIsOpen(false)}>Contests</Link>
             </li>
+            {isLocationAdmin && (
+              <li>
+                <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/admin`} onClick={() => setIsOpen(false)}>Admin</Link>
+              </li>
+            )}
+            {isSuperAdmin && (
+              <li>
+                <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md text-violet-500" href="/admin" onClick={() => setIsOpen(false)}>Super Admin</Link>
+              </li>
+            )}
           </ul>
 
           {/* Footer links */}

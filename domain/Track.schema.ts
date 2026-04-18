@@ -28,6 +28,11 @@ export const TrackSchema = z.object({
   usersWhoCompleted: z.array(UserSchema).optional(),
   locationId: z.number().optional(),
   difficultyLevelId: z.number().nullable().optional(),
+  difficultyLevel: z.object({
+    id: z.number(),
+    name: z.string(),
+    color: z.string().nullable(),
+  }).nullable().optional(),
   zoneId: z.number().nullable().optional(),
   zoneRef: z.object({
     id: z.number(),

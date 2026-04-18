@@ -32,8 +32,13 @@ export async function searchTrackForContest(contestId: number, filters: Filters,
         },
       });
     }
-    // If levels are provided and not empty, add level condition
-    if (filters.difficulties && filters.difficulties.length > 0) {
+    if (filters.difficultyIds && filters.difficultyIds.length > 0) {
+      andConditions.push({
+        difficultyLevelId: {
+          in: filters.difficultyIds,
+        },
+      });
+    } else if (filters.difficulties && filters.difficulties.length > 0) {
       andConditions.push({
         level: {
           in: filters.difficulties,

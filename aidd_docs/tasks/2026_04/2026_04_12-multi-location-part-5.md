@@ -33,7 +33,8 @@ Safe for new pages. The `Track.level` FK migration (Phase 4 of this plan) requir
 - `app/[locationSlug]/admin/page.tsx` — location admin dashboard
 - `app/[locationSlug]/admin/difficulty/page.tsx` — difficulty level management
 - `app/[locationSlug]/admin/users/page.tsx` — user/role management
-- `app/[locationSlug]/admin/settings/page.tsx` — location settings with tabs: General | Difficulty | Zones | Users
+- `app/[locationSlug]/admin/zones/page.tsx` — zone configuration
+- `app/[locationSlug]/admin/settings/page.tsx` — location settings (General only)
 - `app/admin/page.tsx` — super admin: platform overview
 - `app/admin/locations/page.tsx` — super admin: create/publish/hide locations
 - `lib/locations/actions/manageDifficultyLevels.ts`
@@ -54,17 +55,15 @@ flowchart TD
   LocationAdmin["[slug]/admin — location admin"]
   DifficultyPage["[slug]/admin/difficulty"]
   UsersPage["[slug]/admin/users"]
+  ZonesPage["[slug]/admin/zones"]
   SettingsPage["[slug]/admin/settings"]
   SuperAdmin["/admin — super admin"]
   LocationsAdmin["/admin/locations"]
 
-  SettingsPage["[slug]/admin/settings (tabs: General, Difficulty, Zones, Users)"]
-  ZonesTab["Zones tab — main map upload + zone CRUD + reorder"]
-
   LocationAdmin --> DifficultyPage
   LocationAdmin --> UsersPage
+  LocationAdmin --> ZonesPage
   LocationAdmin --> SettingsPage
-  SettingsPage --> ZonesTab
   SuperAdmin --> LocationsAdmin
   DifficultyPage -- reorder/add/edit/delete --> DifficultyLevel["DifficultyLevel table"]
   UsersPage -- assign/revoke role --> UserLocationRole["UserLocationRole table"]
@@ -141,9 +140,8 @@ flowchart TD
    - Main map image is updated via existing `updateLocationSettings(locationId, { mapImageUrl })` in `manageLocation.ts`
 2. Create `ZoneConfigList.tsx` — vertical drag-to-reorder list of zones (same pattern as `DifficultyLevelList.tsx`); each row: zone name (inline editable), mini-map image upload (Cloudinary signature flow), delete button
 3. Create `ZoneDeleteDialog.tsx` — shown on delete click when zone has tracks; displays track count warning + dropdown to select migration target zone; deletion blocked until migration zone confirmed
-4. Add "Zones" tab to `app/[locationSlug]/admin/settings/page.tsx`:
-   - Top section: current main map image display + upload button (Cloudinary, saves to `Location.mapImageUrl`)
-   - Below: `ZoneConfigList` with "Add zone" button at bottom
+4. Create `app/[locationSlug]/admin/zones/page.tsx` — standalone page (not under settings):
+   - Renders `ZoneConfigList` with "Add zone" button at bottom
 5. Access: guarded by existing `checkUserLocationRole(userId, locationId, 'admin')` layout guard — no extra check needed
 
 ### Phase 7: Track.level FK migration

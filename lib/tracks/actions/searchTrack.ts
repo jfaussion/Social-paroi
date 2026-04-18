@@ -33,8 +33,13 @@ export async function searchTrackForUser(userId: string, filters: Filters, locat
         },
       });
     }
-    // If levels are provided and not empty, add level condition
-    if (filters.difficulties && filters.difficulties.length > 0) {
+    if (filters.difficultyIds && filters.difficultyIds.length > 0) {
+      andConditions.push({
+        difficultyLevelId: {
+          in: filters.difficultyIds,
+        },
+      });
+    } else if (filters.difficulties && filters.difficulties.length > 0) {
       andConditions.push({
         level: {
           in: filters.difficulties,
@@ -92,6 +97,13 @@ export async function searchTrackForUser(userId: string, filters: Filters, locat
             id: true,
             name: true,
             miniMapUrl: true,
+          },
+        },
+        difficultyLevel: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
           },
         },
       },

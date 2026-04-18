@@ -34,6 +34,7 @@ export async function postNewTrack(
     const points = parseInt(track.get('points') as string);
     const imageUrl = track.get('imageUrl') as string;
     const removedFlag = track.get('removed') === 'true';
+    const difficultyLevelId = track.get('difficultyLevelId') ? parseInt(track.get('difficultyLevelId') as string) : undefined;
 
     logger.start({
       trackId: trackId ?? null,
@@ -56,6 +57,7 @@ export async function postNewTrack(
         points,
         imageUrl,
         removed: removedFlag,
+        difficultyLevelId: difficultyLevelId || undefined,
       },
       create: {
         name,
@@ -68,6 +70,7 @@ export async function postNewTrack(
         imageUrl,
         removed: false,
         locationId,
+        difficultyLevelId: difficultyLevelId || undefined,
       },
     });
     logger.success({ trackId: newTrack.id, level: newTrack.level, zone: newTrack.zone });

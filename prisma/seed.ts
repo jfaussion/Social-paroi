@@ -16,14 +16,14 @@ async function main() {
 
   // Step 2: Upsert DifficultyLevel rows for location 1 (8 levels in order)
   const difficultyLevels = [
-    { order: 1, name: 'Unknown', color: '#9E9E9E' },
-    { order: 2, name: 'Beginner', color: '#4CAF50' },
-    { order: 3, name: 'Easy', color: '#FFEB3B' },
-    { order: 4, name: 'Intermediate', color: '#FF9800' },
-    { order: 5, name: 'Advanced', color: '#F44336' },
-    { order: 6, name: 'Difficult', color: '#9C27B0' },
-    { order: 7, name: 'FuckingHard', color: '#795548' },
-    { order: 8, name: 'Legendary', color: '#212121' },
+    { order: 1, name: 'Unknown', color: '#6B7280' },
+    { order: 2, name: 'Beginner', color: '#FFFFFF' },
+    { order: 3, name: 'Easy', color: '#22C55E' },
+    { order: 4, name: 'Intermediate', color: '#3B82F6' },
+    { order: 5, name: 'Advanced', color: '#EC4899' },
+    { order: 6, name: 'Difficult', color: '#EF4444' },
+    { order: 7, name: 'FuckingHard', color: '#EAB308' },
+    { order: 8, name: 'Legendary', color: '#000000' },
   ]
 
   for (const level of difficultyLevels) {
