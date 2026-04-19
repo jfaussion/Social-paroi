@@ -2,6 +2,7 @@
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/Button';
 import { CldImage } from 'next-cloudinary';
 import {
   createZone,
@@ -176,13 +177,14 @@ export default function ZoneConfigList({ zones: initialZones, locationId, locati
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <button
+                    <Button
                       onClick={() => saveEdit(zone.id)}
                       disabled={isUploading}
-                      className="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                      btnType="secondary"
+                      className="!h-auto px-3 py-1 text-xs"
                     >
                       Save
-                    </button>
+                    </Button>
                     <button
                       onClick={() => setEditingId(null)}
                       className="px-3 py-1 text-xs bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
@@ -252,13 +254,9 @@ export default function ZoneConfigList({ zones: initialZones, locationId, locati
           placeholder="New zone name"
           className="flex-1 px-3 py-2 border border-gray-300 rounded dark:bg-gray-800 text-sm"
         />
-        <button
-          onClick={handleAdd}
-          disabled={!newName.trim()}
-          className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-40"
-        >
+        <Button onClick={handleAdd} disabled={!newName.trim()} btnType="secondary">
           Add
-        </button>
+        </Button>
       </div>
 
       {deleteDialog && (

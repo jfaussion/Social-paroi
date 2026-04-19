@@ -15,12 +15,12 @@ export const useDeleteNews = () => {
     setError(null);
   }
 
-  const deleteNews = async (id: number): Promise<DeleteNewsResponse> => {
+  const deleteNews = async (id: number, locationId: number): Promise<DeleteNewsResponse> => {
     setIsLoading(true);
     setError(null);
 
     try {
-      await markNewsAsDeleted(id, 1);
+      await markNewsAsDeleted(id, locationId);
       return { success: true };
     } catch (error) {
       // Handle the error

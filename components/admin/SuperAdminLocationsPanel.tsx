@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { createLocation, publishLocation, hideLocation } from '@/lib/locations/actions/manageLocation';
+import { Button } from '@/components/ui/Button';
 import { LocationStatus } from '@/domain/LocationStatus.enum';
 
 type LocationItem = {
@@ -37,6 +38,7 @@ export default function SuperAdminLocationsPanel({ locations }: Props) {
   const [website, setWebsite] = useState('');
   const [creating, setCreating] = useState(false);
   const [togglingId, setTogglingId] = useState<number | null>(null);
+  const [showForm, setShowForm] = useState(false);
 
   function handleNameChange(value: string) {
     setName(value);
@@ -64,6 +66,7 @@ export default function SuperAdminLocationsPanel({ locations }: Props) {
     setSlug('');
     setAddress('');
     setWebsite('');
+    setShowForm(false);
     router.refresh();
   }
 
@@ -132,83 +135,98 @@ export default function SuperAdminLocationsPanel({ locations }: Props) {
       </section>
 
       <section>
-        <h2 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-300">
-          Create Location
-        </h2>
-        <form onSubmit={handleCreate} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="loc-name">
-              Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              id="loc-name"
-              type="text"
-              required
-              value={name}
-              onChange={(e) => handleNameChange(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="loc-type">
-              Type <span className="text-red-500">*</span>
-            </label>
-            <select
-              id="loc-type"
-              required
-              value={type}
-              onChange={(e) => setType(e.target.value as 'gym' | 'outdoor')}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-sm"
-            >
-              <option value="gym">Gym</option>
-              <option value="outdoor">Outdoor</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="loc-slug">
-              Slug <span className="text-red-500">*</span>
-            </label>
-            <input
-              id="loc-slug"
-              type="text"
-              required
-              value={slug}
-              onChange={(e) => setSlug(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="loc-address">
-              Address
-            </label>
-            <input
-              id="loc-address"
-              type="text"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="loc-website">
-              Website
-            </label>
-            <input
-              id="loc-website"
-              type="url"
-              value={website}
-              onChange={(e) => setWebsite(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-sm"
-            />
-          </div>
+        {!showForm ? (
           <button
-            type="submit"
-            disabled={creating}
-            className="px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => setShowForm(true)}
+            className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:border-blue-400 hover:text-blue-600 dark:hover:border-blue-500 dark:hover:text-blue-400 w-full justify-center transition-colors"
           >
-            {creating ? 'Creating...' : 'Create Location'}
+            <span className="text-lg leading-none">+</span>
+            Add location
           </button>
-        </form>
+        ) : (
+          <div className="rounded-lg border border-gray-300 dark:border-neutral-700 bg-gray-100 dark:bg-neutral-800 p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-semibold text-gray-700 dark:text-gray-300">New location</h2>
+              <button
+                type="button"
+                onClick={() => setShowForm(false)}
+                className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              >
+                Cancel
+              </button>
+            </div>
+            <form onSubmit={handleCreate} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1" htmlFor="loc-name">
+                  Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="loc-name"
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => handleNameChange(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1" htmlFor="loc-type">
+                  Type <span className="text-red-500">*</span>
+                </label>
+                <select
+                  id="loc-type"
+                  required
+                  value={type}
+                  onChange={(e) => setType(e.target.value as 'gym' | 'outdoor')}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-sm"
+                >
+                  <option value="gym">Gym</option>
+                  <option value="outdoor">Outdoor</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1" htmlFor="loc-slug">
+                  Slug <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="loc-slug"
+                  type="text"
+                  required
+                  value={slug}
+                  onChange={(e) => setSlug(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1" htmlFor="loc-address">
+                  Address
+                </label>
+                <input
+                  id="loc-address"
+                  type="text"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1" htmlFor="loc-website">
+                  Website
+                </label>
+                <input
+                  id="loc-website"
+                  type="url"
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-sm"
+                />
+              </div>
+              <Button type="submit" btnType="secondary" disabled={creating}>
+                {creating ? 'Creating...' : 'Create location'}
+              </Button>
+            </form>
+          </div>
+        )}
       </section>
     </div>
   );

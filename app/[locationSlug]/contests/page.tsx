@@ -3,11 +3,16 @@ import { auth } from '@/auth';
 import { SessionProvider } from 'next-auth/react';
 import { isConnected } from "@/utils/session.utils";
 import ContestList from '@/components/contests/ContestList';
+import { getLocationBySlug } from '@/lib/locations/actions/getLocationBySlug';
+import { notFound } from 'next/navigation';
 
-export default async function Contests() {
+export default async function Contests({ params }: { params: Promise<{ locationSlug: string }> }) {
+  const { locationSlug } = await params;
+  const location = await getLocationBySlug(locationSlug);
+
+  if (!location) notFound();
 
   const session = await auth();
-
 
   return (
     <SessionProvider session={session}>
@@ -18,7 +23,7 @@ export default async function Contests() {
               <span className="text-xl font-semibold w-full p-4 pt-0">
                 Contests
               </span>
-              <ContestList/>
+              <ContestList locationId={location.id} />
             </div>
           </div>
         )}

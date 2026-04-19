@@ -16,12 +16,12 @@ export const useDeleteContest = () => {
     setError(null);
   }
 
-  const deleteContest = async (contest: Contest): Promise<DeleteContestResponse> => {
+  const deleteContest = async (contest: Contest, locationId: number): Promise<DeleteContestResponse> => {
     setIsLoading(true);
     setError(null);
 
     try {
-      await callDeleteContest(contest, 1);
+      await callDeleteContest(contest, locationId);
       return { success: true };
     } catch (error) {
       // Handle the error

@@ -1,9 +1,16 @@
 import { auth } from "@/auth";
 import RankingList from "@/components/users/RankingList";
+import { getLocationBySlug } from "@/lib/locations/actions/getLocationBySlug";
 import { isConnected } from "@/utils/session.utils";
+import { notFound } from "next/navigation";
 import { SessionProvider } from "next-auth/react";
 
-export default async function RankingPage() {
+export default async function RankingPage({ params }: { params: Promise<{ locationSlug: string }> }) {
+  const { locationSlug } = await params;
+  const location = await getLocationBySlug(locationSlug);
+
+  if (!location) notFound();
+
   const session = await auth();
 
   return (
@@ -15,7 +22,7 @@ export default async function RankingPage() {
               <span className="text-xl font-semibold w-full p-4 pt-0">
                 Ranking
               </span>
-              <RankingList />
+              <RankingList locationId={location.id} />
             </div>
           </div>
         )}

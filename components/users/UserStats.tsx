@@ -8,7 +8,7 @@ import { getBgColorForDifficulty } from "@/utils/difficulty.utils";
 import { TrackStats } from "@/domain/TrackStats.schema";
 import { StatsPlaceHolder } from "./StatsPlaceholder";
 
-const UserStats = () => {
+const UserStats = ({ locationId }: { locationId: number }) => {
   const { fetchStats, isLoading, error } = useFetchUserStats();
   const session = useSession();
   const [userStats, setUserStats] = useState<TrackStats[]>([]);
@@ -19,7 +19,7 @@ const UserStats = () => {
 
     const getStats = async () => {
       if (session.data?.user?.id) {
-        const stats = await fetchStats(session.data.user.id);
+        const stats = await fetchStats(session.data.user.id, locationId);
         if (isMounted) {
           setUserStats(stats);
         }
@@ -31,7 +31,7 @@ const UserStats = () => {
     return () => {
       isMounted = false;
     };
-  }, [session.data?.user?.id]);
+  }, [session.data?.user?.id, locationId]);
 
   if (!session.data?.user?.id) return null;
 

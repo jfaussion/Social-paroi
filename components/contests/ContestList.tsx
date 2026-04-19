@@ -12,7 +12,7 @@ import { ContestPlaceHolder } from "./ContestPlaceHolder";
 import ContestForm from "./ContestForm";
 import { isOpener } from "@/utils/session.utils";
 
-function ContestList() {
+function ContestList({ locationId }: { locationId: number }) {
   const { fetchContests, isLoading, error } = useFetchContests();
   const [contestList, setContestList] = useState<Contest[]>([]);
   const [hasLoadedDataOnce, setHasLoadedDataOnce] = useState<boolean>(false);
@@ -41,7 +41,7 @@ function ContestList() {
   }
 
   const deleteContestAndRefresh = async () => {
-    const { success } = await deleteContest(selectedContest as Contest);
+    const { success } = await deleteContest(selectedContest as Contest, locationId);
     if (success) {
       setIsDeleteDialogOpen(false);
       setContestList(contestList.filter(contest => contest.id !== selectedContest?.id));
@@ -49,7 +49,7 @@ function ContestList() {
   }
 
   const postContest = async (contest: Contest, coverPhoto: File | null) => {
-    const uploadedContest = await postContestData(contest, coverPhoto);
+    const uploadedContest = await postContestData(contest, coverPhoto, locationId);
     if (uploadedContest) {
       setIsPopinOpen(false);
       updateContestList(uploadedContest);
@@ -71,12 +71,12 @@ function ContestList() {
 
   useEffect(() => {
     const fetch = async () => {
-      const contests = await fetchContests();
+      const contests = await fetchContests(locationId);
       setHasLoadedDataOnce(true);
       setContestList(contests);
     };
     fetch();
-  }, []);
+  }, [locationId]);
 
   if (error && !isLoading) {
     return <p className="text-red-500">{error}</p>;

@@ -2,6 +2,7 @@
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/Button';
 import {
   createDifficultyLevel,
   updateDifficultyLevel,
@@ -152,12 +153,13 @@ export default function DifficultyLevelList({ levels: initialLevels, locationId 
                   />
                 </div>
                 <div className="flex gap-2">
-                  <button
+                  <Button
                     onClick={() => saveEdit(level.id)}
-                    className="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                    btnType="secondary"
+                    className="!h-auto px-3 py-1 text-xs"
                   >
                     Save
-                  </button>
+                  </Button>
                   <button
                     onClick={() => setEditingId(null)}
                     className="px-3 py-1 text-xs bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
@@ -232,13 +234,9 @@ export default function DifficultyLevelList({ levels: initialLevels, locationId 
             className="flex-1 px-2 py-2 border border-gray-300 rounded dark:bg-gray-800 text-sm"
             placeholder="Points"
           />
-          <button
-            onClick={handleAdd}
-            disabled={!newName.trim()}
-            className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-40"
-          >
+          <Button onClick={handleAdd} disabled={!newName.trim()} btnType="secondary">
             Add
-          </button>
+          </Button>
         </div>
       </div>
     </div>

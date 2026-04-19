@@ -13,15 +13,15 @@ import { NewsForm } from "./NewsForm";
 import { isOpener } from "@/utils/session.utils";
 
 
-function NewsList() {
+function NewsList({ locationId }: { locationId: number }) {
 
   const { fetchNews, isLoading, error } = useFetchNews();
   const [newsList, setNewsList] = useState<News[]>([]);
   const [hasLoadedDateOnce, setHasLoadedDateOnce] = useState<boolean>(false); // Pour éviter l'effet de clignotement à l'ouverture de la page
-  const session = useSession();  
+  const session = useSession();
   const [isPopinOpen, setIsPopinOpen] = useState<boolean>(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
-  const [selectedNews, setSelectedNews] = useState<News | null>(null);  
+  const [selectedNews, setSelectedNews] = useState<News | null>(null);
 
   const {isLoading: isPostLoading, error: errorPosting, postNewsData} = usePostNews();
   const {isLoading: isLoadingDelete, error: errorDelete, deleteNews, reset: resetDeleteConrfimation} = useDeleteNews();
@@ -43,7 +43,7 @@ function NewsList() {
   }
 
   const deleteNewsAndRefresh = async () => {
-    const {success} = await deleteNews(selectedNews?.id ?? 0);
+    const {success} = await deleteNews(selectedNews?.id ?? 0, locationId);
     if (success) {
       setIsDeleteDialogOpen(false);
       setNewsList(newsList.filter(news => news.id !== selectedNews?.id));
@@ -51,7 +51,7 @@ function NewsList() {
   }
 
   const postNews = async (news: News) =>  {
-    const uploadedNews = await postNewsData(news);
+    const uploadedNews = await postNewsData(news, locationId);
     if (uploadedNews) {
       setIsPopinOpen(false);
       setNewsList([...newsList, uploadedNews]);
@@ -60,12 +60,12 @@ function NewsList() {
 
   useEffect(() => {
     const fetch = async () => {
-      const news = await fetchNews();
+      const news = await fetchNews(locationId);
       setHasLoadedDateOnce(true);
       setNewsList(news);
     };
     fetch();
-  }, []);
+  }, [locationId]);
 
   if (error && !isLoading) {
     return <p className="text-red-500">{error}</p>;
@@ -79,31 +79,28 @@ function NewsList() {
       </div>;
   }
 
-  if (newsList.length === 0) {
-    return <p>Nothing new today...</p>;
-  }
-
   return (
     <div className="space-y-4 w-full max-w-3xl flex flex-col items-center">
+      {newsList.length === 0 && <p>Nothing new today...</p>}
       {newsList.map((news: News) => (
         <NewsCard key={news.id} news={news} editNews={handleEditNews} deleteNews={handleDeleteNews}/>
       ))}
       {isOpener(session.data) && (
-        <Button 
-          onClick={handleCreateNews} 
+        <Button
+          onClick={handleCreateNews}
           className="w-full sm:w-auto"
           btnType="secondary">
           Post News
         </Button>
       )}
-      <NewsForm 
-        isOpen={isPopinOpen} 
+      <NewsForm
+        isOpen={isPopinOpen}
         onCancel={() => setIsPopinOpen(false)}
-        onConfirm={postNews} 
+        onConfirm={postNews}
         news={selectedNews}
         isLoading={isPostLoading}
         error={errorPosting ?? undefined}/>
-      <ConfirmationDialog isOpen={isDeleteDialogOpen} title='Delete news' 
+      <ConfirmationDialog isOpen={isDeleteDialogOpen} title='Delete news'
         text='Are you sure you want to delete this news ?'
         onCancel={() => setIsDeleteDialogOpen(false)} onConfirm={deleteNewsAndRefresh}
         error={errorDelete ?? undefined} isLoading={isLoadingDelete}/>

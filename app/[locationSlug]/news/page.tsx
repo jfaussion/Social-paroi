@@ -3,13 +3,18 @@ import { auth } from "@/auth";
 import { SessionProvider } from "next-auth/react";
 import { isConnected } from "@/utils/session.utils";
 import NewsList from "@/components/news/NewsList";
+import { getLocationBySlug } from "@/lib/locations/actions/getLocationBySlug";
+import { notFound } from "next/navigation";
 
 export const dynamic = 'force-dynamic'
 
-export default async function News() {
+export default async function News({ params }: { params: Promise<{ locationSlug: string }> }) {
+  const { locationSlug } = await params;
+  const location = await getLocationBySlug(locationSlug);
+
+  if (!location) notFound();
 
   const session = await auth();
-
 
   return (
     <SessionProvider session={session}>
@@ -20,7 +25,7 @@ export default async function News() {
               <span className="text-xl font-semibold w-full p-4 pt-0">
                 News
               </span>
-              <NewsList/>
+              <NewsList locationId={location.id} />
             </div>
           </div>
         )}

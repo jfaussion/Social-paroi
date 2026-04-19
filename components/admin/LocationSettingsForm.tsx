@@ -2,6 +2,7 @@
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/Button';
 import { CldImage } from 'next-cloudinary';
 import { updateLocationSettings, regenerateInviteToken } from '@/lib/locations/actions/manageLocation';
 import { compressImage, directUploadToCloudinary } from '@/utils/clientUpload';
@@ -164,13 +165,9 @@ export default function LocationSettingsForm({ location, inviteLink: initialInvi
             </div>
           </div>
         </div>
-        <button
-          type="submit"
-          disabled={saving}
-          className="px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+        <Button type="submit" disabled={saving} btnType="secondary">
           {saving ? 'Saving...' : 'Save'}
-        </button>
+        </Button>
       </form>
 
       <div className="space-y-3">

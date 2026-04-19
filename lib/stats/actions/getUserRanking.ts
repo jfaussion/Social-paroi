@@ -1,5 +1,6 @@
 'use server';
 import prisma from '@/prisma';
+import { TrackStatus } from '@/domain/TrackStatus.enum';
 import { createActionLogger } from '@/utils/logger';
 const logger = createActionLogger('getUserRankings');
 
@@ -11,11 +12,19 @@ export async function getUserRankings(locationId: number) {
   logger.start();
   try {
     const rankings = await prisma.user.findMany({
+      where: {
+        locationMemberships: {
+          some: { locationId },
+        },
+      },
       select: {
         id: true,
         name: true,
         image: true,
         UserTrackProgress: {
+          where: {
+            status: TrackStatus.DONE,
+          },
           select: {
             track: {
               select: {
