@@ -106,6 +106,7 @@ export default function DifficultyLevelList({ levels: initialLevels, locationId 
       return;
     }
     toast.success('Difficulty level created');
+    setLevels((prev) => [...prev, result]);
     setNewName('');
     setNewColor('');
     setNewPoints(0);
@@ -205,36 +206,40 @@ export default function DifficultyLevelList({ levels: initialLevels, locationId 
         ))}
       </ul>
 
-      <div className="flex items-center gap-2 mt-4 p-3 bg-gray-50 dark:bg-gray-900 rounded-md">
-        <input
-          type="text"
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') handleAdd(); }}
-          placeholder="New level name"
-          className="flex-1 px-3 py-2 border border-gray-300 rounded dark:bg-gray-800 text-sm"
-        />
-        <input
-          type="color"
-          value={newColor || '#cccccc'}
-          onChange={(e) => setNewColor(e.target.value)}
-          className="w-10 h-10 rounded cursor-pointer border border-gray-300 p-0"
-          title="Pick color"
-        />
-        <input
-          type="number"
-          value={newPoints}
-          onChange={(e) => setNewPoints(Number(e.target.value))}
-          className="w-20 px-2 py-2 border border-gray-300 rounded dark:bg-gray-800 text-sm"
-          placeholder="Points"
-        />
-        <button
-          onClick={handleAdd}
-          disabled={!newName.trim()}
-          className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-40"
-        >
-          Add
-        </button>
+      <div className="flex flex-col gap-2 mt-4 p-3 bg-gray-50 dark:bg-gray-900 rounded-md">
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleAdd(); }}
+            placeholder="New level name"
+            className="flex-1 px-3 py-2 border border-gray-300 rounded dark:bg-gray-800 text-sm"
+          />
+          <input
+            type="color"
+            value={newColor || '#cccccc'}
+            onChange={(e) => setNewColor(e.target.value)}
+            className="w-10 h-10 flex-shrink-0 rounded cursor-pointer border border-gray-300 p-0"
+            title="Pick color"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            value={newPoints}
+            onChange={(e) => setNewPoints(Number(e.target.value))}
+            className="flex-1 px-2 py-2 border border-gray-300 rounded dark:bg-gray-800 text-sm"
+            placeholder="Points"
+          />
+          <button
+            onClick={handleAdd}
+            disabled={!newName.trim()}
+            className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-40"
+          >
+            Add
+          </button>
+        </div>
       </div>
     </div>
   );

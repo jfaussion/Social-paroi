@@ -21,7 +21,12 @@ export async function getContestDetails(
       include: {
         contestTracks: {
           include: {
-            track: true,
+            track: {
+              include: {
+                zoneRef: true,
+                difficultyLevel: true,
+              }
+            },
             userResults: {
               where: {
                 contestUser: {

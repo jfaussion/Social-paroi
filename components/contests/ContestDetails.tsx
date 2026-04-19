@@ -346,7 +346,7 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
                   onClick={handleGenerateRanking}
                   disabled={isGenerating}
                 >
-                  {isGenerating ? 'Generating...' : contest.status === ContestStatusEnum.Enum.Over ? 'Regenerate Rankings' : 'Generate Rankings'}
+                  {isGenerating ? 'Finalizing...' : contest.status === ContestStatusEnum.Enum.Over ? 'Regenerate Rankings' : 'Finalize Contest'}
                 </Button>
                 {generateError && (
                   <p className="text-red-500 text-sm w-full mt-1">{generateError}</p>
