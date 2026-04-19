@@ -4,7 +4,7 @@ import { postNewTrack } from "../actions/postTrack";
 import { deletePreviousTrackImage } from "../actions/deletePreviousTrackImage";
 import { compressImage, directUploadToCloudinary } from "@/utils/clientUpload";
 
-export const usePostTracks = () => {
+export const usePostTracks = (locationId: number) => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +44,7 @@ export const usePostTracks = () => {
         formData.set('imageUrl', imageUrl);
       }
       setLoadingMessage('Posting block...');
-      const newTrack = await postNewTrack(track.id, formData, 1) as Track;
+      const newTrack = await postNewTrack(track.id, formData, locationId) as Track;
       return newTrack;
     } catch (err) {
       setError('An error occurred while posting the new block');

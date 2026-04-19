@@ -61,7 +61,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId }
   const pathname = usePathname();
   const locationSlug = pathname.split('/')[1] ?? '';
 
-  const { postTrack, isLoading, error, loadingMessage } = usePostTracks();
+  const { postTrack, isLoading, error, loadingMessage } = usePostTracks(locationId ?? 1);
   const [newTrack, setNewTrack] = useState<Track | null>(null);
 
   const handleInputChange = (name: string, value: any) => {
