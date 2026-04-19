@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import prisma from '@/prisma';
 import { LocationStatus } from '@/domain/LocationStatus.enum';
+import { FaEdit } from 'react-icons/fa';
 
 export default async function AdminPage() {
   const locations = await prisma.location.findMany({
@@ -11,20 +12,23 @@ export default async function AdminPage() {
   return (
     <div className="flex flex-col items-center p-4 sm:p-24 sm:pt-8">
       <div className="w-full max-w-2xl">
-        <div className="flex items-center justify-between mb-8">
+        <div className="mb-8">
           <h1 className="text-3xl font-bold">Super Admin</h1>
-          <Link
-            href="/admin/locations"
-            className="px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700"
-          >
-            Manage Locations
-          </Link>
         </div>
 
         <section>
-          <h2 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-300">
-            All Locations
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300">
+              All Locations
+            </h2>
+            <Link
+              href="/admin/locations"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              title="Manage locations"
+            >
+              <FaEdit size={16} />
+            </Link>
+          </div>
           {locations.length === 0 ? (
             <p className="text-gray-500 dark:text-gray-400 text-sm">No locations found.</p>
           ) : (

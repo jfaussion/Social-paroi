@@ -32,7 +32,7 @@ export default function SuperAdminLocationsPanel({ locations }: Props) {
   const router = useRouter();
 
   const [name, setName] = useState('');
-  const [type, setType] = useState<'gym' | 'outdoor'>('gym');
+  const [type, setType] = useState('');
   const [slug, setSlug] = useState('');
   const [address, setAddress] = useState('');
   const [website, setWebsite] = useState('');
@@ -62,7 +62,7 @@ export default function SuperAdminLocationsPanel({ locations }: Props) {
     }
     toast.success('Location created');
     setName('');
-    setType('gym');
+    setType('');
     setSlug('');
     setAddress('');
     setWebsite('');
@@ -165,6 +165,7 @@ export default function SuperAdminLocationsPanel({ locations }: Props) {
                   type="text"
                   required
                   value={name}
+                  placeholder="e.g. Pic & Paroi"
                   onChange={(e) => handleNameChange(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-sm"
                 />
@@ -173,16 +174,15 @@ export default function SuperAdminLocationsPanel({ locations }: Props) {
                 <label className="block text-sm font-medium mb-1" htmlFor="loc-type">
                   Type <span className="text-red-500">*</span>
                 </label>
-                <select
+                <input
                   id="loc-type"
+                  type="text"
                   required
                   value={type}
-                  onChange={(e) => setType(e.target.value as 'gym' | 'outdoor')}
+                  placeholder="e.g. Gym, Outdoor, Bouldering Area"
+                  onChange={(e) => setType(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-sm"
-                >
-                  <option value="gym">Gym</option>
-                  <option value="outdoor">Outdoor</option>
-                </select>
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1" htmlFor="loc-slug">
@@ -193,6 +193,7 @@ export default function SuperAdminLocationsPanel({ locations }: Props) {
                   type="text"
                   required
                   value={slug}
+                  placeholder="e.g. pic-paroi"
                   onChange={(e) => setSlug(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-sm"
                 />
@@ -205,6 +206,7 @@ export default function SuperAdminLocationsPanel({ locations }: Props) {
                   id="loc-address"
                   type="text"
                   value={address}
+                  placeholder="e.g. 123 Main St, City"
                   onChange={(e) => setAddress(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-sm"
                 />
@@ -217,6 +219,7 @@ export default function SuperAdminLocationsPanel({ locations }: Props) {
                   id="loc-website"
                   type="url"
                   value={website}
+                  placeholder="https://example.com"
                   onChange={(e) => setWebsite(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-sm"
                 />

@@ -12,7 +12,7 @@ import { useSession } from 'next-auth/react';
 import { UserRoleEnum } from '@/domain/UserRole.enum';
 import { AdapterUserCustom } from '@/lib/users/AdapterUserCustom';
 
-const Drawer = ({ isLocationAdmin = false }: { isLocationAdmin?: boolean }) => {
+const Drawer = ({ isLocationAdmin = false, locationName, locationWebsite }: { isLocationAdmin?: boolean; locationName?: string; locationWebsite?: string }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { data: session } = useSession();
   const isSuperAdmin = (session?.user as AdapterUserCustom)?.role === UserRoleEnum.Enum.super_admin;
@@ -76,7 +76,7 @@ const Drawer = ({ isLocationAdmin = false }: { isLocationAdmin?: boolean }) => {
           {/* Navigation links */}
           <ul className="p-5 space-y-3 flex-grow">
             <li>
-              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/tracks`} onClick={() => setIsOpen(false)}>Tracks</Link>
+              <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/tracks`} onClick={() => setIsOpen(false)}>Blocks</Link>
             </li>
             <li>
               <Link className="block cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 p-2 rounded-md" href={`/${locationSlug}/news`} onClick={() => setIsOpen(false)}>News</Link>
@@ -109,7 +109,9 @@ const Drawer = ({ isLocationAdmin = false }: { isLocationAdmin?: boolean }) => {
           <div className="mt-auto p-5 flex flex-wrap justify-start text-xs text-blue-500 font-mono space-x-1">
             <Link className="hover:underline" href="/privacy">Privacy policy</Link><span>|</span>
             <Link className="hover:underline" href={`${process.env.NEXT_PUBLIC_FEEDBACK_FORM}`}>Feedback</Link><span>|</span>
-            <Link className="hover:underline" href="https://www.picetparoi.fr/">Pic & Paroi</Link><span>|</span>
+            {locationWebsite && locationName && (
+              <><Link className="hover:underline" href={locationWebsite} target="_blank" rel="noopener noreferrer">{locationName}</Link><span>|</span></>
+            )}
             <Link className="hover:underline" href={`mailto:${process.env.NEXT_PUBLIC_CONTACT}`}>Contact</Link>
           </div>
         </div>

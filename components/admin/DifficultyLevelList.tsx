@@ -176,7 +176,7 @@ export default function DifficultyLevelList({ levels: initialLevels, locationId 
                 {level.name} <span className="text-gray-500 ml-1">({level.points} pts)</span>
               </button>
             )}
-            <div className="flex items-center gap-1 flex-shrink-0">
+            {editingId !== level.id && <div className="flex items-center gap-1 flex-shrink-0">
               <button
                 onClick={() => moveLevel(index, 'up')}
                 disabled={index === 0}
@@ -200,7 +200,7 @@ export default function DifficultyLevelList({ levels: initialLevels, locationId 
               >
                 Delete
               </button>
-            </div>
+            </div>}
             {deleteErrors[level.id] && (
               <p className="text-xs text-red-500 w-full mt-1">{deleteErrors[level.id]}</p>
             )}

@@ -44,7 +44,7 @@ export default async function LocationLayout({
 
   return (
     <>
-      <NavBar isLocationAdmin={isLocationAdmin} />
+      <NavBar isLocationAdmin={isLocationAdmin} locationName={location.name} locationWebsite={location.website ?? undefined} />
       {children}
     </>
   );
