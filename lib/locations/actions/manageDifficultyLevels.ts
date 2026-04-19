@@ -14,7 +14,7 @@ export async function getDifficultyLevels(locationId: number) {
 
 export async function createDifficultyLevel(
   locationId: number,
-  data: { name: string; color?: string }
+  data: { name: string; color?: string; points?: number }
 ) {
   const session = await auth();
   const userId = session?.user?.id;
@@ -30,6 +30,7 @@ export async function createDifficultyLevel(
       locationId,
       name: data.name,
       color: data.color ?? null,
+      points: data.points ?? 0,
       order: count + 1,
     },
   });
@@ -37,7 +38,7 @@ export async function createDifficultyLevel(
 
 export async function updateDifficultyLevel(
   id: number,
-  data: { name?: string; color?: string }
+  data: { name?: string; color?: string; points?: number }
 ) {
   const session = await auth();
   const userId = session?.user?.id;
@@ -54,6 +55,7 @@ export async function updateDifficultyLevel(
     data: {
       ...(data.name !== undefined && { name: data.name }),
       ...(data.color !== undefined && { color: data.color }),
+      ...(data.points !== undefined && { points: data.points }),
     },
   });
 }

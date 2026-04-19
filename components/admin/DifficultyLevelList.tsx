@@ -13,6 +13,7 @@ type DifficultyLevel = {
   id: number;
   name: string;
   color: string | null;
+  points: number;
   order: number;
 };
 
@@ -27,8 +28,10 @@ export default function DifficultyLevelList({ levels: initialLevels, locationId 
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editName, setEditName] = useState('');
   const [editColor, setEditColor] = useState('');
+  const [editPoints, setEditPoints] = useState(0);
   const [newName, setNewName] = useState('');
   const [newColor, setNewColor] = useState('');
+  const [newPoints, setNewPoints] = useState(0);
   const [deleteErrors, setDeleteErrors] = useState<Partial<Record<number, string>>>({});
   const editInputRef = useRef<HTMLInputElement>(null);
 
@@ -54,6 +57,7 @@ export default function DifficultyLevelList({ levels: initialLevels, locationId 
     setEditingId(level.id);
     setEditName(level.name);
     setEditColor(level.color ?? '');
+    setEditPoints(level.points ?? 0);
     setTimeout(() => editInputRef.current?.focus(), 0);
   }
 
@@ -62,6 +66,7 @@ export default function DifficultyLevelList({ levels: initialLevels, locationId 
     const result = await updateDifficultyLevel(id, {
       name: editName.trim(),
       color: editColor.trim() || undefined,
+      points: editPoints,
     });
     if ('error' in result) {
       toast.error(result.error);
@@ -70,7 +75,7 @@ export default function DifficultyLevelList({ levels: initialLevels, locationId 
     toast.success('Difficulty level updated');
     setLevels((prev) =>
       prev.map((l) =>
-        l.id === id ? { ...l, name: editName.trim(), color: editColor.trim() || null } : l
+        l.id === id ? { ...l, name: editName.trim(), color: editColor.trim() || null, points: editPoints } : l
       )
     );
     setEditingId(null);
@@ -94,6 +99,7 @@ export default function DifficultyLevelList({ levels: initialLevels, locationId 
     const result = await createDifficultyLevel(locationId, {
       name: newName.trim(),
       color: newColor.trim() || undefined,
+      points: newPoints,
     });
     if ('error' in result) {
       toast.error(result.error);
@@ -102,6 +108,7 @@ export default function DifficultyLevelList({ levels: initialLevels, locationId 
     toast.success('Difficulty level created');
     setNewName('');
     setNewColor('');
+    setNewPoints(0);
     router.refresh();
   }
 
@@ -135,6 +142,13 @@ export default function DifficultyLevelList({ levels: initialLevels, locationId 
                     className="w-8 h-8 rounded cursor-pointer border-0 p-0"
                     title="Pick color"
                   />
+                  <input
+                    type="number"
+                    value={editPoints}
+                    onChange={(e) => setEditPoints(Number(e.target.value))}
+                    className="w-20 px-2 py-1 border border-gray-400 rounded dark:bg-gray-700 text-sm"
+                    placeholder="Points"
+                  />
                 </div>
                 <div className="flex gap-2">
                   <button
@@ -156,7 +170,7 @@ export default function DifficultyLevelList({ levels: initialLevels, locationId 
                 className="flex-1 text-left text-sm font-medium hover:underline"
                 onClick={() => startEdit(level)}
               >
-                {level.name}
+                {level.name} <span className="text-gray-500 ml-1">({level.points} pts)</span>
               </button>
             )}
             <div className="flex items-center gap-1 flex-shrink-0">
@@ -206,6 +220,13 @@ export default function DifficultyLevelList({ levels: initialLevels, locationId 
           onChange={(e) => setNewColor(e.target.value)}
           className="w-10 h-10 rounded cursor-pointer border border-gray-300 p-0"
           title="Pick color"
+        />
+        <input
+          type="number"
+          value={newPoints}
+          onChange={(e) => setNewPoints(Number(e.target.value))}
+          className="w-20 px-2 py-2 border border-gray-300 rounded dark:bg-gray-800 text-sm"
+          placeholder="Points"
         />
         <button
           onClick={handleAdd}

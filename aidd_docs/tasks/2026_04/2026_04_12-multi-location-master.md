@@ -100,3 +100,18 @@ flowchart TD
 7. User switches to location 2 — sees separate tracks, stats, ranking
 8. Super admin publishes location 2 — appears in public picker
 9. All existing location 1 data unchanged throughout
+
+## Difficulty Points Feature (Implemented)
+
+A `points` field added to `DifficultyLevel` for location-scored climbs.
+
+| Aspect | Detail |
+|--------|--------|
+| Schema | `DifficultyLevel.points Int @default(0)` |
+| Location-scoped | Difficulty levels fetched per location via `useFetchDifficultyLevels` hook |
+| Track linkage | `Track.difficultyLevelId Int?` FK links track to difficulty level |
+| UI admin | `DifficultyLevelList.tsx` — create/edit levels with points input |
+| UI filter | `DifficultyFilter.tsx` — dynamic per-location levels with points display |
+| UI form | `TrackForm.tsx` — select difficulty from location levels, auto-set points |
+| UI cards | `TrackCard.tsx` — colored border from difficulty level color |
+| Backfill | SQL script matches `level` name → `difficultyLevelId` for existing tracks |

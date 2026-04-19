@@ -5,7 +5,7 @@ import { usePostTracks } from "@/lib/tracks/hooks/usePostTrack";
 import { Track } from "@/domain/Track.schema";
 import { DifficultyEnum } from "@/domain/Difficulty.enum";
 import { HoldColorEnum } from "@/domain/HoldColor.enum";
-import { difficultyCustomSelectClass, getPointsForDifficulty } from "@/utils/difficulty.utils";
+import { useFetchDifficultyLevels, DifficultyLevel } from "@/lib/locations/hooks/useFetchDifficultyLevels";
 import Select from 'react-select';
 import { usePathname, useRouter } from "next/navigation";
 import { holdColorCustomSelectClass } from "@/utils/hold.utils";
@@ -28,6 +28,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId }
   const [track, setTrack] = useState({
     ...initialTrack,
     name: initialTrack?.name || '',
+    difficultyLevelId: initialTrack?.difficultyLevelId || undefined as number | undefined,
     difficulty: initialTrack?.level || '',
     holdColor: initialTrack?.holdColor || '',
     zone: defaultZone,
@@ -35,12 +36,22 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId }
     photo: null as File | null,
   });
 
+  const [dynamicDifficultyLevels, setDynamicDifficultyLevels] = useState<DifficultyLevel[]>([]);
+  const { fetchDifficultyLevels } = useFetchDifficultyLevels();
+
+  useEffect(() => {
+    if (locationId) {
+      fetchDifficultyLevels(locationId).then(setDynamicDifficultyLevels);
+    }
+  }, [locationId, fetchDifficultyLevels]);
+
   useEffect(() => {
     if (initialTrack) {
       setTrack({
         ...initialTrack,
+        difficultyLevelId: initialTrack.difficultyLevelId ?? undefined,
         difficulty: initialTrack.level,
-        photo: null  // Reset photo state on initial load in edit mode
+        photo: null
       });
     }
   }, [initialTrack]);
@@ -57,9 +68,18 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId }
     setTrack(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleDifficultyChange = (value: any) => {
-    const difficultyPoints = getPointsForDifficulty(value);
-    setTrack(prev => ({ ...prev, difficulty: value, points: difficultyPoints }));
+  const handleDifficultyChange = (selectedOption: any) => {
+    const selectedLevel = dynamicDifficultyLevels.find(l => l.name === selectedOption?.value);
+    if (selectedLevel) {
+      setTrack(prev => ({
+        ...prev,
+        difficulty: selectedLevel.name,
+        difficultyLevelId: selectedLevel.id,
+        points: selectedLevel.points
+      }));
+    } else {
+      setTrack(prev => ({ ...prev, difficulty: selectedOption?.value || '', difficultyLevelId: undefined as number | undefined }));
+    }
   }
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -81,6 +101,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId }
     setTrack({
       name: '',
       difficulty: DifficultyEnum.Enum.Unknown as string,
+      difficultyLevelId: undefined,
       holdColor: HoldColorEnum.Enum.Unknown as string,
       zone: zones?.[0]?.id ?? 1,
       points: 0,
@@ -91,32 +112,25 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId }
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
 
+    const trackToPost = {
+      name: track.name,
+      level: track.difficulty,
+      holdColor: track.holdColor,
+      zone: track.zone,
+      points: track.points,
+      removed: false,
+      date: new Date(),
+      imageUrl: '',
+      difficultyLevelId: track.difficultyLevelId,
+    } as unknown as Track;
+
     if (isEditMode && initialTrack) {
-      // Update logic
-      const trackToPost = {
-        ...initialTrack,
-        name: track.name,
-        level: track.difficulty,
-        holdColor: track.holdColor,
-        zone: track.zone,
-        points: track.points,
-      } as unknown as Track;
+      trackToPost.id = initialTrack.id;
       const uploadedTrack = await postTrack(trackToPost, track.photo);
       router.back();
       router.refresh();
     } else {
-      // Create logic
       setNewTrack(null);
-      const trackToPost = {
-        name: track.name,
-        level: track.difficulty,
-        holdColor: track.holdColor,
-        zone: track.zone,
-        points: track.points,
-        removed: false,
-        date: new Date(),
-        imageUrl: '',
-      } as unknown as Track;
       const uploadedTrack = await postTrack(trackToPost, track.photo);
       setNewTrack(uploadedTrack);
       clearForm();
@@ -126,10 +140,35 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId }
   };
 
   // Preparing options for react-select
-  const difficultyOptions = Object.values(DifficultyEnum.Enum).map(difficulty => ({
-    value: difficulty,
-    label: difficulty
-  }));
+  const difficultyOptions = dynamicDifficultyLevels.length > 0
+    ? dynamicDifficultyLevels.map(level => ({
+        value: level.name,
+        label: level.name,
+        color: level.color
+      }))
+    : Object.values(DifficultyEnum.Enum).map(difficulty => ({
+        value: difficulty,
+        label: difficulty,
+        color: null
+      }));
+
+  const formatDifficultyOptionLabel = (option: any) => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      {option.color && (
+        <span
+          style={{
+            width: '12px',
+            height: '12px',
+            borderRadius: '50%',
+            backgroundColor: option.color,
+            border: '1px solid #ccc',
+            flexShrink: 0,
+          }}
+        />
+      )}
+      <span>{option.label}</span>
+    </div>
+  );
 
   const holdColorOptions = Object.values(HoldColorEnum.Enum).map(holdColor => ({
     value: holdColor,
@@ -157,11 +196,17 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId }
         name="difficulty"
         isSearchable={false}
         value={difficultyOptions.find(option => option.value === track.difficulty)}
-        onChange={option => handleDifficultyChange(option?.value)}
+        onChange={option => handleDifficultyChange(option)}
         options={difficultyOptions}
-        classNames={difficultyCustomSelectClass}
-        unstyled={true}
+        classNames={{
+          container: () => 'w-full',
+          control: () => 'p-2 border rounded bg-gray-200 dark:bg-gray-800 text-sm',
+          menu: () => 'bg-white dark:bg-gray-800 border rounded mt-1 shadow-lg z-50',
+          menuList: () => 'py-1',
+        }}
+        unstyled={false}
         placeholder="Select a difficulty"
+        formatOptionLabel={formatDifficultyOptionLabel}
         required
       />
       <Select

@@ -8,13 +8,14 @@ import HoldColorFilter from "./HoldColorFilter";
 type TrackFiltersProps = {
   zones: Array<{ id: number; name: string }>;
   selectedZones: number[];
-  selectedDifficulties: string[];
+  selectedDifficulties: number[];
   selectedShowRemoved: string | undefined;
   selectedHoldColor: string | undefined;
+  locationId: number;
   onZoneChange: (selectedOptions: { value: any }[]) => void;
   onDifficultyChange: (selectedOptions: { value: any }[]) => void;
-  onHoldColorChange: (selectedOption: { value: any }) => void;
   onShowRemovedChange: (selectedOptions: any) => void;
+  onHoldColorChange: (selectedOption: { value: any }) => void;
 };
 
 const TrackFilters: React.FC<TrackFiltersProps> = ({
@@ -23,6 +24,7 @@ const TrackFilters: React.FC<TrackFiltersProps> = ({
   selectedDifficulties,
   selectedShowRemoved,
   selectedHoldColor,
+  locationId,
   onZoneChange,
   onDifficultyChange,
   onShowRemovedChange,
@@ -49,7 +51,7 @@ const TrackFilters: React.FC<TrackFiltersProps> = ({
         <ZoneFilter zones={zones} selectedFilters={selectedZones} onChange={onZoneChange} />
         <div className="flex inline sm:w-100 sm:space-x-2">
           <div className="grow">
-            <DifficultyFilter selectedFilters={selectedDifficulties} onChange={onDifficultyChange} />
+            <DifficultyFilter selectedFilters={selectedDifficulties} onChange={onDifficultyChange} locationId={locationId} />
           </div>
           <button
             className="p-2 flex-end rounded hover:bg-gray-300 hover:dark:bg-gray-700 transition duration-300"

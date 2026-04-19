@@ -24,6 +24,9 @@ export const usePostTracks = () => {
       formData.append('zoneId', (track.zoneId ?? track.zone).toString());
       formData.append('points', track.points.toString());
       formData.append('removed', track.removed.toString());
+      if (track.difficultyLevelId) {
+        formData.append('difficultyLevelId', track.difficultyLevelId.toString());
+      }
       // direct upload flow (client -> Cloudinary)
       if (photo) {
         setLoadingMessage('Compressing image...');

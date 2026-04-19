@@ -27,6 +27,7 @@ const TrackCard: React.FC<TrackCardProps> = ({
 }) => {
   const [track, setTrack] = useState<Track>(propTrack);
   const effectiveLevel = (track.difficultyLevel?.name ?? track.level) as import('@/domain/Difficulty.enum').DifficultyType;
+  const levelColor = track.difficultyLevel?.color;
   const levelBorderColor = getBorderColorForDifficulty(effectiveLevel);
   const router = useRouter();
   const pathname = usePathname();
@@ -49,7 +50,7 @@ const TrackCard: React.FC<TrackCardProps> = ({
   const openTrackDetails = () => {
     if (disableNavigation) return;
     localStorage.setItem("lastTrackListUrl", window.location.href);
-    const trackIds = encodeURIComponent(JSON.stringify(trackList?.map(t => t.id))); 
+    const trackIds = encodeURIComponent(JSON.stringify(trackList?.map(t => t.id)));
     router.push(`/${locationSlug}/tracks/track/${track.id}?trackList=${trackIds}`);
   };
 
@@ -84,13 +85,13 @@ const TrackCard: React.FC<TrackCardProps> = ({
       </div>
 
       {/* Right side - Content */}
-      <div className={`w-2/3 flex flex-col justify-between p-4 border-r-8 ${levelBorderColor}`}>
+      <div className={`w-2/3 flex flex-col justify-between p-4 border-r-8 ${levelBorderColor}`}
+        style={levelColor ? { borderRightColor: levelColor } : undefined}>
         <h4 className="text-md font-semibold dark:text-white">{track.name}</h4>
 
         <div className="flex justify-between items-center mt-2">
           <div className="inline-flex items-center space-x-2">
             <Zone miniMapUrl={track.zoneRef?.miniMapUrl} zoneName={track.zoneRef?.name} width={60} height={50} />
-            {track.zoneRef?.name && <span className="text-sm dark:text-gray-300">{track.zoneRef.name}</span>}
             {track.removed && <RemovedLabel />}
           </div>
           {statusHandler && !hideToggleButton && (
