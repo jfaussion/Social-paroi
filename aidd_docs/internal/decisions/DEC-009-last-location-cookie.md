@@ -5,7 +5,7 @@
 | ID      | DEC-009        |
 | Date    | 2026-04-18     |
 | Feature | multi-location |
-| Status  | Accepted       |
+| Status  | Superseded by DEC-012 |
 
 ## Context
 

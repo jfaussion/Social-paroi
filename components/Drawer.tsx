@@ -35,10 +35,11 @@ const Drawer = ({ isLocationAdmin = false, locationName, locationWebsite }: { is
   const locationSlug = pathname.split('/')[1] ?? '';
 
   useEffect(() => {
-    if (locationSlug) {
-      document.cookie = `last-location=${locationSlug}; path=/; max-age=2592000; SameSite=Lax`;
+    const userId = session?.user?.id;
+    if (locationSlug && userId) {
+      document.cookie = `last-location-${userId}=${locationSlug}; path=/; max-age=2592000; SameSite=Lax`;
     }
-  }, [locationSlug]);
+  }, [locationSlug, session?.user?.id]);
 
   const showBackButtonInsteadOfMenu = () =>
     pathname.includes('/tracks/track/') || pathname.includes('/opener/create');

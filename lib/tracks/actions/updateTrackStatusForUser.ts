@@ -111,7 +111,21 @@ export async function updateTrackStatusForUser(
       logger.error(error, { trackId, userId });
       throw error;
     }
-    
+
+    if (!isOpener(user)) {
+      const track = await prisma.track.findUnique({ where: { id: trackId }, select: { locationId: true } });
+      if (!track) throw new Error('Track not found');
+      if (track.locationId === null) throw new Error('Track has no associated location');
+      const membership = await prisma.userLocation.findFirst({
+        where: { userId: user.user.id, locationId: track.locationId },
+      });
+      if (!membership) {
+        const error = new Error('User is not a member of this location');
+        logger.error(error, { trackId, userId });
+        throw error;
+      }
+    }
+
     return await prisma.$transaction(async (tx) => {
       // Update regular track status
       await updateRegularTrackStatus(tx, trackId, userId, newStatus);
@@ -126,12 +140,12 @@ export async function updateTrackStatusForUser(
         contestTrackCount: activeContestTracks.length,
       });
       let updatedContestTracks = 0;
-      
+
       for (const contestTrack of activeContestTracks) {
         const contestUser = contestTrack.contest.contestUsers[0];
         const isSelfContester = contestUser?.userId === user.user?.id;
         const canUpdateContestTrack = isOpener(user) || (isSelfContester && contestTrack.contest.status === ContestStatusEnum.Enum.InProgress)
-        
+
         if (contestUser && canUpdateContestTrack) {
           await updateContestTrackStatus(tx, contestTrack, contestUser, newStatus);
           updatedContestTracks += 1;

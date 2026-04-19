@@ -50,6 +50,8 @@ flowchart LR
 - `isOpener()` / `isAdmin()` in `session.utils.ts` — client-side UI guards only (show/hide buttons), also return true for `super_admin`
 - `checkUserLocationRole(userId, locationId, minRole)` — DB-backed server-side auth for all mutation actions; `super_admin` always passes; `admin` satisfies `opener` checks
 - `isSuperAdmin()` — checks global `super_admin` role from session
+- **Location access guard** (`app/[locationSlug]/layout.tsx`): all location routes require membership via `userLocation` table — non-members are redirected to `/locations` regardless of location status; `super_admin` bypasses
+- **Track status auth** (`updateTrackStatusForUser`): server action verifies membership before any write; openers bypass via global role
 
 ### Prisma Column Naming
 

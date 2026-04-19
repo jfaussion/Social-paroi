@@ -4,7 +4,6 @@ import NavBar from '@/components/Navbar';
 import { getLocationBySlug } from '@/lib/locations/actions/getLocationBySlug';
 import { getUserLocations } from '@/lib/locations/actions/getUserLocations';
 import { checkUserLocationRole } from '@/lib/locations/actions/checkUserLocationRole';
-import { LocationStatus } from '@/domain/LocationStatus.enum';
 import { LocationRoleEnum } from '@/domain/LocationRole.enum';
 import { isSuperAdmin } from '@/utils/session.utils';
 
@@ -25,15 +24,14 @@ export default async function LocationLayout({
   const session = await auth();
   const userId = session?.user?.id;
 
-  if (location.status === LocationStatus.hidden) {
-    if (!userId) {
-      redirect('/locations');
-    }
+  if (!userId) {
+    redirect('/locations');
+  }
 
+  if (!isSuperAdmin(session)) {
     const memberships = await getUserLocations(userId);
     const isMember = memberships.some((m) => m.locationId === location.id);
-
-    if (!isMember && !isSuperAdmin(session)) {
+    if (!isMember) {
       redirect('/locations');
     }
   }

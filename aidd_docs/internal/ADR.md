@@ -14,5 +14,7 @@ This file contains the key architectural decisions made during the project, alon
 | 2026-04-17 | DEC-006 | [LocationRoleEnum for role parameters](./decisions/DEC-006-location-role-enum.md) | Zod enum over string union; callers use `LocationRoleEnum.Enum.*` |
 | 2026-04-17 | DEC-007 | [checkUserLocationRole as centralized auth](./decisions/DEC-007-check-user-location-role.md) | DB-backed location auth replaces session-only `isOpener()` in mutations |
 | 2026-04-18 | DEC-008 | [LocationStatus Zod enum](./decisions/DEC-008-location-status-enum.md) | Lowercase Zod enum in `domain/`; no raw status strings in app code |
-| 2026-04-18 | DEC-009 | [last-location cookie for post-login redirect](./decisions/DEC-009-last-location-cookie.md) | Edge-safe auto-redirect to last gym; `/locations` stays accessible via Drawer |
+| 2026-04-18 | DEC-009 | [last-location cookie for post-login redirect](./decisions/DEC-009-last-location-cookie.md) | ~~Superseded by DEC-012~~ |
 | 2026-04-19 | DEC-010 | [react-select styling convention](./decisions/DEC-010-react-select-styling-convention.md) | All selects use `unstyled={true}` + `customSelectClassName`; no inline classNames |
+| 2026-04-19 | DEC-011 | [Membership required for all location routes](./decisions/DEC-011-location-membership-guard.md) | Layout redirects non-members to `/locations` for all location statuses |
+| 2026-04-19 | DEC-012 | [User-scoped last-location cookie](./decisions/DEC-012-user-scoped-last-location-cookie.md) | Cookie key `last-location-{userId}`; new users no longer inherit prior session's location |

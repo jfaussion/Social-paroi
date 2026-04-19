@@ -39,7 +39,8 @@ export const authConfig = {
             }
           }
           if (!destination) {
-            const lastLocation = request.cookies.get('last-location')?.value;
+            const userId = auth?.user?.id;
+            const lastLocation = userId ? request.cookies.get(`last-location-${userId}`)?.value : undefined;
             destination = lastLocation ? `/${lastLocation}/tracks` : '/locations';
           }
           return Response.redirect(new URL(destination, nextUrl));

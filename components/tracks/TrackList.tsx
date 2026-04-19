@@ -16,9 +16,10 @@ type TracksProps = {
   userId: string;
   locationId: number;
   zones: Array<{ id: number; name: string }>;
+  isMember: boolean;
 };
 
-const TrackList: React.FC<TracksProps> = ({ userId, locationId, zones }) => {
+const TrackList: React.FC<TracksProps> = ({ userId, locationId, zones, isMember }) => {
   const session = useSession();
   const router = useRouter()
   const pathname = usePathname()
@@ -139,7 +140,7 @@ const TrackList: React.FC<TracksProps> = ({ userId, locationId, zones }) => {
         </>
       ) : (
         trackList.map((track: Track) => (
-          <RegularTrackCard key={track.id} {...track} trackList={trackList} />
+          <RegularTrackCard key={track.id} {...track} trackList={trackList} isMember={isMember} />
         ))
       )}
       {error && <p className="text-red-500">Error: {error}</p>}

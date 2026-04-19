@@ -3,8 +3,10 @@ import { SessionProvider } from "next-auth/react";
 import TrackList from "@/components/tracks/TrackList";
 import { getLocationBySlug } from "@/lib/locations/actions/getLocationBySlug";
 import { getZonesByLocation } from "@/lib/locations/actions/getZonesByLocation";
+import { getUserLocations } from "@/lib/locations/actions/getUserLocations";
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import { isOpener } from "@/utils/session.utils";
 
 export const dynamic = 'force-dynamic'
 
@@ -17,9 +19,15 @@ export default async function TracksPage({
   const location = await getLocationBySlug(locationSlug);
   if (!location) notFound();
 
-  const zones = await getZonesByLocation(location.id);
-  const session = await auth();
+  const [zones, session] = await Promise.all([
+    getZonesByLocation(location.id),
+    auth(),
+  ]);
   const userId = session?.user?.id ?? "";
+
+  const isMember = userId
+    ? isOpener(session) || (await getUserLocations(userId)).some((m) => m.locationId === location.id)
+    : false;
 
   const mapSrc = location.mapImageUrl
     ? location.mapImageUrl.startsWith('http')
@@ -46,7 +54,7 @@ export default async function TracksPage({
         )}
 
         {userId ? (
-          <TrackList userId={userId} locationId={location.id} zones={zones} />
+          <TrackList userId={userId} locationId={location.id} zones={zones} isMember={isMember} />
         ) : (
           <div className="bg-red-900 border border-red-500 rounded p-4">
             <p className="text-red-300">Error, sign in to see your tracks...</p>
