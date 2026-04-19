@@ -153,15 +153,14 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId }
       }));
 
   const formatDifficultyOptionLabel = (option: any) => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
       {option.color && (
         <span
           style={{
-            width: '12px',
-            height: '12px',
+            width: '10px',
+            height: '10px',
             borderRadius: '50%',
             backgroundColor: option.color,
-            border: '1px solid #ccc',
             flexShrink: 0,
           }}
         />
@@ -198,13 +197,8 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId }
         value={difficultyOptions.find(option => option.value === track.difficulty)}
         onChange={option => handleDifficultyChange(option)}
         options={difficultyOptions}
-        classNames={{
-          container: () => 'w-full',
-          control: () => 'p-2 border rounded bg-gray-200 dark:bg-gray-800 text-sm',
-          menu: () => 'bg-white dark:bg-gray-800 border rounded mt-1 shadow-lg z-50',
-          menuList: () => 'py-1',
-        }}
-        unstyled={false}
+        classNames={customSelectClassName}
+        unstyled={true}
         placeholder="Select a difficulty"
         formatOptionLabel={formatDifficultyOptionLabel}
         required

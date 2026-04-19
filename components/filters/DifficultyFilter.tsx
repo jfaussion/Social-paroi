@@ -1,6 +1,9 @@
 import React, { useId, useEffect, useState } from 'react';
 import Select, { ActionMeta, MultiValue } from 'react-select';
-import { useFetchDifficultyLevels, DifficultyLevel } from '@/lib/locations/hooks/useFetchDifficultyLevels';
+import { useFetchDifficultyLevels } from '@/lib/locations/hooks/useFetchDifficultyLevels';
+import customSelectClassName from '../ui/customSelectClassName';
+
+type Option = { value: number; label: string; color: string | null; points: number };
 
 type FilterProps = {
   selectedFilters: number[];
@@ -9,7 +12,7 @@ type FilterProps = {
 };
 
 const DifficultyFilter: React.FC<FilterProps> = ({ selectedFilters, onChange, locationId }) => {
-  const [difficultyOptions, setDifficultyOptions] = useState<{ value: number; label: string; color: string | null; points: number }[]>([]);
+  const [difficultyOptions, setDifficultyOptions] = useState<Option[]>([]);
   const { fetchDifficultyLevels } = useFetchDifficultyLevels();
 
   useEffect(() => {
@@ -29,31 +32,21 @@ const DifficultyFilter: React.FC<FilterProps> = ({ selectedFilters, onChange, lo
     loadLevels();
   }, [locationId, fetchDifficultyLevels]);
 
-  const customStyles = {
-    option: (provided: any, state: any) => ({
-      ...provided,
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px',
-    }),
-  };
-
-  const formatOptionLabel = (option: any) => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+  const formatOptionLabel = (option: Option, { context }: { context: 'menu' | 'value' }) => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
       {option.color && (
         <span
           style={{
-            width: '14px',
-            height: '14px',
+            width: '10px',
+            height: '10px',
             borderRadius: '50%',
             backgroundColor: option.color,
-            border: '1px solid #ccc',
             flexShrink: 0,
           }}
         />
       )}
       <span>{option.label}</span>
-      {option.points > 0 && (
+      {context === 'menu' && option.points > 0 && (
         <span className="text-xs text-gray-500">({option.points} pts)</span>
       )}
     </div>
@@ -67,19 +60,14 @@ const DifficultyFilter: React.FC<FilterProps> = ({ selectedFilters, onChange, lo
       name="difficulties"
       value={selectedFilters.map(filter => {
         const option = difficultyOptions.find(o => o.value === filter);
-        return { value: filter, label: option?.label ?? `Level ${filter}`, color: option?.color ?? null };
+        return { value: filter, label: option?.label ?? `Level ${filter}`, color: option?.color ?? null, points: option?.points ?? 0 };
       })}
       options={difficultyOptions}
       className="basic-multi-select"
       classNamePrefix="select"
-      onChange={onChange as (newValue: MultiValue<{ value: number; label: string; color: string | null }>, actionMeta: ActionMeta<{ value: number; label: string; color: string | null }>) => void}
-      classNames={{
-        container: () => 'w-full sm:w-48',
-        control: () => 'p-2 border rounded bg-white dark:bg-gray-800 text-sm',
-        menu: () => 'bg-white dark:bg-gray-800 border rounded mt-1 shadow-lg z-50',
-        menuList: () => 'py-1',
-      }}
-      unstyled={false}
+      onChange={onChange as (newValue: MultiValue<Option>, actionMeta: ActionMeta<Option>) => void}
+      classNames={customSelectClassName}
+      unstyled={true}
       placeholder="Filter by Difficulty"
       formatOptionLabel={formatOptionLabel}
     />

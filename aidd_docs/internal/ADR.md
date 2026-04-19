@@ -15,3 +15,4 @@ This file contains the key architectural decisions made during the project, alon
 | 2026-04-17 | DEC-007 | [checkUserLocationRole as centralized auth](./decisions/DEC-007-check-user-location-role.md) | DB-backed location auth replaces session-only `isOpener()` in mutations |
 | 2026-04-18 | DEC-008 | [LocationStatus Zod enum](./decisions/DEC-008-location-status-enum.md) | Lowercase Zod enum in `domain/`; no raw status strings in app code |
 | 2026-04-18 | DEC-009 | [last-location cookie for post-login redirect](./decisions/DEC-009-last-location-cookie.md) | Edge-safe auto-redirect to last gym; `/locations` stays accessible via Drawer |
+| 2026-04-19 | DEC-010 | [react-select styling convention](./decisions/DEC-010-react-select-styling-convention.md) | All selects use `unstyled={true}` + `customSelectClassName`; no inline classNames |
