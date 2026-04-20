@@ -52,7 +52,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({ isOpener: isOpenerProp, ...
 
   const handleStatusChange = async () => {
     const previousStatus = track.trackProgress?.status ?? TrackStatus.TO_DO;
-    const newStatus = track.trackProgress?.status === TrackStatus.TO_DO ? TrackStatus.DONE : TrackStatus.TO_DO;
+    const newStatus = previousStatus === TrackStatus.TO_DO ? TrackStatus.DONE : TrackStatus.TO_DO;
     setTrack({
       ...track, trackProgress: {
         ...track.trackProgress,
