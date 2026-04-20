@@ -151,7 +151,7 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
   };
 
   const handleDeleteContest = async () => {
-    const wasSuccessful = await deleteContest(contest);
+    const wasSuccessful = await deleteContest(contest, contest.locationId!);
     if (!wasSuccessful) {
       console.error(errorDelete);
     } else {
