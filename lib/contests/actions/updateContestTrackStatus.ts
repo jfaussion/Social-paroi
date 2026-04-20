@@ -180,14 +180,15 @@ export async function updateContestTrackStatus(
     if (!user?.user?.id) {
       throw new Error('User not authenticated');
     }
+    const userId = user.user.id;
 
     const contest = await prisma.contest.findUnique({ where: { id: contestId } });
     const isOpener = contest?.locationId
-      ? await checkUserLocationRole(user.user.id, contest.locationId, LocationRole.opener)
+      ? await checkUserLocationRole(userId, contest.locationId, LocationRole.opener)
       : false;
 
     return await prisma.$transaction(async (tx) => {
-      const finalContestUserId = await getFinalContestUserId(tx, isOpener, user.user!.id, contestId, contestUserId);
+      const finalContestUserId = await getFinalContestUserId(tx, isOpener, userId, contestId, contestUserId);
       const contestTrack = await getContestTrack(tx, contestId, trackId);
 
       const result = await updateContestUserTrack(tx, finalContestUserId, contestTrack.id, status);
