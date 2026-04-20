@@ -11,25 +11,24 @@ import ContestTrackCard from './ContestTrackCard';
 import { Contest } from '@/domain/Contest.schema';
 import { TrackStatus } from '@/domain/TrackStatus.enum';
 import { ContestStatusEnum } from '@/domain/ContestStatus.enum';
-import { Session } from 'next-auth';
-import { isOpener } from '@/utils/session.utils';
 
 interface TrackTabContentProps {
-  session: Session | null;
   contest: Contest;
+  isOpener: boolean;
+  userId?: string;
   onAddTrack: (trackToAdd: Track) => void;
   onRemoveTrack: (trackToRemove: Track) => void;
   onStatusUpdate: (trackId: number, newStatus: TrackStatus) => void;
 }
 
-const TrackTabContent: React.FC<TrackTabContentProps> = ({ session, contest, onAddTrack, onRemoveTrack, onStatusUpdate }) => {
+const TrackTabContent: React.FC<TrackTabContentProps> = ({ contest, isOpener: isOpenerProp, userId, onAddTrack, onRemoveTrack, onStatusUpdate }) => {
   const [isPopinOpen, setPopinOpen] = useState<boolean>(false);
   const { fetchTracks, isLoading: isLoadingTracks, error: fetchError } = useFetchContestTracks();
   const [tracks, setTracks] = useState<Track[]>([]);
   const { addTrack, removeTrack, isLoading: isLoadingAddOrRemove, error: manageError } = useManageContestTracks();
 
-  const contestUser = contest.users.find(contestUser => contestUser.user?.id === session?.user?.id)
-  const isSelfContester = contestUser && session?.user?.id === contestUser.user?.id;
+  const contestUser = contest.users.find(contestUser => contestUser.user?.id === userId);
+  const isSelfContester = contestUser && userId === contestUser.user?.id;
   const isSelfAndInProgress = isSelfContester && contest.status === ContestStatusEnum.Enum.InProgress;
 
   const handleAddTrack = async (trackToAdd: Track) => {
@@ -81,9 +80,9 @@ const TrackTabContent: React.FC<TrackTabContentProps> = ({ session, contest, onA
       ) : (
         contest.tracks.map(track => (
           <div key={track.id}>
-            <ContestTrackCard 
-              {...track} 
-              contest={contest} 
+            <ContestTrackCard
+              {...track}
+              contest={contest}
               contestUser={contestUser}
               onStatusUpdate={onStatusUpdate}
               canUpdateTrackStatus={!!isSelfAndInProgress}
@@ -91,7 +90,7 @@ const TrackTabContent: React.FC<TrackTabContentProps> = ({ session, contest, onA
           </div>
         ))
       )}
-      {isOpener(session) && (
+      {isOpenerProp && (
         <Button onClick={() => { setPopinOpen(true); loadTracks(); }} className="mt-4 w-full flex items-center">
           <span className="flex items-center justify-center mr-2">
             <FaPlus className="text-gray-600 dark:text-gray-300" />
@@ -110,4 +109,4 @@ const TrackTabContent: React.FC<TrackTabContentProps> = ({ session, contest, onA
   );
 };
 
-export default TrackTabContent; 
+export default TrackTabContent;

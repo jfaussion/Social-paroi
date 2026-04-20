@@ -2,7 +2,6 @@
 import { News } from "@/domain/News.schema";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/Button";
-import { useSession } from "next-auth/react";
 import { usePostNews } from "@/lib/news/hooks/usePostNews";
 import ConfirmationDialog from "../ui/ConfirmDialog";
 import { useDeleteNews } from "@/lib/news/hooks/useDeleteNews";
@@ -10,15 +9,13 @@ import NewsCard from "./NewsCard";
 import { useFetchNews } from "@/lib/news/hooks/useFetchNews";
 import { NewsPlaceHolder } from "./NewsPlacehorlder";
 import { NewsForm } from "./NewsForm";
-import { isOpener } from "@/utils/session.utils";
 
 
-function NewsList({ locationId }: { locationId: number }) {
+function NewsList({ locationId, isOpener }: { locationId: number; isOpener: boolean }) {
 
   const { fetchNews, isLoading, error } = useFetchNews();
   const [newsList, setNewsList] = useState<News[]>([]);
   const [hasLoadedDateOnce, setHasLoadedDateOnce] = useState<boolean>(false); // Pour éviter l'effet de clignotement à l'ouverture de la page
-  const session = useSession();
   const [isPopinOpen, setIsPopinOpen] = useState<boolean>(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [selectedNews, setSelectedNews] = useState<News | null>(null);
@@ -83,9 +80,9 @@ function NewsList({ locationId }: { locationId: number }) {
     <div className="space-y-4 w-full max-w-3xl flex flex-col items-center">
       {newsList.length === 0 && <p>Nothing new today...</p>}
       {newsList.map((news: News) => (
-        <NewsCard key={news.id} news={news} editNews={handleEditNews} deleteNews={handleDeleteNews}/>
+        <NewsCard key={news.id} news={news} isOpener={isOpener} editNews={handleEditNews} deleteNews={handleDeleteNews}/>
       ))}
-      {isOpener(session.data) && (
+      {isOpener && (
         <Button
           onClick={handleCreateNews}
           className="w-full sm:w-auto"

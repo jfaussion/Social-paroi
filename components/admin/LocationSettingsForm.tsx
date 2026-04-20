@@ -39,7 +39,7 @@ export default function LocationSettingsForm({ location, inviteLink: initialInvi
     if (pendingMapFile) {
       try {
         const compressed = await compressImage(pendingMapFile, { maxWidth: 1200, quality: 0.8, type: 'image/webp' });
-        const result = await directUploadToCloudinary(compressed, `Locations/${locationSlug}`);
+        const result = await directUploadToCloudinary(compressed, `Locations/${locationSlug}`, location.id);
         resolvedMapImageUrl = result.publicId;
         setMapImageUrl(result.publicId);
         setPendingMapFile(null);

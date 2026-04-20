@@ -3,7 +3,8 @@
 import prisma from '@/prisma';
 import { ContestActivity } from "@/domain/ContestActivity.schema";
 import { auth } from "@/auth";
-import { isOpener } from "@/utils/session.utils";
+import { checkUserLocationRole } from '@/lib/locations/actions/checkUserLocationRole';
+import { LocationRole } from '@/domain/LocationRole.enum';
 import { createActionLogger } from '@/utils/logger';
 const logger = createActionLogger('postActivityToContest');
 
@@ -18,7 +19,11 @@ export const postActivityToContest = async (
   formData: FormData
 ): Promise<ContestActivity | null> => {
   const user = await auth();
-  if (!isOpener(user)) {
+  const contest = await prisma.contest.findUnique({ where: { id: contestId }, select: { locationId: true } });
+  const isOpener = user?.user?.id && contest?.locationId
+    ? await checkUserLocationRole(user.user.id, contest.locationId, LocationRole.opener)
+    : false;
+  if (!isOpener) {
     const error = new Error('You must be Admin or Opener to perform this action.');
     logger.error(error, { contestId, userId: user?.user?.id });
     throw error;
@@ -33,7 +38,7 @@ export const postActivityToContest = async (
     });
 
     const newActivity = await prisma.contestActivity.upsert({
-      where: { 
+      where: {
         id: activityId, // Use -1 for new activities
       },
       update: {
@@ -48,7 +53,7 @@ export const postActivityToContest = async (
         contestId,
       },
     });
-    
+
     logger.success({
       contestId,
       activityId: newActivity.id,
@@ -62,4 +67,4 @@ export const postActivityToContest = async (
     });
     return null;
   }
-}; 
+};

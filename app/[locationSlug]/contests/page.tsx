@@ -4,6 +4,8 @@ import { SessionProvider } from 'next-auth/react';
 import { isConnected } from "@/utils/session.utils";
 import ContestList from '@/components/contests/ContestList';
 import { getLocationBySlug } from '@/lib/locations/actions/getLocationBySlug';
+import { checkUserLocationRole } from '@/lib/locations/actions/checkUserLocationRole';
+import { LocationRole } from '@/domain/LocationRole.enum';
 import { notFound } from 'next/navigation';
 
 export default async function Contests({ params }: { params: Promise<{ locationSlug: string }> }) {
@@ -13,6 +15,10 @@ export default async function Contests({ params }: { params: Promise<{ locationS
   if (!location) notFound();
 
   const session = await auth();
+  const userId = session?.user?.id;
+  const isOpener = userId
+    ? await checkUserLocationRole(userId, location.id, LocationRole.opener)
+    : false;
 
   return (
     <SessionProvider session={session}>
@@ -23,7 +29,7 @@ export default async function Contests({ params }: { params: Promise<{ locationS
               <span className="text-xl font-semibold w-full p-4 pt-0">
                 Contests
               </span>
-              <ContestList locationId={location.id} />
+              <ContestList locationId={location.id} isOpener={isOpener} />
             </div>
           </div>
         )}

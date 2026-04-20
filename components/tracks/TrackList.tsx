@@ -6,9 +6,7 @@ import { CardPlaceHolder } from "../ui/CardPlacehorlder";
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import TrackFilters from "../filters/TrackFilters";
 import { Filters } from "@/domain/Filters";
-import { isOpener } from "@/utils/session.utils";
 import { Button } from "../ui/Button";
-import { useSession } from "next-auth/react";
 import TrackBulkRemove from "./TrackBulkRemove";
 import RegularTrackCard from "./RegularTrackCard";
 
@@ -17,10 +15,10 @@ type TracksProps = {
   locationId: number;
   zones: Array<{ id: number; name: string }>;
   isMember: boolean;
+  isOpener: boolean;
 };
 
-const TrackList: React.FC<TracksProps> = ({ userId, locationId, zones, isMember }) => {
-  const session = useSession();
+const TrackList: React.FC<TracksProps> = ({ userId, locationId, zones, isMember, isOpener }) => {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -112,7 +110,7 @@ const TrackList: React.FC<TracksProps> = ({ userId, locationId, zones, isMember 
   return (
     <div className="space-y-2 w-full max-w-3xl mt-4">
       {
-        isOpener(session.data) && (
+        isOpener && (
           <div className="w-full flex justify-between">
             <Button onClick={() => router.push(`/${locationSlug}/opener/create`)}>Create new Block</Button>
             <TrackBulkRemove trackList={trackList} isRemoveDisabled={isRemoveDisabled()} onRemoveAllSuccess={() => handleRemoveAllSuccess()}/>

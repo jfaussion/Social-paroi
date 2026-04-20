@@ -2,7 +2,6 @@
 import { Contest } from "@/domain/Contest.schema";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/Button";
-import { useSession } from "next-auth/react";
 import { usePostContest } from "@/lib/contests/hooks/usePostContest";
 import ConfirmationDialog from "../ui/ConfirmDialog";
 import { useDeleteContest } from "@/lib/contests/hooks/useDeleteContest";
@@ -10,13 +9,11 @@ import ContestCard from "./ContestCard";
 import { useFetchContests } from "@/lib/contests/hooks/useFetchContests";
 import { ContestPlaceHolder } from "./ContestPlaceHolder";
 import ContestForm from "./ContestForm";
-import { isOpener } from "@/utils/session.utils";
 
-function ContestList({ locationId }: { locationId: number }) {
+function ContestList({ locationId, isOpener }: { locationId: number; isOpener: boolean }) {
   const { fetchContests, isLoading, error } = useFetchContests();
   const [contestList, setContestList] = useState<Contest[]>([]);
   const [hasLoadedDataOnce, setHasLoadedDataOnce] = useState<boolean>(false);
-  const session = useSession();
   const [isPopinOpen, setIsPopinOpen] = useState<boolean>(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [selectedContest, setSelectedContest] = useState<Contest | null>(null);
@@ -98,9 +95,9 @@ function ContestList({ locationId }: { locationId: number }) {
         <p>No contests available...</p>
       )}
       {contestList.map((contest: Contest) => (
-        <ContestCard key={contest.id} contest={contest} editContest={handleEditContest} deleteContest={handleDeleteContest} />
+        <ContestCard key={contest.id} contest={contest} isOpener={isOpener} editContest={handleEditContest} deleteContest={handleDeleteContest} />
       ))}
-      {isOpener(session.data) && (
+      {isOpener && (
         <Button
           onClick={handleCreateContest}
           className="w-full sm:w-auto"

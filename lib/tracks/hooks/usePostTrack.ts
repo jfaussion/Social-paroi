@@ -32,7 +32,7 @@ export const usePostTracks = (locationId: number) => {
         setLoadingMessage('Compressing image...');
         const compressed = await compressImage(photo, { maxWidth: 1600, quality: 0.8, type: 'image/webp' });
         setLoadingMessage('Uploading image...');
-        const result = await directUploadToCloudinary(compressed, 'Tracks');
+        const result = await directUploadToCloudinary(compressed, 'Tracks', locationId);
         // result.publicId is what backend expects (we store public_id)
         // send oldImageUrl for deletion if present
         const oldImageUrl = track.imageUrl?.toString() ?? '';
@@ -40,6 +40,7 @@ export const usePostTracks = (locationId: number) => {
         const imageForm = new FormData();
         imageForm.append('imageUrl', imageUrl);
         if (oldImageUrl) imageForm.append('oldImageUrl', oldImageUrl);
+        imageForm.append('locationId', locationId.toString());
         await deletePreviousTrackImage(imageForm);
         formData.set('imageUrl', imageUrl);
       }

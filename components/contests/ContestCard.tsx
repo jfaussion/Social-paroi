@@ -1,8 +1,6 @@
 "use client";
 
 import { Contest } from '@/domain/Contest.schema';
-import { isOpener } from '@/utils/session.utils';
-import { useSession } from 'next-auth/react';
 import { CldImage } from 'next-cloudinary';
 import { usePathname, useRouter } from 'next/navigation';
 import React from 'react';
@@ -12,16 +10,16 @@ import ContestStatus from '../ui/ContestStatus';
 
 interface ContestCardProps {
   contest: Contest;
+  isOpener: boolean;
   editContest: (contest: Contest) => void;
   deleteContest: (contest: Contest) => void;
 }
 
-const ContestCard: React.FC<ContestCardProps> = ({ contest, editContest, deleteContest }) => {
-  const { data: session } = useSession();
+const ContestCard: React.FC<ContestCardProps> = ({ contest, isOpener: isOpenerProp, editContest, deleteContest }) => {
   const router = useRouter();
   const pathname = usePathname();
   const locationSlug = pathname.split('/')[1] ?? '';
-  const isOpenerOrAdmin = isOpener(session);
+  const isOpenerOrAdmin = isOpenerProp;
 
   const handleClick = () => {
     // Only allow navigation if contest is InProgress or if user is opener/admin

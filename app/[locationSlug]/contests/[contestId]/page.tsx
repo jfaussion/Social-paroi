@@ -5,6 +5,8 @@ import placeholderImage from "@/public/bouldering-placeholder.jpeg";
 import ContestDetails from "@/components/contests/ContestDetails";
 import { redirect } from "next/navigation";
 import { getContestDetails } from "@/lib/contests/actions/getContestDetails";
+import { checkUserLocationRole } from "@/lib/locations/actions/checkUserLocationRole";
+import { LocationRole } from "@/domain/LocationRole.enum";
 
 export const dynamic = 'force-dynamic';
 
@@ -18,10 +20,14 @@ export default async function ContestDetailsPage({ params }: { params: { locatio
     redirect(`/${params.locationSlug}/contests`);
   }
 
+  const isOpener = userId && contest?.locationId
+    ? await checkUserLocationRole(userId, contest.locationId, LocationRole.opener)
+    : false;
+
   return (
     <SessionProvider session={session}>
       {contest ? (
-        <ContestDetails key={contest.id} {...contest} />
+        <ContestDetails key={contest.id} {...contest} isOpener={isOpener} />
       ) : (
         <div>
           <h1>Contest not found</h1>

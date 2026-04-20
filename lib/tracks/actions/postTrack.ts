@@ -1,14 +1,15 @@
 'use server';
 import prisma from '@/prisma';
 import { auth } from '@/auth';
-import { isOpener } from '@/utils/session.utils';
+import { checkUserLocationRole } from '@/lib/locations/actions/checkUserLocationRole';
+import { LocationRole } from '@/domain/LocationRole.enum';
 import { createActionLogger } from '@/utils/logger';
 const logger = createActionLogger('postNewTrack');
 
 /**
  * Creates a new track or updates an existing one.
  * Assuming the image is uploaded and the URL is passed in the form data.
- * 
+ *
  * @param trackId - The track id.
  * @param track - The track data.
  * @throws Error - If the user is not an Admin or Opener.
@@ -19,7 +20,8 @@ export async function postNewTrack(
   locationId: number
 ) {
   const user = await auth();
-  if (isOpener(user) === false){
+  const isOpener = user?.user?.id ? await checkUserLocationRole(user.user.id, locationId, LocationRole.opener) : false;
+  if (!isOpener) {
     const error = new Error('You must be Admin or Opener in to perform this action.');
     logger.error(error, { trackId, userId: user?.user?.id });
     throw error;

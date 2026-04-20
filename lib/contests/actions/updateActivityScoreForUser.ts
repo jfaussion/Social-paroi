@@ -3,8 +3,8 @@
 import prisma from '@/prisma';
 import type { PrismaClient } from '@prisma/client';
 import { auth } from '@/auth';
-import { isOpener } from '@/utils/session.utils';
-import { Session } from 'next-auth';
+import { checkUserLocationRole } from '@/lib/locations/actions/checkUserLocationRole';
+import { LocationRole } from '@/domain/LocationRole.enum';
 import { revalidatePath } from 'next/cache';
 import { ContestStatusEnum } from '@/domain/ContestStatus.enum';
 import { createActionLogger } from '@/utils/logger';
@@ -12,34 +12,35 @@ const logger = createActionLogger('updateActivityScoreForUser');
 
 async function getFinalContestUserId(
   tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>,
-  user: Session,
+  isOpener: boolean,
+  userId: string,
   contestId: number,
   contestUserId: number,
 ): Promise<number> {
   logger.info('resolveContestUserId', {
     contestId,
     requestedContestUserId: contestUserId,
-    isOpener: isOpener(user),
-    userId: user.user?.id,
+    isOpener: isOpener,
+    userId,
   });
 
-  if (!isOpener(user)) {
+  if (!isOpener) {
     logger.info('usingParticipantContestUser', {
       contestId,
-      userId: user.user?.id,
+      userId,
     });
     const userContestParticipation = await tx.contestUser.findFirst({
       where: {
         AND: [
           { contestId },
-          { userId: user.user!.id }
+          { userId }
         ]
       },
     });
 
     if (!userContestParticipation) {
       const error = new Error('User not participating in this contest');
-      logger.error(error, { contestId, userId: user.user?.id });
+      logger.error(error, { contestId, userId });
       throw error;
     }
 
@@ -48,8 +49,8 @@ async function getFinalContestUserId(
       contestUserId: userContestParticipation.id,
     });
     return userContestParticipation.id;
-  } 
-  
+  }
+
   // For openers, verify the provided contestUserId exists and belongs to the contest
   const contestUser = await tx.contestUser.findFirst({
     where: {
@@ -99,12 +100,16 @@ export const updateActivityScoreForUser = async (
       throw new Error('Contest not found');
     }
 
-    if (!isOpener(userSession) && contest.status !== ContestStatusEnum.Enum.InProgress) {
+    const isOpenerRole = contest.locationId
+      ? await checkUserLocationRole(userSession.user.id, contest.locationId, LocationRole.opener)
+      : false;
+
+    if (!isOpenerRole && contest.status !== ContestStatusEnum.Enum.InProgress) {
       throw new Error('Contest is not in progress and user not an opener');
     }
 
     return await prisma.$transaction(async (tx) => {
-      const finalContestUserId = await getFinalContestUserId(tx, userSession, contestId, contestUserId);
+      const finalContestUserId = await getFinalContestUserId(tx, isOpenerRole, userSession.user!.id, contestId, contestUserId);
 
       // Verify the activity exists and belongs to the contest
       const activity = await tx.contestActivity.findFirst({
@@ -151,4 +156,4 @@ export const updateActivityScoreForUser = async (
     logger.error(error, { contestId, activityId, score, contestUserId });
     return false;
   }
-}; 
+};

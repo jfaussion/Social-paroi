@@ -2,7 +2,8 @@
 
 import prisma from '@/prisma';
 import { auth } from '@/auth';
-import { isOpener } from '@/utils/session.utils';
+import { checkUserLocationRole } from '@/lib/locations/actions/checkUserLocationRole';
+import { LocationRole } from '@/domain/LocationRole.enum';
 import { ContestStatusEnum } from '@/domain/ContestStatus.enum';
 import { TrackStatus } from '@/domain/TrackStatus.enum';
 import { GenderEnum } from '@/domain/ContestUser.schema';
@@ -170,9 +171,22 @@ async function generateRanking(tx: any, contestId: number, type: ContestRankingT
 export async function generateContestRankings(contestId: number) {
   logger.start({ contestId });
   const user = await auth();
-  if (!isOpener(user)) {
+  const userId = user?.user?.id;
+  if (!userId) {
+    const error = new Error('User not authenticated');
+    logger.error(error, { contestId });
+    throw error;
+  }
+  const contest = await prisma.contest.findUnique({ where: { id: contestId }, select: { locationId: true } });
+  if (!contest) {
+    const error = new Error('Contest not found');
+    logger.error(error, { contestId });
+    throw error;
+  }
+  const hasRole = await checkUserLocationRole(userId, contest.locationId, LocationRole.opener);
+  if (!hasRole) {
     const error = new Error('Only openers can generate rankings');
-    logger.error(error, { contestId, userId: user?.user?.id });
+    logger.error(error, { contestId, userId });
     throw error;
   }
 

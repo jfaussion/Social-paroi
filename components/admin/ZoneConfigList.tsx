@@ -73,7 +73,7 @@ export default function ZoneConfigList({ zones: initialZones, locationId, locati
     setIsUploading(true);
     try {
       const compressed = await compressImage(file, { maxWidth: 800, quality: 0.8, type: 'image/webp' });
-      const result = await directUploadToCloudinary(compressed, `Zones/${locationSlug}`);
+      const result = await directUploadToCloudinary(compressed, `Zones/${locationSlug}`, locationId);
       setEditMiniMapUrl(result.publicId);
       toast.success('Image uploaded');
     } catch {

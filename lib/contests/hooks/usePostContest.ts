@@ -32,6 +32,7 @@ export const usePostContest = () => {
       // handle image upload
       if (newPhoto) {
         formData.append('coverPhoto', newPhoto);
+        formData.append('locationId', locationId.toString());
         setLoadingMessage('Uploading image...');
         const photoUrl = await postCoverImage(formData);
         formData.set('coverImageUrl', photoUrl);

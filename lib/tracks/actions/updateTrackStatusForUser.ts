@@ -3,7 +3,8 @@ import prisma from '@/prisma';
 import type { PrismaClient } from '@prisma/client';
 import { TrackStatus } from '@/domain/TrackStatus.enum';
 import { ContestStatusEnum } from '@/domain/ContestStatus.enum';
-import { isOpener } from '@/utils/session.utils';
+import { checkUserLocationRole } from '@/lib/locations/actions/checkUserLocationRole';
+import { LocationRole } from '@/domain/LocationRole.enum';
 import { auth } from '@/auth';
 import { createActionLogger } from '@/utils/logger';
 const logger = createActionLogger('updateTrackStatusForUser');
@@ -112,10 +113,13 @@ export async function updateTrackStatusForUser(
       throw error;
     }
 
-    if (!isOpener(user)) {
-      const track = await prisma.track.findUnique({ where: { id: trackId }, select: { locationId: true } });
-      if (!track) throw new Error('Track not found');
-      if (track.locationId === null) throw new Error('Track has no associated location');
+    const track = await prisma.track.findUnique({ where: { id: trackId }, select: { locationId: true } });
+    if (!track) throw new Error('Track not found');
+    if (track.locationId === null) throw new Error('Track has no associated location');
+
+    const isOpener = await checkUserLocationRole(user.user.id, track.locationId, LocationRole.opener);
+
+    if (!isOpener) {
       const membership = await prisma.userLocation.findFirst({
         where: { userId: user.user.id, locationId: track.locationId },
       });
@@ -144,7 +148,7 @@ export async function updateTrackStatusForUser(
       for (const contestTrack of activeContestTracks) {
         const contestUser = contestTrack.contest.contestUsers[0];
         const isSelfContester = contestUser?.userId === user.user?.id;
-        const canUpdateContestTrack = isOpener(user) || (isSelfContester && contestTrack.contest.status === ContestStatusEnum.Enum.InProgress)
+        const canUpdateContestTrack = isOpener || (isSelfContester && contestTrack.contest.status === ContestStatusEnum.Enum.InProgress)
 
         if (contestUser && canUpdateContestTrack) {
           await updateContestTrackStatus(tx, contestTrack, contestUser, newStatus);

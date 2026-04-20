@@ -4,9 +4,10 @@ import TrackList from "@/components/tracks/TrackList";
 import { getLocationBySlug } from "@/lib/locations/actions/getLocationBySlug";
 import { getZonesByLocation } from "@/lib/locations/actions/getZonesByLocation";
 import { getUserLocations } from "@/lib/locations/actions/getUserLocations";
+import { checkUserLocationRole } from "@/lib/locations/actions/checkUserLocationRole";
+import { LocationRole } from "@/domain/LocationRole.enum";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { isOpener } from "@/utils/session.utils";
 
 export const dynamic = 'force-dynamic'
 
@@ -25,8 +26,15 @@ export default async function TracksPage({
   ]);
   const userId = session?.user?.id ?? "";
 
+  const [userLocations, isLocationOpener] = userId
+    ? await Promise.all([
+        getUserLocations(userId),
+        checkUserLocationRole(userId, location.id, LocationRole.opener),
+      ])
+    : [[], false];
+
   const isMember = userId
-    ? isOpener(session) || (await getUserLocations(userId)).some((m) => m.locationId === location.id)
+    ? isLocationOpener || userLocations.some((m) => m.locationId === location.id)
     : false;
 
   const mapSrc = location.mapImageUrl
@@ -54,7 +62,7 @@ export default async function TracksPage({
         )}
 
         {userId ? (
-          <TrackList userId={userId} locationId={location.id} zones={zones} isMember={isMember} />
+          <TrackList userId={userId} locationId={location.id} zones={zones} isMember={isMember} isOpener={isLocationOpener} />
         ) : (
           <div className="bg-red-900 border border-red-500 rounded p-4">
             <p className="text-red-300">Error, sign in to see your tracks...</p>

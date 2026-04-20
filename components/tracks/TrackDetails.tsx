@@ -12,7 +12,6 @@ import { TrackStatus } from '@/domain/TrackStatus.enum';
 import { getBgColorForDifficulty } from '@/utils/difficulty.utils';
 import { getBgColor } from '@/utils/color.utils';
 import { Button } from '../ui/Button';
-import { isOpener } from '@/utils/session.utils';
 import { useChangeMountedTrackStatus } from '@/lib/tracks/hooks/useChangeMountedTrackStatus';
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import ConfirmationDialog from '../ui/ConfirmDialog';
@@ -21,8 +20,9 @@ import { Zone } from '../Zone';
 import { FaChevronLeft, FaChevronRight, FaUserCheck } from 'react-icons/fa6';
 import TrackCompletionList from './TrackCompletionList';
 
+type TrackDetailsProps = Track & { isOpener: boolean };
 
-const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
+const TrackDetails: React.FC<TrackDetailsProps> = ({ isOpener: isOpenerProp, ...propTrack }) => {
   const [track, setTrack] = useState<Track>(propTrack);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
   const { updateTrackStatus, isLoading: isLoadingTrackStatus, error: errorTrackStatus } = useUpdateTrackProgress();
@@ -209,7 +209,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
 
         </div>
 
-        {isOpener(session.data) && (
+        {isOpenerProp && (
           <div className='p-4 w-full border-t-2 border-gray-600 sm:border sm:border-gray-600 sm:rounded-lg dark:bg-gray-900 sm:m-4 sm:mt-0 space-y-2'>
 
             <h2 className="text-lg font-bold mb-3">Editor zone</h2>
