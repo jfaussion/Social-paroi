@@ -91,6 +91,7 @@ export const updateActivityScoreForUser = async (
     if (!userSession?.user?.id) {
       throw new Error('User not authenticated');
     }
+    const userId = userSession.user.id;
 
     const contest = await prisma.contest.findUnique({
       where: { id: contestId },
@@ -101,7 +102,7 @@ export const updateActivityScoreForUser = async (
     }
 
     const isOpenerRole = contest.locationId
-      ? await checkUserLocationRole(userSession.user.id, contest.locationId, LocationRole.opener)
+      ? await checkUserLocationRole(userId, contest.locationId, LocationRole.opener)
       : false;
 
     if (!isOpenerRole && contest.status !== ContestStatusEnum.Enum.InProgress) {
@@ -109,7 +110,7 @@ export const updateActivityScoreForUser = async (
     }
 
     return await prisma.$transaction(async (tx) => {
-      const finalContestUserId = await getFinalContestUserId(tx, isOpenerRole, userSession.user!.id, contestId, contestUserId);
+      const finalContestUserId = await getFinalContestUserId(tx, isOpenerRole, userId, contestId, contestUserId);
 
       // Verify the activity exists and belongs to the contest
       const activity = await tx.contestActivity.findFirst({
