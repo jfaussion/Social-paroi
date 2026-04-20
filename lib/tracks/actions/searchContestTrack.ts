@@ -75,9 +75,12 @@ export async function searchTrackForContest(contestId: number, filters: Filters,
     const tracks = await prisma.track.findMany({
       where: whereCondition,
       include: {
+        difficultyLevel: {
+          select: { id: true, name: true, color: true },
+        },
         contestTracks: {
           include: {
-            contest: true, // Include the contest object linked to ContestTracks
+            contest: true,
           },
         },
       },

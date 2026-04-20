@@ -5,16 +5,10 @@ import { createActionLogger } from '@/utils/logger';
 
 const logger = createActionLogger('processTrackStats');
 
-/**
- * Processes the track stats for a user.
- * 
- * @param userTrackProgress - The tracks done by the user.
- * @param totalMountedTracksByDifficulty - The total number of tracks mounted by difficulty.
- * @returns The processed track stats.
- */
 export const processTrackStats = (
-  userTrackProgress: { track: Track }[], 
-  totalMountedTracksByDifficulty: { _count: { _all: number }, level: string }[]
+  userTrackProgress: { track: Track }[],
+  totalMountedTracksByDifficulty: { _count: { _all: number }, level: string }[],
+  colorMap: Record<string, string | null> = {}
 ) => {
   logger.start({
     progressCount: userTrackProgress.length,
@@ -22,10 +16,10 @@ export const processTrackStats = (
   });
   const stats: Record<string, TrackStats> = {};
 
-  // Initialize stats structure with totalMounted from the second dataset
   totalMountedTracksByDifficulty.forEach(({ level, _count }) => {
     stats[level] = {
       level,
+      color: colorMap[level] ?? null,
       mountedDone: 0,
       totalDone: 0,
       totalMounted: _count._all,
@@ -39,6 +33,7 @@ export const processTrackStats = (
     if (!stats[level]) {
       stats[level] = {
         level,
+        color: colorMap[level] ?? null,
         mountedDone: 0,
         totalDone: 0,
         totalMounted: 0,

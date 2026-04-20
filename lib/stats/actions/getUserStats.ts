@@ -41,7 +41,16 @@ export async function getUserStats(userId: string, locationId: number) {
         _all: true,
       },
     });
-    const processStats = processTrackStats(userTrackStats as { track: Track }[], totalMountedTracksByDifficulty as { _count: { _all: number }, level: string }[]);
+
+    const difficultyLevels = await prisma.difficultyLevel.findMany({
+      where: { locationId },
+      select: { name: true, color: true },
+    });
+    const colorMap: Record<string, string | null> = Object.fromEntries(
+      difficultyLevels.map(dl => [dl.name, dl.color])
+    );
+
+    const processStats = processTrackStats(userTrackStats as { track: Track }[], totalMountedTracksByDifficulty as { _count: { _all: number }, level: string }[], colorMap);
 
     logger.success({
       userId,

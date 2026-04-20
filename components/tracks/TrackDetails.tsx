@@ -9,7 +9,7 @@ import { useUpdateTrackProgress } from '@/lib/tracks/hooks/useUpdateTrackProgres
 import ToggleButton from '../ui/ToggleButton';
 import RemovedLabel from '../ui/RemovedLabel';
 import { TrackStatus } from '@/domain/TrackStatus.enum';
-import { getBgColorForDifficulty } from '@/utils/difficulty.utils';
+
 import { getBgColor } from '@/utils/color.utils';
 import { Button } from '../ui/Button';
 import { useChangeMountedTrackStatus } from '@/lib/tracks/hooks/useChangeMountedTrackStatus';
@@ -29,8 +29,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({ isOpener: isOpenerProp, ...
   const { deleteTrack, isLoading: isLoadingDelete, error: errorDelete, reset: resetDelete } = useDeleteTrack();
   const { changeMountedTrackStatus, isLoading: isLoadingRemove, error: errorRemove } = useChangeMountedTrackStatus();
   const session = useSession();
-  const effectiveLevel = (track.difficultyLevel?.name ?? track.level) as import('@/domain/Difficulty.enum').DifficultyType;
-  const levelClass = getBgColorForDifficulty(effectiveLevel);
+  const levelColor = track.difficultyLevel?.color;
   const holdClass = getBgColor(track.holdColor);
   const router = useRouter();
   const pathname = usePathname();
@@ -171,20 +170,21 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({ isOpener: isOpenerProp, ...
             <ToggleButton isActive={track.trackProgress?.status === TrackStatus.DONE} isDisabled={false} onChange={handleStatusChange} />
           </div>
 
-          {/* Zone and Date row */}
+          {/* Difficulty and Date row */}
           <div className="flex justify-between items-center mb-3">
             <div>
               <span className="text-sm font-medium mr-2">Difficulty</span>
-              <span className={`inline-block w-14 h-3 rounded ${levelClass}`}></span>
+              <span className="inline-block w-14 h-3 rounded bg-gray-500 border border-black dark:border-white"
+                style={levelColor ? { backgroundColor: levelColor } : undefined}></span>
             </div>
             <span className="text-sm text-gray-600 dark:text-gray-400">{track.date ? track.date.toLocaleDateString() : '...'}</span>
           </div>
 
-          {/* Difficulty and Points row */}
+          {/* Hold color and Points row */}
           <div className="flex justify-between items-center mb-3">
             <div>
               <span className="text-sm font-medium mr-2">Hold color</span>
-              <span className={`inline-block w-14 h-3 ${holdClass} rounded`}></span>
+              <span className={`inline-block w-14 h-3 ${holdClass} rounded border border-black dark:border-white`}></span>
             </div>
             <span className="text-sm font-semibold">{track.points}pts</span>
           </div>
@@ -196,7 +196,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({ isOpener: isOpenerProp, ...
               )}
             </div>
 
-            <div className="flex flex-end items-center text-sm space-x-2 font-semibold mr-2 cursor-pointer" 
+            <div className="flex flex-end items-center text-sm space-x-2 font-semibold mr-2 cursor-pointer"
                 onClick={() => setCompletionListOpen(true)}>
               <span>{track.usersWhoCompleted?.length ?? 0}</span>
               <FaUserCheck title="Nb of users that completed this track"/>
@@ -237,7 +237,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({ isOpener: isOpenerProp, ...
         onCancel={handleCancelDelete} onConfirm={handleDeleteTrack}
         error={errorDelete ?? undefined} isLoading={isLoadingDelete} loadingMessage='Deleting block...'></ConfirmationDialog>
 
-      <TrackCompletionList isOpen={isCompletionListOpen} userRanking={track.usersWhoCompleted ?? []} 
+      <TrackCompletionList isOpen={isCompletionListOpen} userRanking={track.usersWhoCompleted ?? []}
         onClose={() => {setCompletionListOpen(false)}} currentUserId={session.data?.user?.id} />
     </main>
   )

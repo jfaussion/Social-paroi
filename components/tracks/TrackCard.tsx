@@ -7,7 +7,7 @@ import placeholderImage from "@/public/bouldering-placeholder.jpeg";
 import { usePathname, useRouter } from "next/navigation";
 import ToggleButton from "../ui/ToggleButton";
 import RemovedLabel from "../ui/RemovedLabel";
-import { getBorderColorForDifficulty } from "@/utils/difficulty.utils";
+
 import { Zone } from "../Zone";
 import { TrackStatusHandler } from "@/domain/TrackStatusHandler.type";
 
@@ -26,9 +26,7 @@ const TrackCard: React.FC<TrackCardProps> = ({
   ...propTrack
 }) => {
   const [track, setTrack] = useState<Track>(propTrack);
-  const effectiveLevel = (track.difficultyLevel?.name ?? track.level) as import('@/domain/Difficulty.enum').DifficultyType;
   const levelColor = track.difficultyLevel?.color;
-  const levelBorderColor = getBorderColorForDifficulty(effectiveLevel);
   const router = useRouter();
   const pathname = usePathname();
   const locationSlug = pathname.split('/')[1] ?? '';
@@ -85,7 +83,7 @@ const TrackCard: React.FC<TrackCardProps> = ({
       </div>
 
       {/* Right side - Content */}
-      <div className={`w-2/3 flex flex-col justify-between p-4 border-r-8 ${levelBorderColor}`}
+      <div className="w-2/3 flex flex-col justify-between p-4 border-r-8 border-gray-500"
         style={levelColor ? { borderRightColor: levelColor } : undefined}>
         <h4 className="text-md font-semibold dark:text-white">{track.name}</h4>
 

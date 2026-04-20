@@ -20,6 +20,13 @@ export async function getTrackDetails(
     const track = await prisma.track.findUnique({
       where: { id: trackId },
       include: {
+        difficultyLevel: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+          },
+        },
         zoneRef: {
           select: {
             id: true,
