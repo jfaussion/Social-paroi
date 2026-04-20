@@ -334,7 +334,7 @@ const ContestDetails: React.FC<ContestDetailsProps> = ({ isOpener: isOpenerProp,
 
           {/* Editor zone for admin actions */}
           {isOpenerProp && (
-            <div className='p-4 w-full border-t-2 border-gray-600 sm:border sm:border-gray-600 sm:rounded-lg dark:bg-gray-900 sm:m-4 sm:mt-0 space-y-2'>
+            <div className='p-4 w-full border-t-2 border-gray-600 sm:border sm:border-gray-600 sm:rounded-lg dark:bg-gray-900 space-y-2'>
               <h2 className="text-lg font-bold mb-3">Editor zone</h2>
               <div className='flex flex-wrap justify-between gap-2'>
                 <Button className='grow' onClick={() => setStatusDialogOpen(true)}>
@@ -361,6 +361,7 @@ const ContestDetails: React.FC<ContestDetailsProps> = ({ isOpener: isOpenerProp,
 
         <ConfirmationDialog isOpen={isDeleteDialogOpen} title='Delete Contest' text='Are you sure you want to delete this contest?'
           onCancel={handleCancelDelete} onConfirm={handleDeleteContest}
+          confirmBtnType="danger"
           error={errorDelete ?? undefined} isLoading={isLoadingDelete} loadingMessage='Deleting contest...'></ConfirmationDialog>
 
         {/* Status Change Dialog */}

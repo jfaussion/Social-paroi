@@ -87,7 +87,7 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contest, isOpener: isOp
   };
 
   const loadUsers = async () => {
-    const fetchedUsers = await fetchUsers();
+    const fetchedUsers = await fetchUsers(contest.locationId);
     setUsers(fetchedUsers);
   };
 
@@ -194,6 +194,7 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contest, isOpener: isOp
         text={`Are you sure you want to remove ${userToRemove?.user?.name ?? userToRemove?.name}?`}
         onCancel={() => setIsDeleteDialogOpen(false)}
         onConfirm={confirmRemoveUser}
+        confirmBtnType="danger"
       />
 
       {/* Score Recap Popin */}

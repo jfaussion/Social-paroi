@@ -235,6 +235,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({ isOpener: isOpenerProp, ...
       </div>
       <ConfirmationDialog isOpen={isDeleteDialogOpen} title='Delete block' text='Are you sure you want to delete this block ?'
         onCancel={handleCancelDelete} onConfirm={handleDeleteTrack}
+        confirmBtnType="danger"
         error={errorDelete ?? undefined} isLoading={isLoadingDelete} loadingMessage='Deleting block...'></ConfirmationDialog>
 
       <TrackCompletionList isOpen={isCompletionListOpen} userRanking={track.usersWhoCompleted ?? []}

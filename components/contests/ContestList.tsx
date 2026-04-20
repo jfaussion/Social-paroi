@@ -118,6 +118,7 @@ function ContestList({ locationId, isOpener }: { locationId: number; isOpener: b
         text='Are you sure you want to delete this contest?'
         onCancel={() => setIsDeleteDialogOpen(false)}
         onConfirm={deleteContestAndRefresh}
+        confirmBtnType="danger"
         error={errorDelete ?? undefined}
         isLoading={isLoadingDelete} />
     </div>

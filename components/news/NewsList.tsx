@@ -100,6 +100,7 @@ function NewsList({ locationId, isOpener }: { locationId: number; isOpener: bool
       <ConfirmationDialog isOpen={isDeleteDialogOpen} title='Delete news'
         text='Are you sure you want to delete this news ?'
         onCancel={() => setIsDeleteDialogOpen(false)} onConfirm={deleteNewsAndRefresh}
+        confirmBtnType="danger"
         error={errorDelete ?? undefined} isLoading={isLoadingDelete}/>
     </div>
   );

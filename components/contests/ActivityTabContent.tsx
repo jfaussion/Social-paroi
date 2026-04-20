@@ -141,6 +141,7 @@ const ActivityTabContent: React.FC<ActivityTabContentProps> = ({
         text={`Are you sure you want to delete "${activityToDelete?.name}"?`}
         onCancel={() => setActivityToDelete(null)}
         onConfirm={confirmDeleteActivity}
+        confirmBtnType="danger"
         error={error ?? undefined}
         isLoading={isLoading}
         loadingMessage="Deleting activity..."
