@@ -7,11 +7,11 @@ export const useFetchCotnestTracks = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function fetchTracks(contestId: number, filters: Filters): Promise<Track[]> {
+  async function fetchTracks(contestId: number, filters: Filters, locationId: number): Promise<Track[]> {
     setIsLoading(true);
     setError(null);
     try {
-      const trackList = await searchTrackForContest(contestId, filters, 1);
+      const trackList = await searchTrackForContest(contestId, filters, locationId);
       setIsLoading(false);
       return trackList;
     } catch (err) {

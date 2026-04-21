@@ -20,8 +20,8 @@ export default async function ContestDetailsPage({ params }: { params: { locatio
     redirect(`/${params.locationSlug}/contests`);
   }
 
-  const isOpener = userId && contest?.locationId
-    ? await checkUserLocationRole(userId, contest.locationId, LocationRole.opener)
+  const isOpener = userId
+    ? await checkUserLocationRole(userId, contest?.locationId ?? 0, LocationRole.opener)
     : false;
 
   return (

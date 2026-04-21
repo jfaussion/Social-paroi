@@ -31,12 +31,12 @@ export async function postNewTrack(
     const name = track.get('name') as string;
     const zone = parseInt(track.get('zone') as string);
     const zoneId = parseInt(track.get('zoneId') as string);
-    const level = track.get('level') as string;
     const holdColor = track.get('holdColor') as string;
     const points = parseInt(track.get('points') as string);
     const imageUrl = track.get('imageUrl') as string;
     const removedFlag = track.get('removed') === 'true';
     const difficultyLevelId = track.get('difficultyLevelId') ? parseInt(track.get('difficultyLevelId') as string) : undefined;
+    const level = 'Unknown'; // Deprecated, will be determined by difficultyLevelId in the future
 
     logger.start({
       trackId: trackId ?? null,

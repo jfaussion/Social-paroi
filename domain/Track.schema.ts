@@ -17,7 +17,7 @@ export const TrackSchema = z.object({
     coverImage: z.string().optional(),
   })).optional(),
   holdColor: HoldColorEnum.nullish().transform(val => val ?? 'Unknown').default('Unknown'),
-  level: DifficultyEnum.default('Unknown'),
+  level: DifficultyEnum.catch('Unknown'), // Deprecated
   zone: z.number(),
   points: z.number(),
   // Regular track progress (for non-contest tracks)
@@ -42,8 +42,3 @@ export const TrackSchema = z.object({
 });
 
 export type Track = z.infer<typeof TrackSchema>;
-
-
-
-
-

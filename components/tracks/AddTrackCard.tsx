@@ -44,7 +44,7 @@ const AddTrackCard: React.FC<AddTrackCardProps> = ({ track, trackList, addTrack,
                 gravity='center'
                 alt="Climbing Track" />
             ) : (
-              <Image src={placeholderImage} alt="Climbing Track - place holder" width={10} height={5} />
+              <Image src={placeholderImage} alt="Climbing Track - place holder" fill style={{ objectFit: 'cover' }} />
             )}
           </div>
         </div>

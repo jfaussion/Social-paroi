@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Track } from '@/domain/Track.schema';
 import { Button } from '../ui/Button';
-import { FaPlus } from 'react-icons/fa';
+import { FaPencilAlt } from 'react-icons/fa';
 import Popin from '../ui/Popin';
 import AddTrackCard from '../tracks/AddTrackCard';
 import { useFetchCotnestTracks as useFetchContestTracks } from '@/lib/tracks/hooks/useFetchContestTracks';
@@ -46,7 +46,7 @@ const TrackTabContent: React.FC<TrackTabContentProps> = ({ contest, isOpener: is
   };
 
   const loadTracks = async () => {
-    const fetchedTracks = await fetchTracks(contest.id, {}); // Assuming filters are not needed for now
+    const fetchedTracks = await fetchTracks(contest.id, {}, contest.locationId ?? 0);
     setTracks(fetchedTracks);
   };
 
@@ -93,14 +93,14 @@ const TrackTabContent: React.FC<TrackTabContentProps> = ({ contest, isOpener: is
       {isOpenerProp && (
         <Button onClick={() => { setPopinOpen(true); loadTracks(); }} className="mt-4 w-full flex items-center">
           <span className="flex items-center justify-center mr-2">
-            <FaPlus className="text-gray-600 dark:text-gray-300" />
+            <FaPencilAlt className="text-gray-600 dark:text-gray-300" />
           </span>
-          {' Add More Blocks'}
+          {' Manage Blocks'}
         </Button>
       )}
 
       {/* Popin for adding tracks */}
-      <Popin isOpen={isPopinOpen} onClose={() => setPopinOpen(false)} title="Add More Blocks">
+      <Popin isOpen={isPopinOpen} onClose={() => setPopinOpen(false)} title="Manage Blocks">
         <div className="p-4">
           {renderPopinAddTrackContent()}
         </div>

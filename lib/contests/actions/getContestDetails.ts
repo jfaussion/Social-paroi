@@ -78,6 +78,7 @@ export async function getContestDetails(
       });
       logger.success({
         contestId,
+        locationId: parsedContest.locationId,
         userId,
         activityCount: contest.contestActivities.length,
         trackCount: contest.contestTracks.length,
