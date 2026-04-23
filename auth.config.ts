@@ -14,6 +14,12 @@ export const authConfig = {
     signIn: '/login',
   },
   callbacks: {
+    session({ session, token }) {
+      if (token?.sub) {
+        session.user = { ...session.user, id: token.sub };
+      }
+      return session;
+    },
     authorized({ auth, request }) {
       const isLoggedIn = !!auth?.user;
       const { nextUrl } = request;
