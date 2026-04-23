@@ -11,8 +11,8 @@ export default function LoginPage() {
         <div className="flex-shrink-0 bg-slate-400 dark:bg-slate-700 h-20 w-20 rounded-full relative mx-auto overflow-hidden">
           <Image src={socialParoiLogo} alt="Social paroi logo" fill sizes='(max-width: 200px)' />
         </div>
-        <SignInWithProviverButton provider="github" providerName='GitHub' providerImageLight='./github-mark.svg' providerImageDark='./github-mark-white.svg' />
-        <SignInWithProviverButton provider="google" providerName='Google' providerImageLight='./google-icon.svg' providerImageDark='./google-icon.svg'/>
+        <SignInWithProviverButton provider="github" providerName='GitHub' providerImageLight='/github-mark.svg' providerImageDark='/github-mark-white.svg' />
+        <SignInWithProviverButton provider="google" providerName='Google' providerImageLight='/google-icon.svg' providerImageDark='/google-icon.svg'/>
       </div>
     </main>
   );

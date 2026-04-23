@@ -9,7 +9,6 @@ import { Button } from '../ui/Button';
 import { useRouter } from "next/navigation";
 import ConfirmationDialog from '../ui/ConfirmDialog';
 import { useDeleteContest } from '@/lib/contests/hooks/useDeleteContest';
-import { isOpener } from '@/utils/session.utils';
 import { Track } from '@/domain/Track.schema';
 import TrackTabContent from './TrackTabContent';
 import UserTabContent from './UserTabContent';
@@ -32,7 +31,9 @@ type StatusOption = {
   label: ContestStatusType;
 };
 
-const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
+type ContestDetailsProps = Contest & { isOpener: boolean };
+
+const ContestDetails: React.FC<ContestDetailsProps> = ({ isOpener: isOpenerProp, ...propContest }) => {
   const [contest, setContest] = useState<Contest>(propContest);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
   const [isStatusDialogOpen, setStatusDialogOpen] = useState<boolean>(false);
@@ -120,16 +121,17 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
     switch (activeTab) {
       case 'users':
         return <UserTabContent
-          session={session}
           contest={contest}
+          isOpener={isOpenerProp}
           onAddUser={handleAddUser}
           onRemoveUser={handleRemoveUser}
         />;
       case 'tracks':
         return (
           <TrackTabContent
-            session={session}
             contest={contest}
+            userId={session?.user?.id}
+            isOpener={isOpenerProp}
             onAddTrack={handleAddTrack}
             onRemoveTrack={handleRemoveTrack}
             onStatusUpdate={handleTrackStatusUpdate}
@@ -139,7 +141,8 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
         return (
           <ActivityTabContent
             contest={contest}
-            session={session}
+            isOpener={isOpenerProp}
+            userId={session?.user?.id}
             onPostActivity={handlePostActivity}
             onRemoveActivity={handleRemoveActivity}
             onUpdateScore={handleUpdateActivityScore}
@@ -151,7 +154,7 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
   };
 
   const handleDeleteContest = async () => {
-    const wasSuccessful = await deleteContest(contest);
+    const wasSuccessful = await deleteContest(contest, contest.locationId!);
     if (!wasSuccessful) {
       console.error(errorDelete);
     } else {
@@ -330,8 +333,8 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
           )}
 
           {/* Editor zone for admin actions */}
-          {isOpener(session) && (
-            <div className='p-4 w-full border-t-2 border-gray-600 sm:border sm:border-gray-600 sm:rounded-lg dark:bg-gray-900 sm:m-4 sm:mt-0 space-y-2'>
+          {isOpenerProp && (
+            <div className='p-4 w-full border-t-2 border-gray-600 sm:border sm:border-gray-600 sm:rounded-lg dark:bg-gray-900 space-y-2'>
               <h2 className="text-lg font-bold mb-3">Editor zone</h2>
               <div className='flex flex-wrap justify-between gap-2'>
                 <Button className='grow' onClick={() => setStatusDialogOpen(true)}>
@@ -346,7 +349,7 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
                   onClick={handleGenerateRanking}
                   disabled={isGenerating}
                 >
-                  {isGenerating ? 'Generating...' : contest.status === ContestStatusEnum.Enum.Over ? 'Regenerate Rankings' : 'Generate Rankings'}
+                  {isGenerating ? 'Finalizing...' : contest.status === ContestStatusEnum.Enum.Over ? 'Regenerate Rankings' : 'Finalize Contest'}
                 </Button>
                 {generateError && (
                   <p className="text-red-500 text-sm w-full mt-1">{generateError}</p>
@@ -358,6 +361,7 @@ const ContestDetails: React.FC<Contest> = ({ ...propContest }) => {
 
         <ConfirmationDialog isOpen={isDeleteDialogOpen} title='Delete Contest' text='Are you sure you want to delete this contest?'
           onCancel={handleCancelDelete} onConfirm={handleDeleteContest}
+          confirmBtnType="danger"
           error={errorDelete ?? undefined} isLoading={isLoadingDelete} loadingMessage='Deleting contest...'></ConfirmationDialog>
 
         {/* Status Change Dialog */}

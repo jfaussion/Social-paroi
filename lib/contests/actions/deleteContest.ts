@@ -1,12 +1,11 @@
 'use server';
+import prisma from '@/prisma';
 import { Contest } from '@/domain/Contest.schema'; // Adjust the import based on your schema
-import { PrismaClient } from '@prisma/client/edge';
 import { auth } from '@/auth';
-import { isOpener } from '@/utils/session.utils';
+import { checkUserLocationRole } from '@/lib/locations/actions/checkUserLocationRole';
+import { LocationRoleEnum } from '@/domain/LocationRole.enum';
 import { deleteImageFromCloudinary } from '@/lib/cloudinary/deleteFromCloudinary'; // Adjust the import based on your cloudinary utility
 import { createActionLogger } from '@/utils/logger';
-
-const prisma = new PrismaClient();
 const logger = createActionLogger('callDeleteContest');
 
 /**
@@ -15,9 +14,10 @@ const logger = createActionLogger('callDeleteContest');
  * @param contest - The contest to be deleted.
  * @throws Error - If the user is not an Admin or Opener.
  */
-export async function callDeleteContest(contest: Contest) {
+export async function callDeleteContest(contest: Contest, locationId: number) {
   const session = await auth();
-  if (isOpener(session) === false) {
+  const hasRole = await checkUserLocationRole(session?.user?.id!, locationId, LocationRoleEnum.Enum.opener);
+  if (!hasRole) {
     throw new Error('You must be Admin or Opener to perform this action. User id: ' + session?.user?.id);
   }
   

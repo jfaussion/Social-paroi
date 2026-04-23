@@ -2,11 +2,9 @@ import NextAuth from 'next-auth';
 import { authConfig } from './auth.config';
 import GithubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
-import { PrismaClient } from '@prisma/client/edge';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import { AdapterUserCustom } from './lib/users/AdapterUserCustom';
-
-const prisma = new PrismaClient()
+import prisma from '@/prisma';
 
 export const { 
   handlers: { GET, POST },

@@ -6,21 +6,27 @@ import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import HoldColorFilter from "./HoldColorFilter";
 
 type TrackFiltersProps = {
+  zones: Array<{ id: number; name: string }>;
   selectedZones: number[];
-  selectedDifficulties: string[];
+  selectedDifficulties: number[];
   selectedShowRemoved: string | undefined;
-  selectedHoldColor: string | undefined;
+  selectedHoldColorIds: number[];
+  holdColors: { id: number; name: string; color: string }[];
+  locationId: number;
   onZoneChange: (selectedOptions: { value: any }[]) => void;
   onDifficultyChange: (selectedOptions: { value: any }[]) => void;
-  onHoldColorChange: (selectedOption: { value: any }) => void;
   onShowRemovedChange: (selectedOptions: any) => void;
+  onHoldColorChange: (ids: number[]) => void;
 };
 
 const TrackFilters: React.FC<TrackFiltersProps> = ({
+  zones,
   selectedZones,
   selectedDifficulties,
   selectedShowRemoved,
-  selectedHoldColor,
+  selectedHoldColorIds,
+  holdColors,
+  locationId,
   onZoneChange,
   onDifficultyChange,
   onShowRemovedChange,
@@ -30,12 +36,12 @@ const TrackFilters: React.FC<TrackFiltersProps> = ({
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   useEffect(() => {
-    if (selectedShowRemoved !== undefined || selectedHoldColor !== undefined) {
+    if (selectedShowRemoved !== undefined || selectedHoldColorIds.length > 0) {
       setShowAdvancedFilters(true);
     } else {
       setShowAdvancedFilters(false);
     }
-  }, [selectedShowRemoved, selectedHoldColor]);
+  }, [selectedShowRemoved, selectedHoldColorIds]);
 
   const toggleFilters = () => {
     setShowAdvancedFilters(!showAdvancedFilters);
@@ -44,10 +50,10 @@ const TrackFilters: React.FC<TrackFiltersProps> = ({
   return (
     <div>
       <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mt-2">
-        <ZoneFilter selectedFilters={selectedZones} onChange={onZoneChange} />
+        <ZoneFilter zones={zones} selectedFilters={selectedZones} onChange={onZoneChange} />
         <div className="flex inline sm:w-100 sm:space-x-2">
           <div className="grow">
-            <DifficultyFilter selectedFilters={selectedDifficulties} onChange={onDifficultyChange} />
+            <DifficultyFilter selectedFilters={selectedDifficulties} onChange={onDifficultyChange} locationId={locationId} />
           </div>
           <button
             className="p-2 flex-end rounded hover:bg-gray-300 hover:dark:bg-gray-700 transition duration-300"
@@ -64,7 +70,7 @@ const TrackFilters: React.FC<TrackFiltersProps> = ({
       {showAdvancedFilters && (
         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mt-2">
           <ShowRemovedFilter selectedFilters={selectedShowRemoved} onChange={onShowRemovedChange} />
-          <HoldColorFilter selectedFilter={selectedHoldColor} onChange={onHoldColorChange} />
+          <HoldColorFilter holdColors={holdColors} selectedIds={selectedHoldColorIds} onChange={onHoldColorChange} />
         </div>
       )}
 

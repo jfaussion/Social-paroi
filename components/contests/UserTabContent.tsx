@@ -15,17 +15,14 @@ import ActivityCard from '../activities/ActivityCard';
 import { useContestUserDetails } from '@/lib/contests/hooks/useContestUserDetails';
 import { Contest } from '@/domain/Contest.schema';
 import { useManageContestActivities } from '@/lib/contests/hooks/useManageContestActivities';
-import { Session } from 'next-auth';
-import { isOpener } from '@/utils/session.utils';
-
 interface UserTabContentProps {
   contest: Contest;
-  session: Session | null;
+  isOpener: boolean;
   onRemoveUser: (user: ContestUser) => void;
   onAddUser: (user: ContestUser) => void;
 }
 
-const UserTabContent: React.FC<UserTabContentProps> = ({ contest, session, onRemoveUser, onAddUser }) => {
+const UserTabContent: React.FC<UserTabContentProps> = ({ contest, isOpener: isOpenerProp, onRemoveUser, onAddUser }) => {
   const [isUserPopinOpen, setUserPopinOpen] = useState<boolean>(false);
   const [isTempUserPopinOpen, setTempUserPopinOpen] = useState<boolean>(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
@@ -90,7 +87,7 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contest, session, onRem
   };
 
   const loadUsers = async () => {
-    const fetchedUsers = await fetchUsers();
+    const fetchedUsers = await fetchUsers(contest.locationId);
     setUsers(fetchedUsers);
   };
 
@@ -118,14 +115,14 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contest, session, onRem
             contestUser={contestUser}
             onRemove={handleRemoveContestUser}
             onViewScoreAction={handleViewScoreAction}
-            isRemovable={isOpener(session)}
-            isOpener={isOpener(session)}
+            isRemovable={isOpenerProp}
+            isOpener={isOpenerProp}
           />
         ))}
       </div>
 
       {/* Only show buttons if user is opener or admin */}
-      {isOpener(session) && (
+      {isOpenerProp && (
         <div className="flex space-x-2 mt-4 justify-center">
           <div className="flex-1">
             <Button className="w-full" onClick={() => { setUserPopinOpen(true); loadUsers(); }}>Add user in app</Button>
@@ -197,6 +194,7 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contest, session, onRem
         text={`Are you sure you want to remove ${userToRemove?.user?.name ?? userToRemove?.name}?`}
         onCancel={() => setIsDeleteDialogOpen(false)}
         onConfirm={confirmRemoveUser}
+        confirmBtnType="danger"
       />
 
       {/* Score Recap Popin */}
@@ -221,7 +219,7 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contest, session, onRem
                       key={track.id}
                       {...track}
                       contest={contest}
-                      canUpdateTrackStatus={isOpener(session)}
+                      canUpdateTrackStatus={isOpenerProp}
                       contestUser={selectedContestUser ?? undefined}
                       disableNavigation={true}
                     />
@@ -242,7 +240,7 @@ const UserTabContent: React.FC<UserTabContentProps> = ({ contest, session, onRem
                       activity={activity}
                       isLoading={isLoadingUpdateActivityScore}
                       contestUser={selectedContestUser ?? undefined}
-                      displayEditButton={isOpener(session)}
+                      displayEditButton={isOpenerProp}
                       displayImageAndDesc={false}
                       onScoreUpdate={async (activityId, newScore) => {
                         if (selectedContestUser) {

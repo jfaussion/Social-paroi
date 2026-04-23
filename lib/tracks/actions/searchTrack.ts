@@ -1,13 +1,11 @@
 'use server';
-import { PrismaClient } from '@prisma/client/edge';
+import prisma from '@/prisma';
 import { Filters } from "@/domain/Filters";
 import { RemovedEnum } from "@/domain/Removed.enum";
 import { mergeTrackWithProgress } from "./mergeTrackWithProgress";
 import { Track } from '@/domain/Track.schema';
 import { TrackStatus } from '@/domain/TrackStatus.enum';
 import { createActionLogger } from '@/utils/logger';
-
-const prisma = new PrismaClient();
 const logger = createActionLogger('searchTrackForUser');
 
 /**
@@ -16,12 +14,12 @@ const logger = createActionLogger('searchTrackForUser');
  * @param filters - The filters to search by.
  * @returns A Promise that resolves to the tracks that match the provided filters.
  */
-export async function searchTrackForUser(userId: string, filters: Filters): Promise<Track[]> {
+export async function searchTrackForUser(userId: string, filters: Filters, locationId: number): Promise<Track[]> {
   logger.start({
     userId,
     zoneFilters: filters.zones?.length ?? 0,
     difficultyFilters: filters.difficulties?.length ?? 0,
-    holdColorFilter: Boolean(filters.holdColor),
+    holdColorFilter: filters.holdColorIds?.length ?? 0,
     showRemoved: filters.showRemoved ?? RemovedEnum.Enum.NO,
   });
   try {
@@ -30,23 +28,30 @@ export async function searchTrackForUser(userId: string, filters: Filters): Prom
     // If zones are provided and not empty, add zone condition
     if (filters.zones && filters.zones.length > 0) {
       andConditions.push({
-        zone: {
+        zoneId: {
           in: filters.zones,
         },
       });
     }
-    // If levels are provided and not empty, add level condition
-    if (filters.difficulties && filters.difficulties.length > 0) {
+    if (filters.difficultyIds && filters.difficultyIds.length > 0) {
+      andConditions.push({
+        difficultyLevelId: {
+          in: filters.difficultyIds,
+        },
+      });
+    } else if (filters.difficulties && filters.difficulties.length > 0) {
       andConditions.push({
         level: {
           in: filters.difficulties,
         },
       });
     }
-    // If holdColor is provided and not empty, add holdColor condition
-    if (filters.holdColor) {
+    // If holdColorIds are provided and not empty, filter by holdColorId
+    if (filters.holdColorIds && filters.holdColorIds.length > 0) {
       andConditions.push({
-        holdColor: filters.holdColor,
+        holdColorId: {
+          in: filters.holdColorIds,
+        },
       });
     }
     // If showRemoved is provided, add removed condition
@@ -65,7 +70,7 @@ export async function searchTrackForUser(userId: string, filters: Filters): Prom
     }
 
     andConditions.push({
-      locationId: 1, // TODO: Remove this once we have a real location
+      locationId,
     });
 
     let whereCondition = andConditions.length > 0 ? { AND: andConditions } : {};
@@ -85,8 +90,29 @@ export async function searchTrackForUser(userId: string, filters: Filters): Prom
               },
             },
           },
-          where: { 
+          where: {
             status: TrackStatus.DONE,
+          },
+        },
+        zoneRef: {
+          select: {
+            id: true,
+            name: true,
+            miniMapUrl: true,
+          },
+        },
+        difficultyLevel: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+          },
+        },
+        holdColor: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
           },
         },
       },

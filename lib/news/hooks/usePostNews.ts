@@ -15,12 +15,12 @@ export const usePostNews = () => {
    * @param news - The news object to be posted.
    * @returns A promise that resolves to the posted news object, or null if an error occurred.
    */
-  const postNewsData = async (news: News): Promise<News | null> => {
+  const postNewsData = async (news: News, locationId: number): Promise<News | null> => {
     setIsLoading(true);
     setError(null);
 
     try {
-      return await postNews(news);
+      return await postNews(news, locationId);
     } catch (err) {
       console.error(err);
       setError("An error occurred while posting the news");

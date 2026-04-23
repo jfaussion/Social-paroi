@@ -6,11 +6,11 @@ export const useFetchContests = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function fetchContests(): Promise<Contest[]> {
+  async function fetchContests(locationId: number): Promise<Contest[]> {
     setIsLoading(true);
     setError(null);
     try {
-      const contestsList = await getAllContests(); // Fetch all active contests
+      const contestsList = await getAllContests(locationId);
       setIsLoading(false);
       return contestsList;
     } catch (err) {

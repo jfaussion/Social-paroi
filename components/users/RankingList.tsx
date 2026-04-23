@@ -6,18 +6,18 @@ import { useEffect, useState } from "react";
 import { RankingPlaceholder } from "./RankingPlaceholder";
 
 
-const RankingList: React.FC = () => {
+const RankingList: React.FC<{ locationId: number }> = ({ locationId }) => {
   const session = useSession();
   const { fetchRanking, isLoading, error } = useFetchRanking();
   const [ranking, setRanking] = useState<any[]>([]);
 
   useEffect(() => {
     const getRanking = async () => {
-      const ranking = await fetchRanking();
+      const ranking = await fetchRanking(locationId);
       setRanking(ranking);
     };
     getRanking();
-  }, []);
+  }, [locationId]);
 
   return (
     <>

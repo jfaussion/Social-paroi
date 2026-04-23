@@ -1,12 +1,11 @@
 'use server';
+import prisma from '@/prisma';
 import { Contest } from '@/domain/Contest.schema';
-import { PrismaClient } from '@prisma/client/edge';
 import { auth } from '@/auth';
-import { isOpener } from '@/utils/session.utils';
+import { checkUserLocationRole } from '@/lib/locations/actions/checkUserLocationRole';
+import { LocationRoleEnum } from '@/domain/LocationRole.enum';
 import { ContestStatusType } from '@/domain/ContestStatus.enum';
 import { createActionLogger } from '@/utils/logger';
-
-const prisma = new PrismaClient();
 const logger = createActionLogger('callChangeContestStatus');
 
 /**
@@ -16,9 +15,10 @@ const logger = createActionLogger('callChangeContestStatus');
  * @param newStatus - The new status to set for the contest.
  * @throws Error - If the user is not an Admin or Opener.
  */
-export async function callChangeContestStatus(contest: Contest, newStatus: ContestStatusType) {
+export async function callChangeContestStatus(contest: Contest, newStatus: ContestStatusType, locationId: number) {
   const session = await auth();
-  if (isOpener(session) === false) {
+  const hasRole = await checkUserLocationRole(session?.user?.id!, locationId, LocationRoleEnum.Enum.opener);
+  if (!hasRole) {
     throw new Error('You must be Admin or Opener to perform this action. User id: ' + session?.user?.id);
   }
   

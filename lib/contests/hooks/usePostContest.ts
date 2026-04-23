@@ -18,7 +18,7 @@ export const usePostContest = () => {
    * @param coverImage - The cover image file to be uploaded.
    * @returns A promise that resolves to the posted contest object, or null if an error occurred.
    */
-  const postContestData = async (contest: Contest, newPhoto: File | null): Promise<Contest | null> => {
+  const postContestData = async (contest: Contest, newPhoto: File | null, locationId: number): Promise<Contest | null> => {
     setIsLoading(true);
     setError(null);
 
@@ -32,6 +32,7 @@ export const usePostContest = () => {
       // handle image upload
       if (newPhoto) {
         formData.append('coverPhoto', newPhoto);
+        formData.append('locationId', locationId.toString());
         setLoadingMessage('Uploading image...');
         const photoUrl = await postCoverImage(formData);
         formData.set('coverImageUrl', photoUrl);
@@ -39,7 +40,7 @@ export const usePostContest = () => {
 
       // Handle post contest
       setLoadingMessage('Posting contest...');
-      const newContest = await postContest(contest.id, formData);
+      const newContest = await postContest(contest.id, formData, locationId);
       return newContest;
     } catch (err) {
       console.error(err);

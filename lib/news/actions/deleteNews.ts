@@ -1,21 +1,22 @@
 'use server'
+import prisma from '@/prisma';
 import { auth } from "@/auth";
-import { isOpener } from "@/utils/session.utils";
-import { PrismaClient } from '@prisma/client/edge';
+import { checkUserLocationRole } from "@/lib/locations/actions/checkUserLocationRole";
+import { LocationRoleEnum } from "@/domain/LocationRole.enum";
 import { createActionLogger } from '@/utils/logger';
-
-const prisma = new PrismaClient()
 const logger = createActionLogger('markNewsAsDeleted');
 
 /**
  * Marks a news as deleted.
- * 
+ *
  * @param newsId - The news id.
+ * @param locationId - The location id.
  * @throws Error - If the user is not an Admin.
  */
-export async function markNewsAsDeleted(newsId: number) {
+export async function markNewsAsDeleted(newsId: number, locationId: number) {
   const user = await auth();
-  if (isOpener(user) === false) {
+  const hasRole = await checkUserLocationRole(user?.user?.id!, locationId, LocationRoleEnum.Enum.opener);
+  if (!hasRole) {
     const error = new Error('You must be an admin to perform this action.');
     logger.error(error, { newsId, userId: user?.user?.id });
     throw error;

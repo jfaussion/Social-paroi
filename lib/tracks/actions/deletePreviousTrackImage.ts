@@ -1,7 +1,8 @@
 
 'use server';
 import { auth } from '@/auth';
-import { isOpener } from '@/utils/session.utils';
+import { checkUserLocationRole } from '@/lib/locations/actions/checkUserLocationRole';
+import { LocationRole } from '@/domain/LocationRole.enum';
 import { deleteImageFromCloudinary } from '@/lib/cloudinary/deleteFromCloudinary';
 import { createActionLogger } from '@/utils/logger';
 
@@ -10,13 +11,17 @@ const logger = createActionLogger('deletePreviousTrackImage');
 
 /**
  * Deletes the previous image from Cloudinary.
- * 
- * @param track - The track to delete the image from.
+ *
+ * @param track - The track form data (must include locationId).
  * @throws Error - If the user is not an Admin or Opener.
  */
 export async function deletePreviousTrackImage(track: FormData) {
   const user = await auth();
-  if (isOpener(user) === false){
+  const locationId = parseInt(track.get('locationId') as string);
+  const isOpener = user?.user?.id && locationId
+    ? await checkUserLocationRole(user.user.id, locationId, LocationRole.opener)
+    : false;
+  if (!isOpener) {
     const error = new Error('You must be Admin or Opener in to perform this action.');
     logger.error(error, { userId: user?.user?.id });
     throw error;

@@ -1,19 +1,20 @@
 'use server'
+import prisma from '@/prisma';
 import { Contest } from "@/domain/Contest.schema"; // Adjust the import based on your schema
-import { PrismaClient } from '@prisma/client/edge';
 import { createActionLogger } from '@/utils/logger';
-
-const prisma = new PrismaClient();
 const logger = createActionLogger('getAllContests');
 
 /**
  * Retrieves all contests.
  * @returns A promise that resolves to an array of active contests ordered by date.
  */
-export async function getAllContests(): Promise<Contest[]> {
+export async function getAllContests(locationId: number): Promise<Contest[]> {
   logger.start();
   try {
     const activeContests = await prisma.contest.findMany({
+      where: {
+        locationId,
+      },
       orderBy: {
         date: 'asc',
       },

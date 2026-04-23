@@ -1,31 +1,38 @@
 'use server';
-import { PrismaClient } from '@prisma/client/edge';
+import prisma from '@/prisma';
+import { TrackStatus } from '@/domain/TrackStatus.enum';
 import { createActionLogger } from '@/utils/logger';
-
-const prisma = new PrismaClient();
 const logger = createActionLogger('getUserRankings');
 
 /**
  * Retrieves the user rankings.
  * @returns A Promise that resolves to an array of user rankings.
  */
-export async function getUserRankings() {
+export async function getUserRankings(locationId: number) {
   logger.start();
   try {
     const rankings = await prisma.user.findMany({
+      where: {
+        locationMemberships: {
+          some: { locationId },
+        },
+      },
       select: {
         id: true,
         name: true,
         image: true,
         UserTrackProgress: {
+          where: {
+            status: TrackStatus.DONE,
+          },
           select: {
             track: {
               select: {
                 points: true,
               },
               where: {
-                removed: false, // Filter out removed tracks
-                locationId: 1, // TODO: Remove this once we have a real location
+                removed: false,
+                locationId,
               }
             },
           }

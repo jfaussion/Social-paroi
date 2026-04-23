@@ -3,15 +3,15 @@ import { Track } from '@/domain/Track.schema';
 import { Filters } from '@/domain/Filters';
 import { searchTrackForContest } from '../actions/searchContestTrack';
 
-export const useFetchCotnestTracks = () => {
+export const useFetchContestTracks = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function fetchTracks(contestId: number, filters: Filters): Promise<Track[]> {
+  async function fetchTracks(contestId: number, filters: Filters, locationId: number): Promise<Track[]> {
     setIsLoading(true);
     setError(null);
     try {
-      const trackList = await searchTrackForContest(contestId, filters);
+      const trackList = await searchTrackForContest(contestId, filters, locationId);
       setIsLoading(false);
       return trackList;
     } catch (err) {

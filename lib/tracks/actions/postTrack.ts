@@ -1,26 +1,20 @@
 'use server';
-import { PrismaClient } from '@prisma/client/edge';
+import prisma from '@/prisma';
 import { auth } from '@/auth';
-import { isOpener } from '@/utils/session.utils';
+import { checkUserLocationRole } from '@/lib/locations/actions/checkUserLocationRole';
+import { LocationRole } from '@/domain/LocationRole.enum';
+import { parseIntOrThrow } from '@/lib/utils/validation';
 import { createActionLogger } from '@/utils/logger';
-
-const prisma = new PrismaClient();
 const logger = createActionLogger('postNewTrack');
 
-/**
- * Creates a new track or updates an existing one.
- * Assuming the image is uploaded and the URL is passed in the form data.
- * 
- * @param trackId - The track id.
- * @param track - The track data.
- * @throws Error - If the user is not an Admin or Opener.
- */
 export async function postNewTrack(
   trackId: number | undefined,
-  track: FormData
+  track: FormData,
+  locationId: number
 ) {
   const user = await auth();
-  if (isOpener(user) === false){
+  const isOpener = user?.user?.id ? await checkUserLocationRole(user.user.id, locationId, LocationRole.opener) : false;
+  if (!isOpener) {
     const error = new Error('You must be Admin or Opener in to perform this action.');
     logger.error(error, { trackId, userId: user?.user?.id });
     throw error;
@@ -28,12 +22,16 @@ export async function postNewTrack(
 
   try {
     const name = track.get('name') as string;
-    const zone = parseInt(track.get('zone') as string);
-    const level = track.get('level') as string;
-    const holdColor = track.get('holdColor') as string;
-    const points = parseInt(track.get('points') as string);
+    const zone = parseIntOrThrow(track.get('zone') as string, 'zone');
+    const zoneId = parseIntOrThrow(track.get('zoneId') as string, 'zoneId');
+    const holdColorIdStr = track.get('holdColorId') as string | null;
+    const holdColorId = holdColorIdStr ? parseIntOrThrow(holdColorIdStr, 'holdColorId') : undefined;
+    const points = parseIntOrThrow(track.get('points') as string, 'points');
     const imageUrl = track.get('imageUrl') as string;
     const removedFlag = track.get('removed') === 'true';
+    const difficultyLevelIdStr = track.get('difficultyLevelId') as string | null;
+    const difficultyLevelId = difficultyLevelIdStr ? parseIntOrThrow(difficultyLevelIdStr, 'difficultyLevelId') : undefined;
+    const level = 'Unknown';
 
     logger.start({
       trackId: trackId ?? null,
@@ -50,22 +48,26 @@ export async function postNewTrack(
       update: {
         name,
         zone,
+        zoneId,
         level,
-        holdColor,
+        holdColorId: holdColorId ?? null,
         points,
         imageUrl,
         removed: removedFlag,
+        difficultyLevelId: difficultyLevelId || undefined,
       },
       create: {
         name,
         zone,
+        zoneId,
         level,
-        holdColor,
+        holdColorId: holdColorId ?? null,
         points,
         date: new Date(),
         imageUrl,
         removed: false,
-        locationId: 1, // TODO: Remove this once we have a real location
+        locationId,
+        difficultyLevelId: difficultyLevelId || undefined,
       },
     });
     logger.success({ trackId: newTrack.id, level: newTrack.level, zone: newTrack.zone });

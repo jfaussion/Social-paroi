@@ -3,16 +3,13 @@ import Select, { ActionMeta, MultiValue } from 'react-select';
 import customSelectClassName from '../ui/customSelectClassName';
 
 type FilterProps = {
+  zones: Array<{ id: number; name: string }>;
   selectedFilters: number[];
-  onChange: Function
+  onChange: Function;
 };
 
-const ZoneFilter: React.FC<FilterProps> = ({ selectedFilters, onChange }) => {
-  const zones = Array.from({ length: 10 }, (_, i) => i + 1);
-  const zoneOptions = zones.map(zone => ({
-    value: zone,
-    label: `Zone ${zone}`
-  }));
+const ZoneFilter: React.FC<FilterProps> = ({ zones, selectedFilters, onChange }) => {
+  const zoneOptions = zones.map(z => ({ value: z.id, label: z.name }));
 
   return (
     <Select
@@ -20,7 +17,7 @@ const ZoneFilter: React.FC<FilterProps> = ({ selectedFilters, onChange }) => {
       isMulti
       isSearchable={false}
       name="zones"
-      value={selectedFilters.map(zone => ({ value: zone, label: `Zone ${zone}` }))}
+      value={selectedFilters.map(id => zoneOptions.find(o => o.value === id)).filter(Boolean) as { value: number; label: string }[]}
       options={zoneOptions}
       className="basic-multi-select"
       classNamePrefix="select"
@@ -33,5 +30,3 @@ const ZoneFilter: React.FC<FilterProps> = ({ selectedFilters, onChange }) => {
 };
 
 export default ZoneFilter;
-
-

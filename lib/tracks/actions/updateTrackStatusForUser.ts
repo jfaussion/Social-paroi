@@ -1,12 +1,12 @@
 'use server';
-import { PrismaClient } from '@prisma/client/edge';
+import prisma from '@/prisma';
+import type { PrismaClient } from '@prisma/client';
 import { TrackStatus } from '@/domain/TrackStatus.enum';
 import { ContestStatusEnum } from '@/domain/ContestStatus.enum';
-import { isOpener } from '@/utils/session.utils';
+import { checkUserLocationRole } from '@/lib/locations/actions/checkUserLocationRole';
+import { LocationRole } from '@/domain/LocationRole.enum';
 import { auth } from '@/auth';
 import { createActionLogger } from '@/utils/logger';
-
-const prisma = new PrismaClient()
 const logger = createActionLogger('updateTrackStatusForUser');
 
 async function updateRegularTrackStatus(
@@ -112,7 +112,24 @@ export async function updateTrackStatusForUser(
       logger.error(error, { trackId, userId });
       throw error;
     }
-    
+
+    const track = await prisma.track.findUnique({ where: { id: trackId }, select: { locationId: true } });
+    if (!track) throw new Error('Track not found');
+    if (track.locationId === null) throw new Error('Track has no associated location');
+
+    const isOpener = await checkUserLocationRole(user.user.id, track.locationId, LocationRole.opener);
+
+    if (!isOpener) {
+      const membership = await prisma.userLocation.findFirst({
+        where: { userId: user.user.id, locationId: track.locationId },
+      });
+      if (!membership) {
+        const error = new Error('User is not a member of this location');
+        logger.error(error, { trackId, userId });
+        throw error;
+      }
+    }
+
     return await prisma.$transaction(async (tx) => {
       // Update regular track status
       await updateRegularTrackStatus(tx, trackId, userId, newStatus);
@@ -127,12 +144,12 @@ export async function updateTrackStatusForUser(
         contestTrackCount: activeContestTracks.length,
       });
       let updatedContestTracks = 0;
-      
+
       for (const contestTrack of activeContestTracks) {
         const contestUser = contestTrack.contest.contestUsers[0];
         const isSelfContester = contestUser?.userId === user.user?.id;
-        const canUpdateContestTrack = isOpener(user) || (isSelfContester && contestTrack.contest.status === ContestStatusEnum.Enum.InProgress)
-        
+        const canUpdateContestTrack = isOpener || (isSelfContester && contestTrack.contest.status === ContestStatusEnum.Enum.InProgress)
+
         if (contestUser && canUpdateContestTrack) {
           await updateContestTrackStatus(tx, contestTrack, contestUser, newStatus);
           updatedContestTracks += 1;

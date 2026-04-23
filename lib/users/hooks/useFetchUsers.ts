@@ -6,11 +6,11 @@ export const useFetchUsers = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function fetchUsers() : Promise<User[]> {
+  async function fetchUsers(locationId?: number) : Promise<User[]> {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await getAllUsersWithContests();
+      const data = await getAllUsersWithContests(locationId);
       setIsLoading(false);
       return data as User[];
     } catch (err) {

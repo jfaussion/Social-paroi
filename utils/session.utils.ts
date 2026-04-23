@@ -10,13 +10,8 @@ const isNotConnected = (session: Session | null): boolean => {
   return !session?.user?.id;
 }
 
-const isOpenerOrAdmin = (session: Session | null): boolean => {
-  return (session?.user as AdapterUserCustom)?.role === UserRoleEnum.Enum.opener
-  || (session?.user as AdapterUserCustom)?.role === UserRoleEnum.Enum.admin;
+const isSuperAdmin = (session: Session | null): boolean => {
+  return (session?.user as AdapterUserCustom)?.role === UserRoleEnum.Enum.super_admin;
 }
 
-const isAdmin = (session: Session | null): boolean => {
-  return (session?.user as AdapterUserCustom)?.role === UserRoleEnum.Enum.admin;
-}
-
-export { isConnected, isNotConnected, isAdmin, isOpenerOrAdmin as isOpener };
+export { isConnected, isNotConnected, isSuperAdmin };

@@ -1,10 +1,8 @@
 'use server';
 
-import { PrismaClient } from '@prisma/client/edge';
+import prisma from '@/prisma';
 import { ContestRankingType } from '@/domain/ContestRankingType.enum';
 import { createActionLogger } from '@/utils/logger';
-
-const prisma = new PrismaClient();
 const logger = createActionLogger('exportRankingToCsv');
 
 export async function exportRankingToCsv(contestId: number, type: ContestRankingType): Promise<string> {
