@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { DifficultyEnum } from './Difficulty.enum';
 import { UserTrackProgressSchema } from './UserTrackProgress.schema';
 import { UserSchema } from './User.schema';
 import { ContestUserTrackSchema } from './ContestUserTrack.schema';
@@ -21,8 +20,6 @@ export const TrackSchema = z.object({
     name: z.string(),
     color: z.string(),
   }).nullable().optional(),
-  level: DifficultyEnum.catch('Unknown'), // Deprecated
-  zone: z.number(),
   points: z.number(),
   // Regular track progress (for non-contest tracks)
   trackProgress: UserTrackProgressSchema.nullable().optional(),

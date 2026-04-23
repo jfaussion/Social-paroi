@@ -22,7 +22,6 @@ export async function postNewTrack(
 
   try {
     const name = track.get('name') as string;
-    const zone = parseIntOrThrow(track.get('zone') as string, 'zone');
     const zoneId = parseIntOrThrow(track.get('zoneId') as string, 'zoneId');
     const holdColorIdStr = track.get('holdColorId') as string | null;
     const holdColorId = holdColorIdStr ? parseIntOrThrow(holdColorIdStr, 'holdColorId') : undefined;
@@ -31,12 +30,9 @@ export async function postNewTrack(
     const removedFlag = track.get('removed') === 'true';
     const difficultyLevelIdStr = track.get('difficultyLevelId') as string | null;
     const difficultyLevelId = difficultyLevelIdStr ? parseIntOrThrow(difficultyLevelIdStr, 'difficultyLevelId') : undefined;
-    const level = 'Unknown';
 
     logger.start({
       trackId: trackId ?? null,
-      level,
-      zone,
       hasImage: Boolean(imageUrl),
       removedFlag,
     });
@@ -47,9 +43,7 @@ export async function postNewTrack(
       },
       update: {
         name,
-        zone,
         zoneId,
-        level,
         holdColorId: holdColorId ?? null,
         points,
         imageUrl,
@@ -58,9 +52,7 @@ export async function postNewTrack(
       },
       create: {
         name,
-        zone,
         zoneId,
-        level,
         holdColorId: holdColorId ?? null,
         points,
         date: new Date(),
@@ -70,7 +62,7 @@ export async function postNewTrack(
         difficultyLevelId: difficultyLevelId || undefined,
       },
     });
-    logger.success({ trackId: newTrack.id, level: newTrack.level, zone: newTrack.zone });
+    logger.success({ trackId: newTrack.id });
     return newTrack;
   } catch (err) {
     logger.error(err, { trackId });

@@ -19,11 +19,9 @@ export const usePostTracks = (locationId: number) => {
       formData.append('date', track.date.toString());
       formData.append('imageUrl', track.imageUrl?.toString() ?? '');
       if (track.holdColorId != null) {
-        formData.append('holdColorId', track.holdColorId.toString());
+        formData.append('holdColorId', track.holdColorId?.toString());
       }
-      formData.append('level', track.level);
-      formData.append('zone', track.zone.toString());
-      formData.append('zoneId', (track.zoneId ?? track.zone).toString());
+      formData.append('zoneId', track.zoneId?.toString() ?? '');
       formData.append('points', track.points.toString());
       formData.append('removed', track.removed.toString());
       if (track.difficultyLevelId) {

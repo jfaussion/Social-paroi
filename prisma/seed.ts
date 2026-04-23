@@ -59,25 +59,7 @@ async function main() {
   }
   console.log('Upserted 10 zones for location 1')
 
-  // Step 6: Backfill Track.zoneId from Track.zone for tracks belonging to location 1
-  for (let n = 1; n <= 10; n++) {
-    const zone = await prisma.zone.findUnique({
-      where: { locationId_order: { locationId: 1, order: n } },
-    })
-    if (zone) {
-      await prisma.track.updateMany({
-        where: {
-          zone: n,
-          OR: [{ locationId: 1 }, { locationId: null }],
-          zoneId: null,
-        },
-        data: { zoneId: zone.id },
-      })
-    }
-  }
-  console.log('Backfilled Track.zoneId from Track.zone for location 1 tracks')
-
-  // Step 7: Migrate existing User.role values to UserLocationRole
+  // Step 6: Migrate existing User.role values to UserLocationRole
   const users = await prisma.user.findMany({
     where: { role: { in: ['opener', 'admin'] } },
   })
