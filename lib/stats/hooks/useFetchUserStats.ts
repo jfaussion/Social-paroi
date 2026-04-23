@@ -5,11 +5,11 @@ export const useFetchUserStats = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function fetchStats(userId: string): Promise<any> {
+  async function fetchStats(userId: string, locationId: number): Promise<any> {
     setIsLoading(true);
     setError(null);
     try {
-      const userStats = await getUserStats(userId);
+      const userStats = await getUserStats(userId, locationId);
       setIsLoading(false);
       return userStats;
     } catch (err) {

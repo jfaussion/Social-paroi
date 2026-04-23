@@ -1,23 +1,30 @@
 'use server';
 import { auth } from '@/auth';
-import { isOpener } from '@/utils/session.utils';
+import { checkUserLocationRole } from '@/lib/locations/actions/checkUserLocationRole';
+import { LocationRole } from '@/domain/LocationRole.enum';
 import { uploadImageToCloudinary } from '@/lib/cloudinary/uploadToCloudinary';
 import { deleteImageFromCloudinary } from '@/lib/cloudinary/deleteFromCloudinary';
 import { CloudinarySubfolders } from '@/lib/cloudinary/cloudinarySubfolders';
+import { parseIntOrThrow } from '@/lib/utils/validation';
+import prisma from '@/prisma';
 import { createActionLogger } from '@/utils/logger';
 
 const logger = createActionLogger('postActivityImage');
 
-/**
- * Uploads a new activity image to Cloudinary and deletes the previous one if necessary.
- * 
- * @param activity - The activity form data containing the image.
- * @throws Error - If the user is not an Admin or Opener.
- * @returns The URL of the uploaded activity image.
- */
 export async function postActivityImage(activity: FormData) {
   const user = await auth();
-  if (!isOpener(user)) {
+  const contestIdStr = activity.get('contestId') as string | null;
+  if (!contestIdStr) {
+    const error = new Error('contestId is required');
+    logger.error(error, { userId: user?.user?.id });
+    throw error;
+  }
+  const contestId = parseIntOrThrow(contestIdStr, 'contestId');
+  const contest = await prisma.contest.findUnique({ where: { id: contestId }, select: { locationId: true } });
+  const isOpener = user?.user?.id && contest?.locationId
+    ? await checkUserLocationRole(user.user.id, contest.locationId, LocationRole.opener)
+    : false;
+  if (!isOpener) {
     const error = new Error('You must be Admin or Opener to perform this action.');
     logger.error(error, { userId: user?.user?.id });
     throw error;
@@ -50,4 +57,4 @@ export async function postActivityImage(activity: FormData) {
     logger.error(err, { hasPhoto: photoPresent, hadExistingImage: imagePresent });
     return '';
   }
-} 
+}

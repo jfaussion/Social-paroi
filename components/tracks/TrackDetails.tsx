@@ -9,29 +9,30 @@ import { useUpdateTrackProgress } from '@/lib/tracks/hooks/useUpdateTrackProgres
 import ToggleButton from '../ui/ToggleButton';
 import RemovedLabel from '../ui/RemovedLabel';
 import { TrackStatus } from '@/domain/TrackStatus.enum';
-import { getBgColorForDifficulty } from '@/utils/difficulty.utils';
-import { getBgColor } from '@/utils/color.utils';
+
 import { Button } from '../ui/Button';
-import { isOpener } from '@/utils/session.utils';
 import { useChangeMountedTrackStatus } from '@/lib/tracks/hooks/useChangeMountedTrackStatus';
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import ConfirmationDialog from '../ui/ConfirmDialog';
 import { useDeleteTrack } from '@/lib/tracks/hooks/useDeleteTrack';
 import { Zone } from '../Zone';
 import { FaChevronLeft, FaChevronRight, FaUserCheck } from 'react-icons/fa6';
 import TrackCompletionList from './TrackCompletionList';
 
+type TrackDetailsProps = Track & { isOpener: boolean };
 
-const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
+const TrackDetails: React.FC<TrackDetailsProps> = ({ isOpener: isOpenerProp, ...propTrack }) => {
   const [track, setTrack] = useState<Track>(propTrack);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
   const { updateTrackStatus, isLoading: isLoadingTrackStatus, error: errorTrackStatus } = useUpdateTrackProgress();
   const { deleteTrack, isLoading: isLoadingDelete, error: errorDelete, reset: resetDelete } = useDeleteTrack();
   const { changeMountedTrackStatus, isLoading: isLoadingRemove, error: errorRemove } = useChangeMountedTrackStatus();
   const session = useSession();
-  const levelClass = getBgColorForDifficulty(track.level);
-  const holdClass = getBgColor(track.holdColor);
+  const levelColor = track.difficultyLevel?.color;
+  const holdColor = track.holdColor?.color;
   const router = useRouter();
+  const pathname = usePathname();
+  const locationSlug = pathname.split('/')[1] ?? '';
   const [isCompletionListOpen, setCompletionListOpen] = useState<boolean>(false);
   const searchParams = useSearchParams();
 
@@ -45,12 +46,12 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
   const nextTrackId = trackList[currentIndex + 1] ?? null;
 
   const navigateToTrack = (trackId: number) => {
-    router.push(`/dashboard/track/${trackId}?trackList=${encodeURIComponent(JSON.stringify(trackList))}`);
+    router.push(`/${locationSlug}/tracks/track/${trackId}?trackList=${encodeURIComponent(JSON.stringify(trackList))}`);
   };
 
   const handleStatusChange = async () => {
     const previousStatus = track.trackProgress?.status ?? TrackStatus.TO_DO;
-    const newStatus = track.trackProgress?.status === TrackStatus.TO_DO ? TrackStatus.DONE : TrackStatus.TO_DO;
+    const newStatus = previousStatus === TrackStatus.TO_DO ? TrackStatus.DONE : TrackStatus.TO_DO;
     setTrack({
       ...track, trackProgress: {
         ...track.trackProgress,
@@ -168,20 +169,24 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
             <ToggleButton isActive={track.trackProgress?.status === TrackStatus.DONE} isDisabled={false} onChange={handleStatusChange} />
           </div>
 
-          {/* Zone and Date row */}
+          {/* Difficulty and Date row */}
           <div className="flex justify-between items-center mb-3">
             <div>
               <span className="text-sm font-medium mr-2">Difficulty</span>
-              <span className={`inline-block w-14 h-3 rounded ${levelClass}`}></span>
+              <span className="inline-block w-14 h-3 rounded bg-gray-500 border border-black dark:border-white"
+                style={levelColor ? { backgroundColor: levelColor } : undefined}></span>
             </div>
             <span className="text-sm text-gray-600 dark:text-gray-400">{track.date ? track.date.toLocaleDateString() : '...'}</span>
           </div>
 
-          {/* Difficulty and Points row */}
+          {/* Hold color and Points row */}
           <div className="flex justify-between items-center mb-3">
             <div>
               <span className="text-sm font-medium mr-2">Hold color</span>
-              <span className={`inline-block w-14 h-3 ${holdClass} rounded`}></span>
+              <span
+                className="inline-block w-14 h-3 rounded border border-black dark:border-white"
+                style={holdColor ? { backgroundColor: holdColor } : undefined}
+              ></span>
             </div>
             <span className="text-sm font-semibold">{track.points}pts</span>
           </div>
@@ -193,7 +198,7 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
               )}
             </div>
 
-            <div className="flex flex-end items-center text-sm space-x-2 font-semibold mr-2 cursor-pointer" 
+            <div className="flex flex-end items-center text-sm space-x-2 font-semibold mr-2 cursor-pointer"
                 onClick={() => setCompletionListOpen(true)}>
               <span>{track.usersWhoCompleted?.length ?? 0}</span>
               <FaUserCheck title="Nb of users that completed this track"/>
@@ -201,12 +206,12 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
           </div>
 
           <div className="flex justify-center sm:justify-between items-center pt-3 mb-3">
-            <Zone zone={track.zone} width={200} height={100} />
+            <Zone miniMapUrl={track.zoneRef?.miniMapUrl} zoneName={track.zoneRef?.name} width={200} height={100} />
           </div>
 
         </div>
 
-        {isOpener(session.data) && (
+        {isOpenerProp && (
           <div className='p-4 w-full border-t-2 border-gray-600 sm:border sm:border-gray-600 sm:rounded-lg dark:bg-gray-900 sm:m-4 sm:mt-0 space-y-2'>
 
             <h2 className="text-lg font-bold mb-3">Editor zone</h2>
@@ -232,9 +237,10 @@ const TrackDetails: React.FC<Track> = ({ ...propTrack }) => {
       </div>
       <ConfirmationDialog isOpen={isDeleteDialogOpen} title='Delete block' text='Are you sure you want to delete this block ?'
         onCancel={handleCancelDelete} onConfirm={handleDeleteTrack}
+        confirmBtnType="danger"
         error={errorDelete ?? undefined} isLoading={isLoadingDelete} loadingMessage='Deleting block...'></ConfirmationDialog>
 
-      <TrackCompletionList isOpen={isCompletionListOpen} userRanking={track.usersWhoCompleted ?? []} 
+      <TrackCompletionList isOpen={isCompletionListOpen} userRanking={track.usersWhoCompleted ?? []}
         onClose={() => {setCompletionListOpen(false)}} currentUserId={session.data?.user?.id} />
     </main>
   )

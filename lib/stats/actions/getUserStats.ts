@@ -10,16 +10,15 @@ const logger = createActionLogger('getUserStats');
  * @param userId - The ID of the user.
  * @returns The processed statistics for the user.
  */
-export async function getUserStats(userId: string) {
+export async function getUserStats(userId: string, locationId: number) {
   logger.start({ userId });
   try {
-    // Query to get tracks and done by the user, and total done by the user
     const userTrackStats = await prisma.userTrackProgress.findMany({
       where: {
         userId,
         status: 'DONE',
         track: {
-          locationId: 1, // TODO: Remove this once we have a real location
+          locationId,
         }
       },
       select: {
@@ -32,18 +31,26 @@ export async function getUserStats(userId: string) {
       },
     });
 
-    // Query to get total number of tracks mounted by difficulty
     const totalMountedTracksByDifficulty = await prisma.track.groupBy({
       by: ['level'],
       where: {
         removed: false,
-        locationId: 1, // TODO: Remove this once we have a real location
+        locationId,
       },
       _count: {
         _all: true,
       },
     });
-    const processStats = processTrackStats(userTrackStats as { track: Track }[], totalMountedTracksByDifficulty as { _count: { _all: number }, level: string }[]);
+
+    const difficultyLevels = await prisma.difficultyLevel.findMany({
+      where: { locationId },
+      select: { name: true, color: true },
+    });
+    const colorMap: Record<string, string | null> = Object.fromEntries(
+      difficultyLevels.map(dl => [dl.name, dl.color])
+    );
+
+    const processStats = processTrackStats(userTrackStats as { track: Track }[], totalMountedTracksByDifficulty as { _count: { _all: number }, level: string }[], colorMap);
 
     logger.success({
       userId,

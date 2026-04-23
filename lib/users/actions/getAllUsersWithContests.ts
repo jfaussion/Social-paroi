@@ -7,10 +7,13 @@ const logger = createActionLogger('getAllUsersWithContests');
  * Retrieves all users and their contest participation.
  * @returns A Promise that resolves to an array of users with their contest participation.
  */
-export async function getAllUsersWithContests() {
+export async function getAllUsersWithContests(locationId?: number) {
   logger.start();
   try {
     const users = await prisma.user.findMany({
+      where: locationId
+        ? { locationMemberships: { some: { locationId } } }
+        : undefined,
       select: {
         id: true,
         name: true,

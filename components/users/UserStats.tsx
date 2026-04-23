@@ -3,12 +3,10 @@ import { useFetchUserStats } from "@/lib/stats/hooks/useFetchUserStats";
 import DonutChart from "../ui/DonutChart";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { DifficultyType } from "@/domain/Difficulty.enum";
-import { getBgColorForDifficulty } from "@/utils/difficulty.utils";
 import { TrackStats } from "@/domain/TrackStats.schema";
 import { StatsPlaceHolder } from "./StatsPlaceholder";
 
-const UserStats = () => {
+const UserStats = ({ locationId }: { locationId: number }) => {
   const { fetchStats, isLoading, error } = useFetchUserStats();
   const session = useSession();
   const [userStats, setUserStats] = useState<TrackStats[]>([]);
@@ -19,7 +17,7 @@ const UserStats = () => {
 
     const getStats = async () => {
       if (session.data?.user?.id) {
-        const stats = await fetchStats(session.data.user.id);
+        const stats = await fetchStats(session.data.user.id, locationId);
         if (isMounted) {
           setUserStats(stats);
         }
@@ -31,7 +29,7 @@ const UserStats = () => {
     return () => {
       isMounted = false;
     };
-  }, [session.data?.user?.id]);
+  }, [session.data?.user?.id, locationId]);
 
   if (!session.data?.user?.id) return null;
 
@@ -53,11 +51,12 @@ const UserStats = () => {
                 <span className="text-sm w-[4rem] sm:w-[8rem] text-end font-semibold">All time</span>
               </div>
             </div>
-            {userStats.map(({ level, mountedDone, totalDone, totalMounted }: TrackStats) => (
+            {userStats.map(({ level, color, mountedDone, totalDone, totalMounted }: TrackStats) => (
               <div key={level}>
                 <div className="flex justify-between mb-3" >
                   <div className="flex items-center mb-10 space-x-2">
-                    <span className={`h-3 w-3 rounded-full ${getBgColorForDifficulty(level as DifficultyType)}`}></span>
+                    <span className="h-3 w-3 rounded-full bg-gray-500 border border-black dark:border-white"
+                      style={color ? { backgroundColor: color } : undefined}></span>
                     <span className="text-sm font-medium">{level}</span>
                   </div>
                   <div className="flex justify-self-end space-x-2">

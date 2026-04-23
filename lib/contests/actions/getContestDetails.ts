@@ -2,26 +2,27 @@
 import prisma from '@/prisma';
 import { ContestSchema } from '@/domain/Contest.schema';
 import { createActionLogger } from '@/utils/logger';
+import { checkUserLocationMembership } from '@/lib/locations/actions/checkUserLocationMembership';
 const logger = createActionLogger('getContestDetails');
 
-/**
- * Retrieves the details of a contest.
- * @param contestId - The ID of the contest.
- * @param userId - The ID of the user. (used to fetch the user progress on this contest)
- * @returns A Promise that resolves to the contest details with progress, or null if the contest is not found or an error occurs.
- */
 export async function getContestDetails(
   contestId: number,
-  userId: string
+  userId: string,
+  locationId?: number
 ) {
-  logger.start({ contestId, userId });
+  logger.start({ contestId, userId, locationId });
   try {
     const contest = await prisma.contest.findUnique({
       where: { id: contestId },
       include: {
         contestTracks: {
           include: {
-            track: true,
+            track: {
+              include: {
+                zoneRef: true,
+                difficultyLevel: true,
+              }
+            },
             userResults: {
               where: {
                 contestUser: {
@@ -57,31 +58,43 @@ export async function getContestDetails(
       },
     });
 
-    if (contest) {
-      // Validate and return the contest details using the schema
-      const parsedContest = ContestSchema.parse({
-        ...contest,
-        activities: contest.contestActivities.map(activity => ({
-          ...activity,
-          userScore: activity.userResults[0]?.score || 0
-        })),
-        users: contest.contestUsers,
-        tracks: contest.contestTracks.map(ct => ({
-          ...ct.track,
-          contestProgress: ct.userResults[0] || null
-        })),
-      });
-      logger.success({
-        contestId,
-        userId,
-        activityCount: contest.contestActivities.length,
-        trackCount: contest.contestTracks.length,
-        userCount: contest.contestUsers.length
-      });
-      return parsedContest;
+    if (!contest) {
+      logger.info('contestNotFound', { contestId, userId });
+      return null;
     }
-    logger.info('contestNotFound', { contestId, userId });
-    return null;
+
+    if (!contest.locationId) {
+      logger.error(new Error('Contest has no location'), { contestId, userId });
+      return null;
+    }
+
+    const isMember = await checkUserLocationMembership(userId, contest.locationId);
+    if (!isMember) {
+      logger.error(new Error('Unauthorized access attempt'), { contestId, userId, locationId: contest.locationId });
+      return null;
+    }
+
+    const parsedContest = ContestSchema.parse({
+      ...contest,
+      activities: contest.contestActivities.map(activity => ({
+        ...activity,
+        userScore: activity.userResults[0]?.score || 0
+      })),
+      users: contest.contestUsers,
+      tracks: contest.contestTracks.map(ct => ({
+        ...ct.track,
+        contestProgress: ct.userResults[0] || null
+      })),
+    });
+    logger.success({
+      contestId,
+      locationId: parsedContest.locationId,
+      userId,
+      activityCount: contest.contestActivities.length,
+      trackCount: contest.contestTracks.length,
+      userCount: contest.contestUsers.length
+    });
+    return parsedContest;
   } catch (err) {
     logger.error(err, { contestId, userId });
     return null;

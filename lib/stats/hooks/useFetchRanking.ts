@@ -5,11 +5,11 @@ export const useFetchRanking = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function fetchRanking(): Promise<any> {
+  async function fetchRanking(locationId: number): Promise<any> {
     setIsLoading(true);
     setError(null);
     try {
-      const ranking = await getUserRankings();
+      const ranking = await getUserRankings(locationId);
       setIsLoading(false);
       return ranking;
     } catch (err) {

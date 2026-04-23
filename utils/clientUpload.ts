@@ -5,11 +5,11 @@ export type DirectUploadResult = {
   secureUrl: string;
 };
 
-async function getSignature(folder: string) {
+async function getSignature(folder: string, locationId: number) {
   const res = await fetch('/api/uploads/cloudinary-signature', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ folder }),
+    body: JSON.stringify({ folder, locationId }),
   });
   if (!res.ok) throw new Error('Failed to get upload signature');
   return res.json() as Promise<{
@@ -53,8 +53,8 @@ export async function compressImage(file: File, opts?: { maxWidth?: number; qual
   }
 }
 
-export async function directUploadToCloudinary(fileOrBlob: File | Blob, folder: string): Promise<DirectUploadResult> {
-  const sig = await getSignature(folder);
+export async function directUploadToCloudinary(fileOrBlob: File | Blob, folder: string, locationId: number): Promise<DirectUploadResult> {
+  const sig = await getSignature(folder, locationId);
   const form = new FormData();
   form.append('file', fileOrBlob);
   form.append('api_key', sig.apiKey);

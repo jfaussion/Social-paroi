@@ -12,15 +12,16 @@ type ConfirmProps = {
   error?: string;
   isLoading?: boolean;
   loadingMessage?: string;
+  confirmBtnType?: 'primary' | 'secondary' | 'danger';
 };
 
-const ConfirmationDialog: React.FC<ConfirmProps> = ({ isOpen, text, title, onCancel, onConfirm, error, isLoading, loadingMessage }) => {
+const ConfirmationDialog: React.FC<ConfirmProps> = ({ isOpen, text, title, onCancel, onConfirm, error, isLoading, loadingMessage, confirmBtnType = 'secondary' }) => {
 
   return (
     <Popin isOpen={isOpen} onClose={onCancel} title={title}>
       <p>{text}</p>
       <div className="mt-4 flex justify-end space-x-2">
-        <Button btnType='secondary' onClick={onConfirm}>Confirm</Button>
+        <Button btnType={confirmBtnType} onClick={onConfirm}>Confirm</Button>
         <Button btnType='primary' onClick={onCancel}>Cancel</Button>
       </div>
       <Loader isLoading={isLoading ?? false} text={loadingMessage ?? 'Deleting...'} ></Loader>

@@ -1,34 +1,62 @@
 import React, { useId } from 'react';
-import Select, { ActionMeta, SingleValue } from 'react-select';
-import { holdColorCustomSelectClass } from '@/utils/hold.utils';
-import { HoldColorEnum } from '@/domain/HoldColor.enum';
+import Select, { ActionMeta, MultiValue } from 'react-select';
+import customSelectClassName from '../ui/customSelectClassName';
+
+type HoldColorOption = { value: number; label: string; color: string };
 
 type FilterProps = {
-  selectedFilter: string | undefined;
-  onChange: Function;
+  holdColors: { id: number; name: string; color: string }[];
+  selectedIds: number[];
+  onChange: (ids: number[]) => void;
 };
 
-const HoldColorFilter: React.FC<FilterProps> = ({ selectedFilter, onChange }) => {
-  const holdColorOptions = HoldColorEnum.options.map(color => ({
-    value: color,
-    label: color
-  })).filter(option => option.value !== 'Unknown');
+const HoldColorFilter: React.FC<FilterProps> = ({ holdColors, selectedIds, onChange }) => {
+  const options: HoldColorOption[] = holdColors.map(hc => ({
+    value: hc.id,
+    label: hc.name,
+    color: hc.color,
+  }));
 
+  const formatOptionLabel = (option: HoldColorOption) => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+      <span
+        style={{
+          width: '10px',
+          height: '10px',
+          borderRadius: '50%',
+          backgroundColor: option.color,
+          flexShrink: 0,
+        }}
+      />
+      <span>{option.label}</span>
+    </div>
+  );
+
+  const value = selectedIds.map(id => {
+    const opt = options.find(o => o.value === id);
+    return { value: id, label: opt?.label ?? `Color ${id}`, color: opt?.color ?? '#888888' };
+  });
+
+  const handleChange = (newValue: MultiValue<HoldColorOption>, _actionMeta: ActionMeta<HoldColorOption>) => {
+    onChange(newValue.map(o => o.value));
+  };
 
   return (
     <Select
+      isMulti
       isSearchable={false}
       instanceId={useId()}
       isClearable
-      name="holdColors"
-      value={holdColorOptions.find(option => option.value === selectedFilter)}
-      options={holdColorOptions}
+      name="holdColorIds"
+      value={value}
+      options={options}
       className="basic-multi-select"
       classNamePrefix="select"
-      onChange={onChange as (newValue: SingleValue<{ value: string; label: string }>, actionMeta: ActionMeta<any>) => void}
-      classNames={holdColorCustomSelectClass}
+      onChange={handleChange}
+      classNames={customSelectClassName}
       unstyled={true}
       placeholder="Filter by hold color"
+      formatOptionLabel={formatOptionLabel}
     />
   );
 };

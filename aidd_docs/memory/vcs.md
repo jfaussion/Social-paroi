@@ -13,14 +13,10 @@ scope: all
 
 ## Branch Naming Convention
 
-@aidd_docs/templates/vcs/branch.md
-
-### Observed pattern
-
-- `feature/add-logs` (uses `feature/` prefix, kebab-case)
+- Pattern: `feature/add-logs` (uses `feature/` prefix, kebab-case)
 - PRs merged from feature branches into `dev`
 - `dev` periodically merged into `main` for releases
 
 ## Commit Convention
 
-@aidd_docs/templates/vcs/commit.md
+- Conventional Commits format (`fix:`, `feat:`, `chore:`, etc.)

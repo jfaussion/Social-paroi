@@ -43,6 +43,22 @@ flowchart LR
 - **Constants**: UPPER_CASE for enums
 - **Types/Interfaces**: PascalCase, Zod schemas suffixed `.schema.ts`, enums suffixed `.enum.ts`
 
+### Role System
+
+- **Global roles** (`UserRole`): `user`, `opener`, `admin`, `super_admin` — stored on the `User` model, carried in JWT
+- **Location roles** (`LocationRole`): `opener`, `admin` — stored in `UserLocationRole`, scoped per location
+- `isSuperAdmin()` in `session.utils.ts` — client-side UI guard (show/hide super_admin-only buttons)
+- `checkUserLocationRole(userId, locationId, minRole)` — DB-backed server-side auth for all mutation actions; `super_admin` always passes; `admin` satisfies `opener` checks
+- **Location access guard** (`app/[locationSlug]/layout.tsx`): all location routes require membership via `userLocation` table — non-members are redirected to `/locations` regardless of location status; `super_admin` bypasses
+- **Track status auth** (`updateTrackStatusForUser`): server action verifies membership before any write; openers bypass via global role
+
+### Prisma Column Naming
+
+- All camelCase field names use `@map(name: "snake_case")` — DB columns are always snake_case
+- Applies to every multi-word field: FKs, timestamps, any camelCase name
+- Table names use `@@map("snake_case")` — reference model: `UserTrackProgress`
+- Raw SQL in migrations must use the `@map` value, never the Prisma field name
+
 ## Services communication
 
 ### Client → Server flow

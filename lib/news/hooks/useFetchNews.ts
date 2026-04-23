@@ -6,11 +6,11 @@ export const useFetchNews = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function fetchNews(): Promise<News[]> {
+  async function fetchNews(locationId: number): Promise<News[]> {
     setIsLoading(true);
     setError(null);
     try {
-      const newsList = await getAllActiveNews();
+      const newsList = await getAllActiveNews(locationId);
       setIsLoading(false);
       return newsList;
     } catch (err) {

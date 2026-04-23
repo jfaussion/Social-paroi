@@ -8,12 +8,13 @@ const logger = createActionLogger('getAllActiveNews');
  * Retrieves all active news.
  * @returns A promise that resolves to an array of active news ordered by date.
  */
-export async function getAllActiveNews(): Promise<News[]> {
+export async function getAllActiveNews(locationId: number): Promise<News[]> {
   logger.start();
   try {
     const activeNews = await prisma.news.findMany({
       where: {
         deleted: false,
+        locationId,
       },
       orderBy: {
         date: 'desc',

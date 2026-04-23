@@ -2,7 +2,8 @@
 import prisma from '@/prisma';
 import { auth } from "@/auth";
 import { Contest } from "@/domain/Contest.schema"; // Adjust the import based on your schema
-import { isOpener } from "@/utils/session.utils";
+import { checkUserLocationRole } from '@/lib/locations/actions/checkUserLocationRole';
+import { LocationRoleEnum } from '@/domain/LocationRole.enum';
 import { createActionLogger } from '@/utils/logger';
 const logger = createActionLogger('postContest');
 
@@ -13,9 +14,10 @@ const logger = createActionLogger('postContest');
  * @returns A promise that resolves to the posted contest.
  * @throws Error - If the user is not an Admin or Opener.
  */
-export async function postContest(contestId: number, contest: FormData): Promise<Contest | null> {
+export async function postContest(contestId: number, contest: FormData, locationId: number): Promise<Contest | null> {
   const user = await auth();
-  if (isOpener(user) === false) {
+  const hasRole = await checkUserLocationRole(user?.user?.id!, locationId, LocationRoleEnum.Enum.opener);
+  if (!hasRole) {
     const error = new Error('You must be Admin or Opener to perform this action.');
     logger.error(error, { contestId, userId: user?.user?.id });
     throw error;
@@ -45,6 +47,7 @@ export async function postContest(contestId: number, contest: FormData): Promise
         name,
         date: new Date(dateValue),
         coverImage,
+        locationId,
       },
     });
     logger.success({ contestId: newContest.id, hasCoverImage: Boolean(newContest.coverImage) });

@@ -8,10 +8,13 @@ const logger = createActionLogger('getAllContests');
  * Retrieves all contests.
  * @returns A promise that resolves to an array of active contests ordered by date.
  */
-export async function getAllContests(): Promise<Contest[]> {
+export async function getAllContests(locationId: number): Promise<Contest[]> {
   logger.start();
   try {
     const activeContests = await prisma.contest.findMany({
+      where: {
+        locationId,
+      },
       orderBy: {
         date: 'asc',
       },

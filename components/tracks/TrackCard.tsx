@@ -4,10 +4,10 @@ import Image from "next/image";
 import { CldImage } from "next-cloudinary";
 import { Track } from "../../domain/Track.schema";
 import placeholderImage from "@/public/bouldering-placeholder.jpeg";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import ToggleButton from "../ui/ToggleButton";
 import RemovedLabel from "../ui/RemovedLabel";
-import { getBorderColorForDifficulty } from "@/utils/difficulty.utils";
+
 import { Zone } from "../Zone";
 import { TrackStatusHandler } from "@/domain/TrackStatusHandler.type";
 
@@ -26,8 +26,10 @@ const TrackCard: React.FC<TrackCardProps> = ({
   ...propTrack
 }) => {
   const [track, setTrack] = useState<Track>(propTrack);
-  const levelBorderColor = getBorderColorForDifficulty(track.level);
+  const levelColor = track.difficultyLevel?.color;
   const router = useRouter();
+  const pathname = usePathname();
+  const locationSlug = pathname.split('/')[1] ?? '';
   const prevPropTrackRef = useRef<Track | null>(propTrack);
 
   useEffect(() => {
@@ -46,8 +48,8 @@ const TrackCard: React.FC<TrackCardProps> = ({
   const openTrackDetails = () => {
     if (disableNavigation) return;
     localStorage.setItem("lastTrackListUrl", window.location.href);
-    const trackIds = encodeURIComponent(JSON.stringify(trackList?.map(t => t.id))); 
-    router.push(`/dashboard/track/${track.id}?trackList=${trackIds}`);
+    const trackIds = encodeURIComponent(JSON.stringify(trackList?.map(t => t.id)));
+    router.push(`/${locationSlug}/tracks/track/${track.id}?trackList=${trackIds}`);
   };
 
   return (
@@ -81,12 +83,13 @@ const TrackCard: React.FC<TrackCardProps> = ({
       </div>
 
       {/* Right side - Content */}
-      <div className={`w-2/3 flex flex-col justify-between p-4 border-r-8 ${levelBorderColor}`}>
+      <div className="w-2/3 flex flex-col justify-between p-4 border-r-8 border-gray-500"
+        style={levelColor ? { borderRightColor: levelColor } : undefined}>
         <h4 className="text-md font-semibold dark:text-white">{track.name}</h4>
 
         <div className="flex justify-between items-center mt-2">
           <div className="inline-flex items-center space-x-2">
-            <Zone zone={track.zone} width={60} height={50} />
+            <Zone miniMapUrl={track.zoneRef?.miniMapUrl} zoneName={track.zoneRef?.name} width={120} height={100} className="w-[60px] md:w-[90px] h-auto" />
             {track.removed && <RemovedLabel />}
           </div>
           {statusHandler && !hideToggleButton && (

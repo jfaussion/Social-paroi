@@ -17,12 +17,12 @@ flowchart TD
     Components --> UILib["ui/ (generic)"]
     Components --> DomainComponents["Domain components (tracks, contests, news, users, activities, filters)"]
     Pages --> LibLayer["lib/ (Server Actions + Hooks)"]
-    LibLayer --> Actions["actions/ per domain (tracks, contests, news, stats, users)"]
+    LibLayer --> Actions["actions/ per domain (tracks, contests, news, stats, users, locations)"]
     LibLayer --> Hooks["hooks/ per domain (client-side)"]
     LibLayer --> CloudinaryLib["cloudinary/ (upload helpers)"]
     Actions --> PrismaClient["prisma.ts (Prisma client)"]
     PrismaClient --> DB["PostgreSQL (Vercel)"]
-    Domain["domain/ (Zod schemas + enums)"] --> Actions
+    Domain["domain/ (Zod schemas — enums replaced by DB models)"] --> Actions
     Domain --> Components
     Utils["utils/ (shared utilities)"] --> Actions
     Utils --> Components

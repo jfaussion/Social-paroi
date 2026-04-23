@@ -36,6 +36,7 @@ const TrackBulkRemove: React.FC<TrackBulkRemoveProps> = ({ trackList, isRemoveDi
         text={`Are you sure you want to mark as removed all ${trackList.length} selected blocks?`}
         onConfirm={handleRemoveAll}
         onCancel={() => setIsDialogOpen(false)}
+        confirmBtnType="danger"
         error={error ?? undefined}
         isLoading={isLoading}
         loadingMessage="Removing all blocks..."
