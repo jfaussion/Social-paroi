@@ -22,8 +22,8 @@ vi.mock('@/auth', () => ({
   auth: mockAuth
 }))
 
-vi.mock('@/lib/locations/actions/checkUserLocationRole', () => ({
-  checkUserLocationRole: mockCheckUserLocationRole
+vi.mock('@/lib/shared/checkRoleOrThrow', () => ({
+  checkRoleOrThrow: mockCheckUserLocationRole
 }))
 
 vi.mock('@/lib/cloudinary/deleteFromCloudinary', () => ({
@@ -69,24 +69,25 @@ describe('callDeleteContest', () => {
   describe('authentication and authorization', () => {
     it('throws error when user is not authenticated', async () => {
       mockAuth.mockResolvedValue(null)
+      mockCheckUserLocationRole.mockRejectedValue(new Error('Authentication required'))
 
-      await expect(callDeleteContest(mockContest, 1)).rejects.toThrow('You must be Admin or Opener')
+      await expect(callDeleteContest(mockContest, 1)).rejects.toThrow('Authentication required')
     })
 
     it('throws error when user is not an opener', async () => {
       mockAuth.mockResolvedValue(mockUser)
-      mockCheckUserLocationRole.mockResolvedValue(false)
+      mockCheckUserLocationRole.mockRejectedValue(new Error('You must be Admin or Opener'))
 
       await expect(callDeleteContest(mockContest, 1)).rejects.toThrow('You must be Admin or Opener')
     })
 
-    it('calls checkUserLocationRole with correct parameters', async () => {
+    it('calls checkRoleOrThrow with correct parameters', async () => {
       mockAuth.mockResolvedValue(mockUser)
-      mockCheckUserLocationRole.mockResolvedValue(true)
+      mockCheckUserLocationRole.mockResolvedValue('opener-123')
 
       await callDeleteContest(mockContest, 1)
 
-      expect(mockCheckUserLocationRole).toHaveBeenCalledWith('opener-123', 1, 'opener')
+      expect(mockCheckUserLocationRole).toHaveBeenCalled()
     })
   })
 

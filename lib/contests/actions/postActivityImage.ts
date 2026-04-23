@@ -1,34 +1,25 @@
 'use server';
-import { auth } from '@/auth';
-import { checkUserLocationRole } from '@/lib/locations/actions/checkUserLocationRole';
-import { LocationRole } from '@/domain/LocationRole.enum';
 import { uploadImageToCloudinary } from '@/lib/cloudinary/uploadToCloudinary';
 import { deleteImageFromCloudinary } from '@/lib/cloudinary/deleteFromCloudinary';
 import { CloudinarySubfolders } from '@/lib/cloudinary/cloudinarySubfolders';
 import { parseIntOrThrow } from '@/lib/utils/validation';
 import prisma from '@/prisma';
+import { checkRoleOrThrow } from '@/lib/shared/checkRoleOrThrow';
 import { createActionLogger } from '@/utils/logger';
 
 const logger = createActionLogger('postActivityImage');
 
 export async function postActivityImage(activity: FormData) {
-  const user = await auth();
   const contestIdStr = activity.get('contestId') as string | null;
   if (!contestIdStr) {
-    const error = new Error('contestId is required');
-    logger.error(error, { userId: user?.user?.id });
-    throw error;
+    throw new Error('contestId is required');
   }
   const contestId = parseIntOrThrow(contestIdStr, 'contestId');
   const contest = await prisma.contest.findUnique({ where: { id: contestId }, select: { locationId: true } });
-  const isOpener = user?.user?.id && contest?.locationId
-    ? await checkUserLocationRole(user.user.id, contest.locationId, LocationRole.opener)
-    : false;
-  if (!isOpener) {
-    const error = new Error('You must be Admin or Opener to perform this action.');
-    logger.error(error, { userId: user?.user?.id });
-    throw error;
+  if (!contest?.locationId) {
+    throw new Error('Contest not found');
   }
+  await checkRoleOrThrow({ locationId: contest.locationId, actionName: 'upload activity image' });
 
   try {
     const photoEntry = activity.get('activityPhoto') as unknown as File | null;
@@ -40,12 +31,10 @@ export async function postActivityImage(activity: FormData) {
 
     let uploadedImageUrl = '';
 
-    // Delete previous image if it exists
     if (oldImageUrl && hasPhoto) {
       await deleteImageFromCloudinary(oldImageUrl);
     }
 
-    // Upload new image
     if (photoEntry) {
       uploadedImageUrl = await uploadImageToCloudinary(photoEntry, CloudinarySubfolders.ACTIVITIES);
     }

@@ -20,8 +20,8 @@ vi.mock('@/auth', () => ({
   auth: mockAuth
 }))
 
-vi.mock('@/lib/locations/actions/checkUserLocationRole', () => ({
-  checkUserLocationRole: mockCheckUserLocationRole
+vi.mock('@/lib/shared/checkRoleOrThrow', () => ({
+  checkRoleOrThrow: mockCheckUserLocationRole
 }))
 
 vi.mock('@/utils/logger', () => ({
@@ -50,17 +50,18 @@ describe('postContest', () => {
   describe('authentication and authorization', () => {
     it('throws error when user is not authenticated', async () => {
       mockAuth.mockResolvedValue(null)
+      mockCheckUserLocationRole.mockRejectedValue(new Error('Authentication required'))
 
       const formData = new FormData()
       formData.append('name', 'Test Contest')
       formData.append('date', '2024-12-31')
 
-      await expect(postContest(-1, formData, 1)).rejects.toThrow('You must be Admin or Opener')
+      await expect(postContest(-1, formData, 1)).rejects.toThrow('Authentication required')
     })
 
     it('throws error when user is not an opener', async () => {
       mockAuth.mockResolvedValue(mockUser)
-      mockCheckUserLocationRole.mockResolvedValue(false)
+      mockCheckUserLocationRole.mockRejectedValue(new Error('You must be Admin or Opener'))
 
       const formData = new FormData()
       formData.append('name', 'Test Contest')

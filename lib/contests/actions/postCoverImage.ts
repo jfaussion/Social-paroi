@@ -1,32 +1,20 @@
 'use server';
-import { auth } from '@/auth';
-import { checkUserLocationRole } from '@/lib/locations/actions/checkUserLocationRole';
-import { LocationRole } from '@/domain/LocationRole.enum';
 import { uploadImageToCloudinary } from '@/lib/cloudinary/uploadToCloudinary';
 import { deleteImageFromCloudinary } from '@/lib/cloudinary/deleteFromCloudinary';
 import { CloudinarySubfolders } from '@/lib/cloudinary/cloudinarySubfolders';
 import { parseIntOrThrow } from '@/lib/utils/validation';
+import { checkRoleOrThrow } from '@/lib/shared/checkRoleOrThrow';
 import { createActionLogger } from '@/utils/logger';
 
 const logger = createActionLogger('postCoverImage');
 
 export async function postCoverImage(contest: FormData) {
-  const user = await auth();
   const locationIdStr = contest.get('locationId') as string | null;
   if (!locationIdStr) {
-    const error = new Error('locationId is required');
-    logger.error(error, { userId: user?.user?.id });
-    throw error;
+    throw new Error('locationId is required');
   }
   const locationId = parseIntOrThrow(locationIdStr, 'locationId');
-  const isOpener = user?.user?.id
-    ? await checkUserLocationRole(user.user.id, locationId, LocationRole.opener)
-    : false;
-  if (!isOpener) {
-    const error = new Error('You must be Admin or Opener to perform this action.');
-    logger.error(error, { userId: user?.user?.id });
-    throw error;
-  }
+  await checkRoleOrThrow({ locationId, actionName: 'upload cover image' });
 
   try {
     const coverPhoto = contest.get('coverPhoto') as unknown as File | null;
@@ -38,12 +26,10 @@ export async function postCoverImage(contest: FormData) {
 
     let uploadedImageUrl = '';
 
-    // Delete previous image
     if (oldImageUrl && coverPhoto) {
       await deleteImageFromCloudinary(oldImageUrl);
     }
 
-    // Upload new image
     if (coverPhoto) {
       uploadedImageUrl = await uploadImageToCloudinary(coverPhoto, CloudinarySubfolders.CONTESTS);
     }

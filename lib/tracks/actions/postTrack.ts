@@ -1,9 +1,7 @@
 'use server';
 import prisma from '@/prisma';
-import { auth } from '@/auth';
-import { checkUserLocationRole } from '@/lib/locations/actions/checkUserLocationRole';
-import { LocationRole } from '@/domain/LocationRole.enum';
 import { parseIntOrThrow } from '@/lib/utils/validation';
+import { checkRoleOrThrow } from '@/lib/shared/checkRoleOrThrow';
 import { createActionLogger } from '@/utils/logger';
 const logger = createActionLogger('postNewTrack');
 
@@ -12,13 +10,7 @@ export async function postNewTrack(
   track: FormData,
   locationId: number
 ) {
-  const user = await auth();
-  const isOpener = user?.user?.id ? await checkUserLocationRole(user.user.id, locationId, LocationRole.opener) : false;
-  if (!isOpener) {
-    const error = new Error('You must be Admin or Opener in to perform this action.');
-    logger.error(error, { trackId, userId: user?.user?.id });
-    throw error;
-  }
+  await checkRoleOrThrow({ locationId, actionName: 'create or update track' });
 
   try {
     const name = track.get('name') as string;
