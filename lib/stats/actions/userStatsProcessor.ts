@@ -1,66 +1,81 @@
-import { difficultyOrder } from "@/domain/Difficulty.enum";
-import { Track } from "@/domain/Track.schema";
 import { TrackStats } from "@/domain/TrackStats.schema";
 import { createActionLogger } from '@/utils/logger';
 
 const logger = createActionLogger('processTrackStats');
 
+type DifficultyLevelMeta = {
+  name: string;
+  color: string | null;
+  order: number;
+};
+
+type TrackProgressEntry = {
+  track: {
+    removed: boolean | null;
+    difficultyLevel: DifficultyLevelMeta | null;
+  } | null;
+};
+
+type MountedByDifficulty = {
+  difficultyLevel: DifficultyLevelMeta | null;
+  _count: { _all: number };
+};
+
 export const processTrackStats = (
-  userTrackProgress: { track: Track }[],
-  totalMountedTracksByDifficulty: { _count: { _all: number }, level: string }[],
-  colorMap: Record<string, string | null> = {}
+  userTrackProgress: TrackProgressEntry[],
+  totalMountedTracksByDifficulty: MountedByDifficulty[],
 ) => {
   logger.start({
     progressCount: userTrackProgress.length,
     mountedGroups: totalMountedTracksByDifficulty.length,
   });
-  const stats: Record<string, TrackStats> = {};
 
-  totalMountedTracksByDifficulty.forEach(({ level, _count }) => {
-    stats[level] = {
-      level,
-      color: colorMap[level] ?? null,
+  // Key: difficulty name (or 'Unknown' for null)
+  const stats: Record<string, TrackStats> = {};
+  // Store order alongside for sorting
+  const orderMap: Record<string, number> = {};
+
+  totalMountedTracksByDifficulty.forEach(({ difficultyLevel, _count }) => {
+    const name = difficultyLevel?.name ?? 'Unknown';
+    const order = difficultyLevel?.order ?? Number.MAX_SAFE_INTEGER;
+    stats[name] = {
+      level: name,
+      color: difficultyLevel?.color ?? null,
       mountedDone: 0,
       totalDone: 0,
       totalMounted: _count._all,
     };
+    orderMap[name] = order;
   });
 
   // Calculate user-specific stats
   userTrackProgress.forEach(({ track }) => {
-    const { level, removed } = track;
+    if (!track) return;
+    const name = track.difficultyLevel?.name ?? 'Unknown';
+    const order = track.difficultyLevel?.order ?? Number.MAX_SAFE_INTEGER;
 
-    if (!stats[level]) {
-      stats[level] = {
-        level,
-        color: colorMap[level] ?? null,
+    if (!stats[name]) {
+      stats[name] = {
+        level: name,
+        color: track.difficultyLevel?.color ?? null,
         mountedDone: 0,
         totalDone: 0,
         totalMounted: 0,
       };
+      orderMap[name] = order;
     }
 
-    stats[level].totalDone += 1;
+    stats[name].totalDone += 1;
 
-    if (!removed) {
-      stats[level].mountedDone += 1;
-    }
-  });
-
-  // Ensure that levels present in userTrackProgress but not in totalMountedTracksByDifficulty are initialized
-  Object.keys(stats).forEach(level => {
-    if (!stats[level].totalMounted) {
-      stats[level].totalMounted = 0;
+    if (!track.removed) {
+      stats[name].mountedDone += 1;
     }
   });
 
-  const sortedStats = sortTrackStatsByDifficulty(Object.values(stats));
+  const sortedStats = Object.values(stats).sort(
+    (a, b) => (orderMap[a.level] ?? Number.MAX_SAFE_INTEGER) - (orderMap[b.level] ?? Number.MAX_SAFE_INTEGER)
+  );
+
   logger.success({ levelCount: sortedStats.length });
   return sortedStats;
-};
-
-const sortTrackStatsByDifficulty: (stats: TrackStats[]) => TrackStats[] = (stats) => {
-  return stats.sort((a, b) => {
-    return difficultyOrder.indexOf(a.level) - difficultyOrder.indexOf(b.level);
-  });
 };
