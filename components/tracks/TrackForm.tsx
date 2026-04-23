@@ -3,7 +3,6 @@ import { ChangeEvent, useEffect, useId, useRef, useState } from "react";
 import Image from 'next/image';
 import { usePostTracks } from "@/lib/tracks/hooks/usePostTrack";
 import { Track } from "@/domain/Track.schema";
-import { DifficultyEnum } from "@/domain/Difficulty.enum";
 import Select from 'react-select';
 import { usePathname, useRouter } from "next/navigation";
 import { CldImage } from "next-cloudinary";
@@ -37,27 +36,28 @@ type TrackFromProps = {
 
 const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId, holdColors = [], difficultyLevels = [] }) => {
   const isEditMode = Boolean(initialTrack);
-  const defaultZone = initialTrack?.zone ?? zones?.[0]?.id ?? 1;
+  const defaultZoneId = initialTrack?.zoneId ?? zones?.[0]?.id ?? 1;
   const [track, setTrack] = useState({
     ...initialTrack,
     name: initialTrack?.name || '',
     difficultyLevelId: initialTrack?.difficultyLevelId || undefined as number | undefined,
-    difficulty: initialTrack?.level || '',
+    difficulty: initialTrack?.difficultyLevelId?.toString() || '',
     holdColorId: initialTrack?.holdColorId || null as number | null,
-    zone: defaultZone,
+    zoneId: defaultZoneId,
     points: initialTrack?.points || 0,
     photo: null as File | null,
   });
 
   useEffect(() => {
     if (initialTrack) {
-      setTrack({
-        ...initialTrack,
+      setTrack(prev => ({
+        ...prev,
         difficultyLevelId: initialTrack.difficultyLevelId ?? undefined,
-        difficulty: initialTrack.level,
+        difficulty: initialTrack.difficultyLevelId?.toString() ?? '',
         holdColorId: initialTrack.holdColorId ?? null,
+        zoneId: initialTrack.zoneId ?? defaultZoneId,
         photo: null
-      });
+      }));
     }
   }, [initialTrack]);
 
@@ -78,7 +78,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId, 
   };
 
   const handleDifficultyChange = (selectedOption: any) => {
-    const selectedLevel = difficultyLevels.find(l => l.name === selectedOption?.value);
+    const selectedLevel = difficultyLevels.find(l => l.id === selectedOption?.value);
     if (selectedLevel) {
       setTrack(prev => ({
         ...prev,
@@ -87,7 +87,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId, 
         points: selectedLevel.points
       }));
     } else {
-      setTrack(prev => ({ ...prev, difficulty: selectedOption?.value || '', difficultyLevelId: undefined as number | undefined }));
+      setTrack(prev => ({ ...prev, difficulty: '', difficultyLevelId: undefined as number | undefined }));
     }
   }
 
@@ -105,16 +105,16 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId, 
     }
   };
 
-  const isFormValid = () => track.name && track.difficulty && track.zone && track.holdColorId !== null;
+  const isFormValid = () => track.name && track.difficulty && track.zoneId && track.holdColorId !== null;
 
   const clearForm = () => {
     clearFileInput();
     setTrack({
       name: '',
-      difficulty: DifficultyEnum.Enum.Unknown as string,
+      difficulty: '',
       difficultyLevelId: undefined,
       holdColorId: null,
-      zone: zones?.[0]?.id ?? 1,
+      zoneId: zones?.[0]?.id ?? 1,
       points: 0,
       photo: null as File | null,
     });
@@ -125,9 +125,8 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId, 
 
     const trackToPost = {
       name: track.name,
-      level: track.difficulty,
       holdColorId: track.holdColorId,
-      zone: track.zone,
+      zoneId: track.zoneId,
       points: track.points,
       removed: false,
       date: new Date(),
@@ -153,7 +152,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId, 
 
   // Preparing options for react-select
   const difficultyOptions = difficultyLevels.map(level => ({
-    value: level.name,
+    value: level.id,
     label: level.name,
     color: level.color
   }));
@@ -216,7 +215,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId, 
         instanceId={difficultySelectId}
         name="difficulty"
         isSearchable={false}
-        value={difficultyOptions.find(option => option.value === track.difficulty)}
+        value={difficultyOptions.find(option => option.value === track.difficultyLevelId)}
         onChange={option => handleDifficultyChange(option)}
         options={difficultyOptions}
         classNames={customSelectClassName}
@@ -239,25 +238,25 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId, 
       />
       <Select
         instanceId={zoneSelectId}
-        name="zone"
+        name="zoneId"
         isSearchable={false}
-        value={zoneOptions.find(option => option.value === track.zone)}
-        onChange={option => handleInputChange('zone', option?.value)}
+        value={zoneOptions.find(option => option.value === track.zoneId)}
+        onChange={option => handleInputChange('zoneId', option?.value)}
         options={zoneOptions}
         classNames={customSelectClassName}
         unstyled={true}
         placeholder="Select a zone"
         required
       />
-      {!!track.zone && (
+      {!!track.zoneId && (
         <div className="flex justify-center sm:justify-start items-center p-2 mb-3">
           <Zone
             miniMapUrl={
               zones
-                ? zones.find(z => z.id === track.zone)?.miniMapUrl
+                ? zones.find(z => z.id === track.zoneId)?.miniMapUrl
                 : initialTrack?.zoneRef?.miniMapUrl
             }
-            zoneName={zones ? zones.find(z => z.id === track.zone)?.name : initialTrack?.zoneRef?.name}
+            zoneName={zones ? zones.find(z => z.id === track.zoneId)?.name : initialTrack?.zoneRef?.name}
             width={200}
             height={100}
           />

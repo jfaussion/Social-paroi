@@ -84,11 +84,8 @@ model Track {
   id                Int                 @id @default(autoincrement())
   name              String?
   date              DateTime?
-  zone              Int
   points            Int                 @default(0)
-  level             String?
   imageUrl          String?             @map(name: "imageUrl")
-  holdColorLegacy   String?             @default("Unknown") @map(name: "holdColor")
   removed           Boolean?            @default(false)
   trackProgress     UserTrackProgress[]
 

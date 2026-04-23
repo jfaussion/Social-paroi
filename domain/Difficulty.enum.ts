@@ -4,5 +4,4 @@ export const DifficultyEnum = z.enum(['Unknown', 'Beginner', 'Easy', 'Intermedia
 
 export type DifficultyType = z.infer<typeof DifficultyEnum>;
 
-export const difficultyOrder = ['Beginner', 'Easy', 'Intermediate', 'Advanced', 'Difficult', 'FuckingHard', 'Legendary', 'Unknown'];
 

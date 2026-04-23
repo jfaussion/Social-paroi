@@ -1,6 +1,5 @@
 'use server';
 import prisma from '@/prisma';
-import { Track } from '@/domain/Track.schema';
 import { processTrackStats } from './userStatsProcessor';
 import { createActionLogger } from '@/utils/logger';
 const logger = createActionLogger('getUserStats');
@@ -24,15 +23,21 @@ export async function getUserStats(userId: string, locationId: number) {
       select: {
         track: {
           select: {
-            level: true,
             removed: true,
+            difficultyLevel: {
+              select: {
+                name: true,
+                color: true,
+                order: true,
+              },
+            },
           },
         },
       },
     });
 
-    const totalMountedTracksByDifficulty = await prisma.track.groupBy({
-      by: ['level'],
+    const totalMountedByDifficultyId = await prisma.track.groupBy({
+      by: ['difficultyLevelId'],
       where: {
         removed: false,
         locationId,
@@ -42,20 +47,30 @@ export async function getUserStats(userId: string, locationId: number) {
       },
     });
 
+    const difficultyIds = totalMountedByDifficultyId
+      .map(g => g.difficultyLevelId)
+      .filter((id): id is number => id !== null);
+
     const difficultyLevels = await prisma.difficultyLevel.findMany({
-      where: { locationId },
-      select: { name: true, color: true },
+      where: { id: { in: difficultyIds } },
+      select: { id: true, name: true, color: true, order: true },
     });
-    const colorMap: Record<string, string | null> = Object.fromEntries(
-      difficultyLevels.map(dl => [dl.name, dl.color])
+
+    const difficultyLevelMap = Object.fromEntries(
+      difficultyLevels.map(dl => [dl.id, dl])
     );
 
-    const processStats = processTrackStats(userTrackStats as { track: Track }[], totalMountedTracksByDifficulty as { _count: { _all: number }, level: string }[], colorMap);
+    const totalMountedTracksByDifficulty = totalMountedByDifficultyId.map(g => ({
+      difficultyLevel: g.difficultyLevelId !== null ? (difficultyLevelMap[g.difficultyLevelId] ?? null) : null,
+      _count: g._count,
+    }));
+
+    const processStats = processTrackStats(userTrackStats, totalMountedTracksByDifficulty);
 
     logger.success({
       userId,
       trackCount: userTrackStats.length,
-      groupedLevels: totalMountedTracksByDifficulty.length,
+      groupedLevels: totalMountedByDifficultyId.length,
     });
     return processStats;
   } catch (error) {
