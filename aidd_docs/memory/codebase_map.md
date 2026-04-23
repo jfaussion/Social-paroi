@@ -22,7 +22,7 @@ flowchart TD
     LibLayer --> CloudinaryLib["cloudinary/ (upload helpers)"]
     Actions --> PrismaClient["prisma.ts (Prisma client)"]
     PrismaClient --> DB["PostgreSQL (Vercel)"]
-    Domain["domain/ (Zod schemas + enums)"] --> Actions
+    Domain["domain/ (Zod schemas — enums replaced by DB models)"] --> Actions
     Domain --> Components
     Utils["utils/ (shared utilities)"] --> Actions
     Utils --> Components

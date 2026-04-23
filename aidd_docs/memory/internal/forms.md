@@ -33,6 +33,12 @@ flowchart LR
 - Server Action returns error → sonner toast with error message
 - Success → sonner toast with success message
 
+## Form Data Fetching
+
+- **Server-side in page.tsx**: lookup data (zones, holdColors, difficultyLevels) fetched via `Promise.all`
+- **Passed as props**: Components receive data, don't fetch it
+- **Client-side hooks**: Only for dynamic/refetched data (e.g., filters)
+
 ## Form Flow
 
 ```mermaid
@@ -40,7 +46,9 @@ flowchart LR
 title: Form Submission Flow
 ---
 flowchart LR
-    User["User input"] --> LocalState["useState"]
+    Page["page.tsx (server)"] --> Data["Promise.all data fetch"]
+    Data --> Form["Form Component (client)"]
+    Form --> LocalState["useState"]
     LocalState --> OnSubmit["onSubmit handler"]
     OnSubmit --> ServerAction["Server Action (lib/*/actions)"]
     ServerAction --> ZodValidate["Zod validate"]

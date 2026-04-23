@@ -3,6 +3,8 @@ import TrackForm from "@/components/tracks/TrackForm";
 import { getTrackDetails } from "@/lib/tracks/actions/getTrackDetails";
 import { getLocationBySlug } from "@/lib/locations/actions/getLocationBySlug";
 import { getZonesByLocation } from "@/lib/locations/actions/getZonesByLocation";
+import { getHoldColors } from "@/lib/locations/actions/manageHoldColors";
+import { getDifficultyLevels } from "@/lib/locations/actions/manageDifficultyLevels";
 import { SessionProvider } from "next-auth/react";
 import { redirect } from "next/navigation";
 
@@ -25,7 +27,11 @@ export default async function TrackEditPage({ params }: { params: { locationSlug
     redirect(`/${params.locationSlug}/tracks`);
   }
 
-  const zones = await getZonesByLocation(location.id);
+  const [zones, holdColors, difficultyLevels] = await Promise.all([
+    getZonesByLocation(location.id),
+    getHoldColors(location.id),
+    getDifficultyLevels(location.id),
+  ]);
 
   return (
     <SessionProvider session={session}>
@@ -37,7 +43,7 @@ export default async function TrackEditPage({ params }: { params: { locationSlug
             </span>
             {track &&
               (
-                <TrackForm key={track.id} initialTrack={track} locationId={location.id} zones={zones} />
+                <TrackForm key={track.id} initialTrack={track} locationId={location.id} zones={zones} holdColors={holdColors} difficultyLevels={difficultyLevels} />
               )}
           </div>
         </div>

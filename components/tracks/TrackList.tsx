@@ -14,11 +14,12 @@ type TracksProps = {
   userId: string;
   locationId: number;
   zones: Array<{ id: number; name: string }>;
+  holdColors: { id: number; name: string; color: string }[];
   isMember: boolean;
   isOpener: boolean;
 };
 
-const TrackList: React.FC<TracksProps> = ({ userId, locationId, zones, isMember, isOpener }) => {
+const TrackList: React.FC<TracksProps> = ({ userId, locationId, zones, holdColors, isMember, isOpener }) => {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -27,7 +28,7 @@ const TrackList: React.FC<TracksProps> = ({ userId, locationId, zones, isMember,
   const [selectedDifficultyIds, setSelectedDifficultyIds] = useState<number[]>([]);
   const [selectedZones, setSelectedZones] = useState<number[]>([]);
   const [selectedShowRemoved, setSelectedShowRemoved] = useState<string>();
-  const [selectedHoldColor, setSelectedHoldColor] = useState<string>();
+  const [selectedHoldColorIds, setSelectedHoldColorIds] = useState<number[]>([]);
   const { fetchTracks, isLoading, error } = useFetchTracks();
   const currentUrlParams = new URLSearchParams(Array.from(searchParams.entries())); // -> has to use this form
 
@@ -40,20 +41,20 @@ const TrackList: React.FC<TracksProps> = ({ userId, locationId, zones, isMember,
     const zones = searchParams.has('zones') ? searchParams.get('zones')?.split(',').map(Number) as number[] : [] as number[];
     const difficultyIds = searchParams.has('difficultyIds') ? searchParams.get('difficultyIds')?.split(',').map(Number) as number[] : [] as number[];
     const showRemoved = searchParams.has('showRemoved') ? searchParams.get('showRemoved') as string : undefined;
-    const holdColor = searchParams.has('holdColor') ? searchParams.get('holdColor') as string : undefined;
-    const filters = { zones, difficultyIds, showRemoved, holdColor };
+    const holdColorIds = searchParams.has('holdColorIds') ? searchParams.get('holdColorIds')?.split(',').map(Number) as number[] : [] as number[];
+    const filters = { zones, difficultyIds, showRemoved, holdColorIds };
     setSelectedZones(zones);
     setSelectedDifficultyIds(difficultyIds);
     setSelectedShowRemoved(showRemoved);
-    setSelectedHoldColor(holdColor);
+    setSelectedHoldColorIds(holdColorIds);
     getTracks(filters);
   }, [userId, locationId, searchParams]);
 
-  const updateFiltersInURL = (zones: any[], difficultyIds: any[], showRemoved: string | undefined, holdColor: string | undefined) => {
+  const updateFiltersInURL = (zones: any[], difficultyIds: any[], showRemoved: string | undefined, holdColorIds: number[]) => {
     currentUrlParams.delete('zones');
     currentUrlParams.delete('difficultyIds');
     currentUrlParams.delete('showRemoved');
-    currentUrlParams.delete('holdColor');
+    currentUrlParams.delete('holdColorIds');
     if (zones.length > 0) {
       currentUrlParams.set('zones', zones.join(','));
     }
@@ -63,8 +64,8 @@ const TrackList: React.FC<TracksProps> = ({ userId, locationId, zones, isMember,
     if (showRemoved) {
       currentUrlParams.set('showRemoved', showRemoved);
     }
-    if (holdColor) {
-      currentUrlParams.set('holdColor', holdColor);
+    if (holdColorIds.length > 0) {
+      currentUrlParams.set('holdColorIds', holdColorIds.join(','));
     }
 
     const search = currentUrlParams.toString();
@@ -75,25 +76,24 @@ const TrackList: React.FC<TracksProps> = ({ userId, locationId, zones, isMember,
   const handleZoneChange = (selectedOptions: { value: any; }[]) => {
     const zones = selectedOptions.map((option: { value: any; }) => option.value);
     setSelectedZones(zones);
-    updateFiltersInURL(zones, selectedDifficultyIds, selectedShowRemoved, selectedHoldColor);
+    updateFiltersInURL(zones, selectedDifficultyIds, selectedShowRemoved, selectedHoldColorIds);
   };
 
   const handleDifficultyChange = (selectedOptions: { value: any; }[]) => {
     const difficultyIds = selectedOptions.map((option: { value: any; }) => option.value);
     setSelectedDifficultyIds(difficultyIds);
-    updateFiltersInURL(selectedZones, difficultyIds, selectedShowRemoved, selectedHoldColor);
+    updateFiltersInURL(selectedZones, difficultyIds, selectedShowRemoved, selectedHoldColorIds);
   };
 
   const handleShowRemovedChange = (selectedOptions: any) => {
     const showRemoved = selectedOptions?.value as string | undefined;
     setSelectedShowRemoved(showRemoved);
-    updateFiltersInURL(selectedZones, selectedDifficultyIds, showRemoved, selectedHoldColor);
+    updateFiltersInURL(selectedZones, selectedDifficultyIds, showRemoved, selectedHoldColorIds);
   };
 
-  const handleHoldColorChange = (selectedOptions: any) => {
-    const holdColor = selectedOptions?.value as string | undefined;
-    setSelectedHoldColor(holdColor);
-    updateFiltersInURL(selectedZones, selectedDifficultyIds, selectedShowRemoved, holdColor);
+  const handleHoldColorChange = (ids: number[]) => {
+    setSelectedHoldColorIds(ids);
+    updateFiltersInURL(selectedZones, selectedDifficultyIds, selectedShowRemoved, ids);
   };
 
   const handleRemoveAllSuccess = () => {
@@ -104,7 +104,7 @@ const TrackList: React.FC<TracksProps> = ({ userId, locationId, zones, isMember,
   const isRemoveDisabled = () => {
     return trackList.length === 0
       || !!selectedShowRemoved
-      || (selectedZones.length === 0 && selectedDifficultyIds.length === 0 && !selectedHoldColor);
+      || (selectedZones.length === 0 && selectedDifficultyIds.length === 0 && selectedHoldColorIds.length === 0);
   };
 
   return (
@@ -122,7 +122,8 @@ const TrackList: React.FC<TracksProps> = ({ userId, locationId, zones, isMember,
         selectedZones={selectedZones}
         selectedDifficulties={selectedDifficultyIds}
         selectedShowRemoved={selectedShowRemoved}
-        selectedHoldColor={selectedHoldColor}
+        selectedHoldColorIds={selectedHoldColorIds}
+        holdColors={holdColors}
         locationId={locationId}
         onZoneChange={handleZoneChange}
         onDifficultyChange={handleDifficultyChange}

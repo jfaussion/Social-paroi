@@ -4,7 +4,7 @@ import { Button } from '../ui/Button';
 import { FaPencilAlt } from 'react-icons/fa';
 import Popin from '../ui/Popin';
 import AddTrackCard from '../tracks/AddTrackCard';
-import { useFetchCotnestTracks as useFetchContestTracks } from '@/lib/tracks/hooks/useFetchContestTracks';
+import { useFetchContestTracks } from '@/lib/tracks/hooks/useFetchContestTracks';
 import { CardPlaceHolder } from '../ui/CardPlacehorlder';
 import { useManageContestTracks } from '@/lib/contests/hooks/useManageContestTracks';
 import ContestTrackCard from './ContestTrackCard';

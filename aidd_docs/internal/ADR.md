@@ -18,3 +18,7 @@ This file contains the key architectural decisions made during the project, alon
 | 2026-04-19 | DEC-010 | [react-select styling convention](./decisions/DEC-010-react-select-styling-convention.md) | All selects use `unstyled={true}` + `customSelectClassName`; no inline classNames |
 | 2026-04-19 | DEC-011 | [Membership required for all location routes](./decisions/DEC-011-location-membership-guard.md) | Layout redirects non-members to `/locations` for all location statuses |
 | 2026-04-19 | DEC-012 | [User-scoped last-location cookie](./decisions/DEC-012-user-scoped-last-location-cookie.md) | Cookie key `last-location-{userId}`; new users no longer inherit prior session's location |
+| 2026-04-23 | DEC-013 | [Soft field rename / legacy alias pattern](./decisions/DEC-013-soft-field-rename-legacy-alias-pattern.md) | Rename Prisma alias, preserve `@map`, keep both fields during transition — no DB column drop |
+| 2026-04-23 | DEC-014 | [Per-location DB-backed enum pattern](./decisions/DEC-014-per-location-db-backed-enum-pattern.md) | Static enums replaced by location-scoped model + admin CRUD; hex stored in DB, not code |
+| 2026-04-23 | DEC-015 | [Admin list inline edit pattern](./decisions/DEC-015-admin-list-inline-edit-pattern.md) | Consistent click-to-edit with Save/Cancel; reusable pattern for all admin components |
+| 2026-04-23 | DEC-016 | [Server-side form data fetching](./decisions/DEC-016-server-side-form-data.md) | Form lookup data fetched in page.tsx via Promise.all; components receive as props |

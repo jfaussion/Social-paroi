@@ -24,7 +24,8 @@ export async function postNewTrack(
     const name = track.get('name') as string;
     const zone = parseIntOrThrow(track.get('zone') as string, 'zone');
     const zoneId = parseIntOrThrow(track.get('zoneId') as string, 'zoneId');
-    const holdColor = track.get('holdColor') as string;
+    const holdColorIdStr = track.get('holdColorId') as string | null;
+    const holdColorId = holdColorIdStr ? parseIntOrThrow(holdColorIdStr, 'holdColorId') : undefined;
     const points = parseIntOrThrow(track.get('points') as string, 'points');
     const imageUrl = track.get('imageUrl') as string;
     const removedFlag = track.get('removed') === 'true';
@@ -49,7 +50,7 @@ export async function postNewTrack(
         zone,
         zoneId,
         level,
-        holdColor,
+        holdColorId: holdColorId ?? null,
         points,
         imageUrl,
         removed: removedFlag,
@@ -60,7 +61,7 @@ export async function postNewTrack(
         zone,
         zoneId,
         level,
-        holdColor,
+        holdColorId: holdColorId ?? null,
         points,
         date: new Date(),
         imageUrl,

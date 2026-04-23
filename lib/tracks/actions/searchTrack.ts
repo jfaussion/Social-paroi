@@ -19,7 +19,7 @@ export async function searchTrackForUser(userId: string, filters: Filters, locat
     userId,
     zoneFilters: filters.zones?.length ?? 0,
     difficultyFilters: filters.difficulties?.length ?? 0,
-    holdColorFilter: Boolean(filters.holdColor),
+    holdColorFilter: filters.holdColorIds?.length ?? 0,
     showRemoved: filters.showRemoved ?? RemovedEnum.Enum.NO,
   });
   try {
@@ -46,10 +46,12 @@ export async function searchTrackForUser(userId: string, filters: Filters, locat
         },
       });
     }
-    // If holdColor is provided and not empty, add holdColor condition
-    if (filters.holdColor) {
+    // If holdColorIds are provided and not empty, filter by holdColorId
+    if (filters.holdColorIds && filters.holdColorIds.length > 0) {
       andConditions.push({
-        holdColor: filters.holdColor,
+        holdColorId: {
+          in: filters.holdColorIds,
+        },
       });
     }
     // If showRemoved is provided, add removed condition
@@ -100,6 +102,13 @@ export async function searchTrackForUser(userId: string, filters: Filters, locat
           },
         },
         difficultyLevel: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+          },
+        },
+        holdColor: {
           select: {
             id: true,
             name: true,

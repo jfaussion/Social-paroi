@@ -18,7 +18,9 @@ export const usePostTracks = (locationId: number) => {
       formData.append('name', track.name);
       formData.append('date', track.date.toString());
       formData.append('imageUrl', track.imageUrl?.toString() ?? '');
-      formData.append('holdColor', track.holdColor);
+      if (track.holdColorId != null) {
+        formData.append('holdColorId', track.holdColorId.toString());
+      }
       formData.append('level', track.level);
       formData.append('zone', track.zone.toString());
       formData.append('zoneId', (track.zoneId ?? track.zone).toString());
@@ -45,8 +47,9 @@ export const usePostTracks = (locationId: number) => {
         formData.set('imageUrl', imageUrl);
       }
       setLoadingMessage('Posting block...');
-      const newTrack = await postNewTrack(track.id, formData, locationId) as Track;
-      return newTrack;
+      const prismaTrack = await postNewTrack(track.id, formData, locationId);
+      if (!prismaTrack) return null;
+      return prismaTrack as unknown as Track;
     } catch (err) {
       setError('An error occurred while posting the new block');
       return null;

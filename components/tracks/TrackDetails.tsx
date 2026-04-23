@@ -10,7 +10,6 @@ import ToggleButton from '../ui/ToggleButton';
 import RemovedLabel from '../ui/RemovedLabel';
 import { TrackStatus } from '@/domain/TrackStatus.enum';
 
-import { getBgColor } from '@/utils/color.utils';
 import { Button } from '../ui/Button';
 import { useChangeMountedTrackStatus } from '@/lib/tracks/hooks/useChangeMountedTrackStatus';
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -30,7 +29,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({ isOpener: isOpenerProp, ...
   const { changeMountedTrackStatus, isLoading: isLoadingRemove, error: errorRemove } = useChangeMountedTrackStatus();
   const session = useSession();
   const levelColor = track.difficultyLevel?.color;
-  const holdClass = getBgColor(track.holdColor);
+  const holdColor = track.holdColor?.color;
   const router = useRouter();
   const pathname = usePathname();
   const locationSlug = pathname.split('/')[1] ?? '';
@@ -184,7 +183,10 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({ isOpener: isOpenerProp, ...
           <div className="flex justify-between items-center mb-3">
             <div>
               <span className="text-sm font-medium mr-2">Hold color</span>
-              <span className={`inline-block w-14 h-3 ${holdClass} rounded border border-black dark:border-white`}></span>
+              <span
+                className="inline-block w-14 h-3 rounded border border-black dark:border-white"
+                style={holdColor ? { backgroundColor: holdColor } : undefined}
+              ></span>
             </div>
             <span className="text-sm font-semibold">{track.points}pts</span>
           </div>

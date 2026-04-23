@@ -23,6 +23,13 @@ export async function getTrackDetails(
             color: true,
           },
         },
+        holdColor: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+          },
+        },
         zoneRef: {
           select: {
             id: true,

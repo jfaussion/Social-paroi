@@ -5,7 +5,7 @@ export const FiltersSchema = z.object({
   difficulties: z.array(z.string()).optional(),
   difficultyIds: z.array(z.number()).optional(),
   showRemoved: z.string().optional(),
-  holdColor: z.string().optional(),
+  holdColorIds: z.array(z.number()).optional(),
 });
 
 export type Filters = z.infer<typeof FiltersSchema>;

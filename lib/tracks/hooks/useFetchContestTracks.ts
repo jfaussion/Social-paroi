@@ -3,7 +3,7 @@ import { Track } from '@/domain/Track.schema';
 import { Filters } from '@/domain/Filters';
 import { searchTrackForContest } from '../actions/searchContestTrack';
 
-export const useFetchCotnestTracks = () => {
+export const useFetchContestTracks = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

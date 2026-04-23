@@ -22,6 +22,14 @@ export default async function AdminPage({
         <li>
           <Link
             className="block p-4 bg-gray-100 dark:bg-gray-800 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
+            href={`/${locationSlug}/admin/hold-colors`}
+          >
+            Hold colors
+          </Link>
+        </li>
+        <li>
+          <Link
+            className="block p-4 bg-gray-100 dark:bg-gray-800 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
             href={`/${locationSlug}/admin/users`}
           >
             Users &amp; roles

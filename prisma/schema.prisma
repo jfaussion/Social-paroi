@@ -81,16 +81,16 @@ model Authenticator {
 }
 
 model Track {
-  id            Int                 @id @default(autoincrement())
-  name          String?
-  date          DateTime?
-  zone          Int
-  points        Int                 @default(0)
-  level         String?
-  imageUrl      String?             @map(name: "imageUrl")
-  holdColor     String?             @default("Unknown") @map(name: "holdColor")
-  removed       Boolean?            @default(false)
-  trackProgress UserTrackProgress[]
+  id                Int                 @id @default(autoincrement())
+  name              String?
+  date              DateTime?
+  zone              Int
+  points            Int                 @default(0)
+  level             String?
+  imageUrl          String?             @map(name: "imageUrl")
+  holdColorLegacy   String?             @default("Unknown") @map(name: "holdColor")
+  removed           Boolean?            @default(false)
+  trackProgress     UserTrackProgress[]
 
   locationId Int?
   location   Location? @relation("LocationTracks", fields: [locationId], references: [id], onDelete: Cascade)
@@ -102,6 +102,9 @@ model Track {
 
   zoneId  Int?
   zoneRef Zone? @relation(fields: [zoneId], references: [id])
+
+  holdColorId Int?       @map(name: "hold_color_id")
+  holdColor   HoldColor? @relation(fields: [holdColorId], references: [id])
 
   @@index([id], name: "idx_tracks_id")
   @@index([name], name: "idx_tracks_name")
@@ -162,6 +165,7 @@ model Location {
   zones           Zone[]
   contests        Contest[]
   news            News[]
+  holdColors      HoldColor[]
 
   @@map("locations")
 }
@@ -343,13 +347,13 @@ model ContestRankingResult {
   contestRankingId Int
   contestUserId   Int
   rank            Int
-  totalScore      Float    
-  trackScore      Float    
-  activityScore   Int      
-  completedTracks Int      
+  totalScore      Float
+  trackScore      Float
+  activityScore   Int
+  completedTracks Int
   trackDetails    Json     // Store track completion details as JSON: [{ trackId, name, points, status }]
   activityDetails Json     // Store activity scores as JSON: [{ activityId, name, score }]
-  
+
   contestRanking ContestRanking @relation(fields: [contestRankingId], references: [id], onDelete: Cascade)
   contestUser    ContestUser    @relation(fields: [contestUserId], references: [id], onDelete: Cascade)
 
@@ -357,5 +361,21 @@ model ContestRankingResult {
   @@index([contestRankingId], name: "idx_contestrankingresult_ranking_id")
   @@index([contestUserId], name: "idx_contestrankingresult_user_id")
   @@map("contest_ranking_results")
+}
+
+model HoldColor {
+  id         Int      @id @default(autoincrement())
+  locationId Int      @map(name: "location_id")
+  name       String
+  color      String
+  order      Int
+  createdAt  DateTime @default(now()) @map(name: "created_at")
+  updatedAt  DateTime @updatedAt      @map(name: "updated_at")
+
+  location Location @relation(fields: [locationId], references: [id])
+  tracks   Track[]
+
+  @@unique([locationId, order])
+  @@map("hold_colors")
 }
 

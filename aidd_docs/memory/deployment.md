@@ -24,12 +24,14 @@ scope: all
 
 ## Database Environment
 
-> **CRITICAL**: Development and production share the same Vercel Postgres database. There is no separate dev or staging DB.
+- **Development**: Local PostgreSQL via `DATABASE_URL` in `.env`
+- **Production**: Vercel Postgres via `DATABASE_URL` and `POSTGRES_URL_NON_POOLING`
 
-- All schema changes affect real user data immediately
-- Migrations must be additive and backward-compatible — never drop columns/tables with existing data
-- Seed scripts must be additive only — never truncate or delete existing rows
-- Any destructive operation requires explicit user confirmation before execution
+### Migration Workflow
+
+- Dev: `npx prisma migrate dev` — standard Prisma workflow
+- Prod: `npx prisma migrate deploy` — Vercel handles on deploy
+- Seed: `npx prisma db seed` — additive seed data only
 
 # Infrastructure
 

@@ -4,25 +4,38 @@ import Image from 'next/image';
 import { usePostTracks } from "@/lib/tracks/hooks/usePostTrack";
 import { Track } from "@/domain/Track.schema";
 import { DifficultyEnum } from "@/domain/Difficulty.enum";
-import { HoldColorEnum } from "@/domain/HoldColor.enum";
-import { useFetchDifficultyLevels, DifficultyLevel } from "@/lib/locations/hooks/useFetchDifficultyLevels";
 import Select from 'react-select';
 import { usePathname, useRouter } from "next/navigation";
-import { holdColorCustomSelectClass } from "@/utils/hold.utils";
 import { CldImage } from "next-cloudinary";
 import { Button } from "../ui/Button";
 import customSelectClassName from "../ui/customSelectClassName";
 import Loader from "../ui/Loader";
 import { Zone } from "../Zone";
+import { toast } from "sonner";
 
+export type HoldColorOption = {
+  id: number;
+  name: string;
+  color: string;
+};
+
+export type DifficultyLevel = {
+  id: number;
+  name: string;
+  color: string | null;
+  points: number;
+  order: number;
+};
 
 type TrackFromProps = {
   initialTrack?: Track;
   zones?: Array<{ id: number; name: string; miniMapUrl?: string | null }>;
   locationId?: number;
+  holdColors?: HoldColorOption[];
+  difficultyLevels?: DifficultyLevel[];
 };
 
-const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId }) => {
+const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId, holdColors = [], difficultyLevels = [] }) => {
   const isEditMode = Boolean(initialTrack);
   const defaultZone = initialTrack?.zone ?? zones?.[0]?.id ?? 1;
   const [track, setTrack] = useState({
@@ -30,20 +43,11 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId }
     name: initialTrack?.name || '',
     difficultyLevelId: initialTrack?.difficultyLevelId || undefined as number | undefined,
     difficulty: initialTrack?.level || '',
-    holdColor: initialTrack?.holdColor || '',
+    holdColorId: initialTrack?.holdColorId || null as number | null,
     zone: defaultZone,
     points: initialTrack?.points || 0,
     photo: null as File | null,
   });
-
-  const [dynamicDifficultyLevels, setDynamicDifficultyLevels] = useState<DifficultyLevel[]>([]);
-  const { fetchDifficultyLevels } = useFetchDifficultyLevels();
-
-  useEffect(() => {
-    if (locationId) {
-      fetchDifficultyLevels(locationId).then(setDynamicDifficultyLevels);
-    }
-  }, [locationId, fetchDifficultyLevels]);
 
   useEffect(() => {
     if (initialTrack) {
@@ -51,6 +55,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId }
         ...initialTrack,
         difficultyLevelId: initialTrack.difficultyLevelId ?? undefined,
         difficulty: initialTrack.level,
+        holdColorId: initialTrack.holdColorId ?? null,
         photo: null
       });
     }
@@ -61,6 +66,10 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId }
   const pathname = usePathname();
   const locationSlug = pathname.split('/')[1] ?? '';
 
+  const difficultySelectId = useId();
+  const holdColorSelectId = useId();
+  const zoneSelectId = useId();
+
   const { postTrack, isLoading, error, loadingMessage } = usePostTracks(locationId ?? 1);
   const [newTrack, setNewTrack] = useState<Track | null>(null);
 
@@ -69,7 +78,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId }
   };
 
   const handleDifficultyChange = (selectedOption: any) => {
-    const selectedLevel = dynamicDifficultyLevels.find(l => l.name === selectedOption?.value);
+    const selectedLevel = difficultyLevels.find(l => l.name === selectedOption?.value);
     if (selectedLevel) {
       setTrack(prev => ({
         ...prev,
@@ -96,13 +105,15 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId }
     }
   };
 
+  const isFormValid = () => track.name && track.difficulty && track.zone && track.holdColorId !== null;
+
   const clearForm = () => {
     clearFileInput();
     setTrack({
       name: '',
       difficulty: DifficultyEnum.Enum.Unknown as string,
       difficultyLevelId: undefined,
-      holdColor: HoldColorEnum.Enum.Unknown as string,
+      holdColorId: null,
       zone: zones?.[0]?.id ?? 1,
       points: 0,
       photo: null as File | null,
@@ -115,7 +126,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId }
     const trackToPost = {
       name: track.name,
       level: track.difficulty,
-      holdColor: track.holdColor,
+      holdColorId: track.holdColorId,
       zone: track.zone,
       points: track.points,
       removed: false,
@@ -134,23 +145,18 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId }
       const uploadedTrack = await postTrack(trackToPost, track.photo);
       setNewTrack(uploadedTrack);
       clearForm();
+      toast.success('Track created successfully');
     }
 
 
   };
 
   // Preparing options for react-select
-  const difficultyOptions = dynamicDifficultyLevels.length > 0
-    ? dynamicDifficultyLevels.map(level => ({
-        value: level.name,
-        label: level.name,
-        color: level.color
-      }))
-    : Object.values(DifficultyEnum.Enum).map(difficulty => ({
-        value: difficulty,
-        label: difficulty,
-        color: null
-      }));
+  const difficultyOptions = difficultyLevels.map(level => ({
+    value: level.name,
+    label: level.name,
+    color: level.color
+  }));
 
   const formatDifficultyOptionLabel = (option: any) => (
     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -169,10 +175,26 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId }
     </div>
   );
 
-  const holdColorOptions = Object.values(HoldColorEnum.Enum).map(holdColor => ({
-    value: holdColor,
-    label: holdColor
+  const holdColorOptions = holdColors.map(hc => ({
+    value: hc.id,
+    label: hc.name,
+    color: hc.color,
   }));
+
+  const formatHoldColorOptionLabel = (option: { value: number; label: string; color: string }) => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+      <span
+        style={{
+          width: '10px',
+          height: '10px',
+          borderRadius: '50%',
+          backgroundColor: option.color,
+          flexShrink: 0,
+        }}
+      />
+      <span>{option.label}</span>
+    </div>
+  );
 
   const zoneOptions = zones
     ? zones.map(z => ({ value: z.id, label: z.name }))
@@ -191,7 +213,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId }
         className="p-2 text-black dark:text-white bg-gray-200 dark:bg-gray-800 rounded-md border border-gray-800 dark:border-gray-600"
       />
       <Select
-        instanceId={useId()}
+        instanceId={difficultySelectId}
         name="difficulty"
         isSearchable={false}
         value={difficultyOptions.find(option => option.value === track.difficulty)}
@@ -204,19 +226,19 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId }
         required
       />
       <Select
-        instanceId={useId()}
-        name="holdColor"
+        instanceId={holdColorSelectId}
+        name="holdColorId"
         isSearchable={false}
-        value={holdColorOptions.find(option => option.value === track.holdColor)}
-        onChange={option => handleInputChange('holdColor', option?.value)}
+        value={holdColorOptions.find(option => option.value === track.holdColorId) ?? null}
+        onChange={option => handleInputChange('holdColorId', option?.value ?? null)}
         options={holdColorOptions}
-        classNames={holdColorCustomSelectClass}
+        classNames={customSelectClassName}
         unstyled={true}
         placeholder="Select a hold color"
-        required
+        formatOptionLabel={formatHoldColorOptionLabel}
       />
       <Select
-        instanceId={useId()}
+        instanceId={zoneSelectId}
         name="zone"
         isSearchable={false}
         value={zoneOptions.find(option => option.value === track.zone)}
@@ -288,7 +310,8 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId }
       <Loader isLoading={isLoading} text={loadingMessage} />
       {error && <p className="text-red-500">Error: {error}</p>}
 
-      <Button type="submit" className="py-2" btnType='secondary' disabled={isLoading}>Submit</Button>
+      <Button type="submit" className="py-2" btnType='secondary'
+      disabled={isLoading || !isFormValid()}>Submit</Button>
 
       {!isLoading && newTrack && (
         <Button className="py-2" btnType='primary'

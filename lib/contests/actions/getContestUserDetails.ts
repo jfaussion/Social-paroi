@@ -23,7 +23,13 @@ export const getContestUserDetails = async (
         contestId: contestId,
       },
       include: {
-        track: true,
+        track: {
+          include: {
+            holdColor: {
+              select: { id: true, name: true, color: true },
+            },
+          },
+        },
         userResults: {
           where: {
             contestUserId: contestUserId,
@@ -33,12 +39,14 @@ export const getContestUserDetails = async (
     });
 
     // Transform tracks to include completion status
-    const tracks = contestTracks.map(contestTrack => ({
-      ...contestTrack.track,
-      contestProgress: {
-        status: contestTrack.userResults[0]?.status || TrackStatusEnum.Enum.TO_DO
-      },
-    }));
+    const tracks = contestTracks.map(contestTrack => {
+      return {
+        ...contestTrack.track,
+        contestProgress: {
+          status: contestTrack.userResults[0]?.status || TrackStatusEnum.Enum.TO_DO
+        },
+      };
+    });
 
     // Get all activities for this contest with scores for this user
     const contestActivities = await prisma.contestActivity.findMany({
@@ -62,7 +70,7 @@ export const getContestUserDetails = async (
     }));
 
     const payload: ContestUserDetails = {
-      tracks: tracks as Track[],
+      tracks: tracks as unknown as Track[],
       activities: activities as ContestActivity[],
     };
     logger.success({

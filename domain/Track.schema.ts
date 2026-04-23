@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { DifficultyEnum } from './Difficulty.enum';
-import { HoldColorEnum } from './HoldColor.enum';
 import { UserTrackProgressSchema } from './UserTrackProgress.schema';
 import { UserSchema } from './User.schema';
 import { ContestUserTrackSchema } from './ContestUserTrack.schema';
@@ -16,7 +15,12 @@ export const TrackSchema = z.object({
     date: z.date(),
     coverImage: z.string().optional(),
   })).optional(),
-  holdColor: HoldColorEnum.nullish().transform(val => val ?? 'Unknown').default('Unknown'),
+  holdColorId: z.number().int().nullable().optional(),
+  holdColor: z.object({
+    id: z.number(),
+    name: z.string(),
+    color: z.string(),
+  }).nullable().optional(),
   level: DifficultyEnum.catch('Unknown'), // Deprecated
   zone: z.number(),
   points: z.number(),
