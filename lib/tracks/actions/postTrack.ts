@@ -3,17 +3,10 @@ import prisma from '@/prisma';
 import { auth } from '@/auth';
 import { checkUserLocationRole } from '@/lib/locations/actions/checkUserLocationRole';
 import { LocationRole } from '@/domain/LocationRole.enum';
+import { parseIntOrThrow } from '@/lib/utils/validation';
 import { createActionLogger } from '@/utils/logger';
 const logger = createActionLogger('postNewTrack');
 
-/**
- * Creates a new track or updates an existing one.
- * Assuming the image is uploaded and the URL is passed in the form data.
- *
- * @param trackId - The track id.
- * @param track - The track data.
- * @throws Error - If the user is not an Admin or Opener.
- */
 export async function postNewTrack(
   trackId: number | undefined,
   track: FormData,
@@ -29,14 +22,15 @@ export async function postNewTrack(
 
   try {
     const name = track.get('name') as string;
-    const zone = parseInt(track.get('zone') as string);
-    const zoneId = parseInt(track.get('zoneId') as string);
+    const zone = parseIntOrThrow(track.get('zone') as string, 'zone');
+    const zoneId = parseIntOrThrow(track.get('zoneId') as string, 'zoneId');
     const holdColor = track.get('holdColor') as string;
-    const points = parseInt(track.get('points') as string);
+    const points = parseIntOrThrow(track.get('points') as string, 'points');
     const imageUrl = track.get('imageUrl') as string;
     const removedFlag = track.get('removed') === 'true';
-    const difficultyLevelId = track.get('difficultyLevelId') ? parseInt(track.get('difficultyLevelId') as string) : undefined;
-    const level = 'Unknown'; // Deprecated, will be determined by difficultyLevelId in the future
+    const difficultyLevelIdStr = track.get('difficultyLevelId') as string | null;
+    const difficultyLevelId = difficultyLevelIdStr ? parseIntOrThrow(difficultyLevelIdStr, 'difficultyLevelId') : undefined;
+    const level = 'Unknown';
 
     logger.start({
       trackId: trackId ?? null,

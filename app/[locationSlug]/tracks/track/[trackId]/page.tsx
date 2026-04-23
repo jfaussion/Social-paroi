@@ -16,8 +16,12 @@ export default async function TrackDetailsPage({ params }: { params: { locationS
   const session = await auth();
 
   const userId = session?.user?.id ?? "";
+  const trackId = parseInt(params.trackId, 10);
+  if (isNaN(trackId) || trackId <= 0) {
+    redirect(`/${params.locationSlug}/tracks`);
+  }
   const [track, location] = await Promise.all([
-    getTrackDetails(parseInt(params.trackId), userId),
+    getTrackDetails(trackId, userId),
     getLocationBySlug(params.locationSlug),
   ]);
   if (!track) {

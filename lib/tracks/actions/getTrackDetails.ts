@@ -3,19 +3,15 @@ import prisma from '@/prisma';
 import { mergeTrackWithProgress } from './mergeTrackWithProgress';
 import { TrackStatus } from '@/domain/TrackStatus.enum';
 import { createActionLogger } from '@/utils/logger';
+import { checkUserLocationMembership } from '@/lib/locations/actions/checkUserLocationMembership';
 const logger = createActionLogger('getTrackDetails');
 
-/**
- * Retrieves the details of a track.
- * @param trackId - The ID of the track.
- * @param userId - The ID of the user. (used to fetch the user progress on this track)
- * @returns A Promise that resolves to the track details with progress, or null if the track is not found or an error occurs.
- */
 export async function getTrackDetails(
   trackId: number,
-  userId: string
+  userId: string,
+  locationId?: number
 ) {
-  logger.start({ trackId, userId });
+  logger.start({ trackId, userId, locationId });
   try {
     const track = await prisma.track.findUnique({
       where: { id: trackId },
@@ -53,17 +49,29 @@ export async function getTrackDetails(
       },
     });
 
-    if (track) {
-      const mergedTrack = mergeTrackWithProgress(track, userId);
-      logger.success({
-        trackId,
-        userId,
-        progressItems: track.trackProgress.length,
-      });
-      return mergedTrack;
+    if (!track) {
+      logger.info('trackNotFound', { trackId, userId });
+      return null;
     }
-    logger.info('trackNotFound', { trackId, userId });
-    return null;
+
+    if (!track.locationId) {
+      logger.error(new Error('Track has no location'), { trackId, userId });
+      return null;
+    }
+
+    const isMember = await checkUserLocationMembership(userId, track.locationId);
+    if (!isMember) {
+      logger.error(new Error('Unauthorized access attempt'), { trackId, userId, locationId: track.locationId });
+      return null;
+    }
+
+    const mergedTrack = mergeTrackWithProgress(track, userId);
+    logger.success({
+      trackId,
+      userId,
+      progressItems: track.trackProgress.length,
+    });
+    return mergedTrack;
   } catch (err) {
     logger.error(err, { trackId, userId });
     return null;

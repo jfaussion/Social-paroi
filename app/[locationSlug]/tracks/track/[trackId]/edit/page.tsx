@@ -10,7 +10,11 @@ export default async function TrackEditPage({ params }: { params: { locationSlug
   const session = await auth();
 
   const userId = session?.user?.id ?? "";
-  const track = await getTrackDetails(parseInt(params.trackId), userId);
+  const trackId = parseInt(params.trackId, 10);
+  if (isNaN(trackId) || trackId <= 0) {
+    redirect(`/${params.locationSlug}/tracks`);
+  }
+  const track = await getTrackDetails(trackId, userId);
   if (!track) {
     console.log('No track found, redirecting to tracks list');
     redirect(`/${params.locationSlug}/tracks`);

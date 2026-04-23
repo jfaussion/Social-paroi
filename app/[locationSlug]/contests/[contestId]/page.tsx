@@ -13,7 +13,11 @@ export const dynamic = 'force-dynamic';
 export default async function ContestDetailsPage({ params }: { params: { locationSlug: string; contestId: string } }) {
   const session = await auth();
   const userId = session?.user?.id ?? "";
-  const contest = await getContestDetails(parseInt(params.contestId), userId);
+  const contestId = parseInt(params.contestId, 10);
+  if (isNaN(contestId) || contestId <= 0) {
+    redirect(`/${params.locationSlug}/contests`);
+  }
+  const contest = await getContestDetails(contestId, userId);
 
   if (!contest) {
     console.log('No contest found, redirecting to contests list');
