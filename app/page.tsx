@@ -8,9 +8,8 @@ import { EarlyAccessSection } from "@/components/landing/EarlyAccessSection";
 export default function Home() {
   return (
     <>
-      <div className="fixed inset-0 z-0 overflow-hidden">
+      <div className="fixed inset-0 z-0 overflow-hidden bg-landing-bg">
         <AuroraBackground />
-        <div className="absolute inset-0 bg-landing-bg/15" />
       </div>
 
       <LandingNavbar />
