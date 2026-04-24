@@ -110,4 +110,60 @@ describe('parseIdListFromQueryParam', () => {
       expect(parseIdListFromQueryParam(input)).toEqual([100])
     })
   })
+
+  describe('XSS prevention - security assertions', () => {
+    it('rejects XSS payload with script tag', () => {
+      const input = encodeURIComponent('[1, 2, "<script>alert(1)</script>"]')
+      expect(parseIdListFromQueryParam(input)).toEqual([])
+    })
+
+    it('rejects XSS payload with javascript protocol', () => {
+      const input = encodeURIComponent('[1, "javascript:alert(1)"]')
+      expect(parseIdListFromQueryParam(input)).toEqual([])
+    })
+
+    it('rejects XSS payload with onerror handler', () => {
+      const input = encodeURIComponent('[1, "<img src=x onerror=alert(1)>"]')
+      expect(parseIdListFromQueryParam(input)).toEqual([])
+    })
+
+    it('rejects XSS payload with expression', () => {
+      const input = encodeURIComponent('[1, "<div style=expression(alert(1))>"]')
+      expect(parseIdListFromQueryParam(input)).toEqual([])
+    })
+
+    it('rejects XSS payload with data URL', () => {
+      const input = encodeURIComponent('[1, "data:text/html,<script>alert(1)</script>"]')
+      expect(parseIdListFromQueryParam(input)).toEqual([])
+    })
+
+    it('rejects array containing eval with malicious input', () => {
+      const input = encodeURIComponent('[1, "eval(atob(dGFsZXJ0KQ==))"]')
+      expect(parseIdListFromQueryParam(input)).toEqual([])
+    })
+
+    it('rejects array containing base64 encoded script', () => {
+      const input = encodeURIComponent('[1, "PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg=="]')
+      expect(parseIdListFromQueryParam(input)).toEqual([])
+    })
+  })
+
+  describe('return type assertions', () => {
+    it('returns array of numbers (not strings)', () => {
+      const input = encodeURIComponent(JSON.stringify([1, 2, 3]))
+      const result = parseIdListFromQueryParam(input)
+      expect(result.every(n => typeof n === 'number')).toBe(true)
+    })
+
+    it('returns array with correct length', () => {
+      const input = encodeURIComponent(JSON.stringify([10, 20, 30, 40]))
+      expect(parseIdListFromQueryParam(input).length).toBe(4)
+    })
+
+    it('returns array where all elements are positive integers', () => {
+      const input = encodeURIComponent(JSON.stringify([7, 8, 9, 10]))
+      const result = parseIdListFromQueryParam(input)
+      expect(result.every(n => Number.isInteger(n) && n > 0)).toBe(true)
+    })
+  })
 })
