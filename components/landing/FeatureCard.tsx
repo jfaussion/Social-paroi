@@ -10,8 +10,7 @@ interface FeatureCardProps {
 export function FeatureCard({ icon, title, description, screenshot }: FeatureCardProps) {
   return (
     <div
-      className="rounded-2xl p-px"
-      style={{ background: "linear-gradient(150deg, #0b56b1, #f974160b, #6c02ee70)" }}
+      className="rounded-2xl p-px bg-feature-card-border"
     >
       <div className="rounded-2xl bg-[#0c0c14] backdrop-blur-md p-6 flex flex-col h-full">
         <div className="mb-4 text-aurora-violet">{icon}</div>

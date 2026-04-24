@@ -33,13 +33,6 @@ export function GymsSection() {
               description="Manage multiple gym locations from a single dashboard. Keep each site's data separate while sharing team access."
             />
           </SectionContent>
-          <SectionContent delay={300}>
-            <FeatureCard
-              icon={<FaHandshake size={28} />}
-              title="Guided Onboarding"
-              description="We walk you through the setup personally. Get your gym live quickly with hands-on support from our team."
-            />
-          </SectionContent>
         </div>
       </div>
     </section>
