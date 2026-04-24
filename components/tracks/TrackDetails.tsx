@@ -18,6 +18,7 @@ import { useDeleteTrack } from '@/lib/tracks/hooks/useDeleteTrack';
 import { Zone } from '../Zone';
 import { FaChevronLeft, FaChevronRight, FaUserCheck } from 'react-icons/fa6';
 import TrackCompletionList from './TrackCompletionList';
+import { parseIdListFromQueryParam } from '@/utils/parseIdList';
 
 type TrackDetailsProps = Track & { isOpener: boolean };
 
@@ -36,9 +37,8 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({ isOpener: isOpenerProp, ...
   const [isCompletionListOpen, setCompletionListOpen] = useState<boolean>(false);
   const searchParams = useSearchParams();
 
-  // Parse trackList from URL query params
   const trackListParam = searchParams.get("trackList");
-  const trackList = trackListParam ? JSON.parse(decodeURIComponent(trackListParam)) : [];
+  const trackList = parseIdListFromQueryParam(trackListParam);
 
   // Find current track position in list
   const currentIndex = trackList.indexOf(track.id);
