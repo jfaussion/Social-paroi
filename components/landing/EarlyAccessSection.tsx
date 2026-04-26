@@ -1,36 +1,20 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useForm, ValidationError } from "@formspree/react";
+import { useEffect } from "react";
+import { toast } from "sonner";
 import { SectionContent } from "./SectionContent";
 import { FooterSection } from "./FooterSection";
 
 export function EarlyAccessSection() {
-  const [gymName, setGymName] = useState("");
-  const [yourName, setYourName] = useState("");
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [state, handleSubmit] = useForm(process.env.NEXT_PUBLIC_FORMSPREE_FORM_ID!);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setStatus("loading");
-    try {
-      const endpoint = process.env.NEXT_PUBLIC_FORMSPREE_ENDPOINT ?? "";
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ gymName, yourName, email, message }),
-      });
-      if (res.ok) {
-        setStatus("success");
-      } else {
-        setStatus("error");
-      }
-    } catch {
-      setStatus("error");
+  useEffect(() => {
+    if (state.succeeded) {
+      toast.success("Thank you! We will be in touch shortly.");
     }
-  }
+  }, [state.succeeded]);
 
   const inputClass =
     "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-aurora-violet focus:ring-1 focus:ring-aurora-violet";
@@ -57,61 +41,51 @@ export function EarlyAccessSection() {
             <p className="text-sm text-white/60">Already trusted by Pic &amp; Paroi</p>
           </div>
 
-          {status === "success" ? (
-            <p className="rounded-xl border border-green-500/30 bg-green-500/10 px-6 py-4 text-center text-green-400">
-              Thank you! We will be in touch shortly.
-            </p>
-          ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <input
                 type="text"
+                name="gymName"
                 required
                 placeholder="Gym Name"
-                value={gymName}
-                onChange={(e) => setGymName(e.target.value)}
                 className={inputClass}
                 style={{ fontSize: "16px" }}
               />
+              <ValidationError field="gymName" errors={state.errors} className="text-sm text-red-400" />
               <input
                 type="text"
+                name="yourName"
                 required
                 placeholder="Your Name"
-                value={yourName}
-                onChange={(e) => setYourName(e.target.value)}
                 className={inputClass}
                 style={{ fontSize: "16px" }}
               />
+              <ValidationError field="yourName" errors={state.errors} className="text-sm text-red-400" />
               <input
                 type="email"
+                name="email"
                 required
                 placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 className={inputClass}
                 style={{ fontSize: "16px" }}
               />
+              <ValidationError field="email" errors={state.errors} className="text-sm text-red-400" />
               <textarea
+                name="message"
                 placeholder="Message (optional)"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
                 rows={4}
                 className={inputClass}
                 style={{ fontSize: "16px" }}
               />
-              {status === "error" && (
-                <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-center text-red-400">
-                  Something went wrong. Please try again.
-                </p>
-              )}
+              <ValidationError field="message" errors={state.errors} className="text-sm text-red-400" />
+              <ValidationError errors={state.errors} className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-center text-red-400" />
               <button
                 type="submit"
-                disabled={status === "loading"}
-                className="rounded-xl bg-aurora-violet px-6 py-3 text-base font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                disabled={state.submitting}
+                className="rounded-xl bg-landing-btn-gradient border border-violet-500/30 px-6 py-3 text-base font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
               >
-                {status === "loading" ? "Sending…" : "Request Early Access"}
+                {state.submitting ? "Sending…" : "Request Early Access"}
               </button>
             </form>
-          )}
         </div>
       </SectionContent>
       </div>

@@ -13,7 +13,7 @@ export function LandingNavbar() {
       />
       <Link
         href="/login"
-        className="rounded-md bg-aurora-violet px-4 py-1 text-sm font-medium text-white transition-opacity hover:opacity-90"
+        className="rounded-md bg-landing-btn-gradient px-4 py-1 text-sm font-medium text-white transition-opacity hover:opacity-90"
       >
         Sign In
       </Link>

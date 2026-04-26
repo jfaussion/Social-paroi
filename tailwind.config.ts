@@ -15,6 +15,7 @@ const config: Config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
         "feature-card-border": `linear-gradient(150deg, ${theme("colors.border-blue")}, ${theme("colors.border-orange")}0b, ${theme("colors.border-violet")}70)`,
+        "landing-btn-gradient": `linear-gradient(120deg, ${theme("colors.light-blue")}, ${theme("colors.dark-blue")} 50%, ${theme("colors.dark-violet")} 92%, ${theme("colors.light-violet")} 100%)`,
       }),
       colors: {
         "aurora-violet": "#7c3aed",
@@ -24,6 +25,10 @@ const config: Config = {
         "border-blue": "#0b56b1",
         "border-orange": "#f97416",
         "border-violet": "#6c02ee",
+        "light-blue": "#4f7ff5",
+        "dark-blue": "#2459e1",
+        "dark-violet": "#7c3aed",
+        "light-violet": "#ad47f1",
       },
     },
   },

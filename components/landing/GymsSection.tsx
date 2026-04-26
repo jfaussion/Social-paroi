@@ -8,7 +8,7 @@ export function GymsSection() {
       <div className="mx-auto max-w-6xl w-full">
         <SectionContent delay={0}>
           <h2 className="mb-12 text-center text-3xl font-bold text-white sm:text-4xl">
-            For Gyms
+            For Openers &amp; Gym Managers
           </h2>
         </SectionContent>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
