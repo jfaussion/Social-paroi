@@ -16,7 +16,7 @@ export function FeatureCard({ icon, title, description, screenshot }: FeatureCar
         <div className="mb-4 text-aurora-violet">{icon}</div>
         <h3 className="mb-2 text-lg font-semibold text-white">{title}</h3>
         <p className="mb-4 text-sm text-white/60">{description}</p>
-        <div className="mt-auto overflow-hidden rounded-xl border border-white/10 bg-white/5 h-32">
+        <div className="mt-auto overflow-hidden rounded-xl border border-white/10 bg-white/5 flex items-start justify-center min-h-64 max-h-[580px]">
           {screenshot ? (
             <img src={screenshot} alt={title} className="h-full w-full object-cover object-top" />
           ) : (
