@@ -26,7 +26,7 @@ export async function postNewTrack(
     const holdColorIdStr = track.get('holdColorId') as string | null;
     const holdColorId = holdColorIdStr ? parseIntOrThrow(holdColorIdStr, 'holdColorId') : undefined;
     const points = parseIntOrThrow(track.get('points') as string, 'points');
-    const imageUrl = track.get('imageUrl') as string;
+    const imageUrl = (track.get('imageUrl') as string) || null;
     const removedFlag = track.get('removed') === 'true';
     const difficultyLevelIdStr = track.get('difficultyLevelId') as string | null;
     const difficultyLevelId = difficultyLevelIdStr ? parseIntOrThrow(difficultyLevelIdStr, 'difficultyLevelId') : undefined;

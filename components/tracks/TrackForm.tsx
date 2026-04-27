@@ -130,7 +130,7 @@ const TrackForm: React.FC<TrackFromProps> = ({ initialTrack, zones, locationId, 
       points: track.points,
       removed: false,
       date: new Date(),
-      imageUrl: '',
+      imageUrl: track.imageUrl ?? '',
       difficultyLevelId: track.difficultyLevelId,
     } as unknown as Track;
 
