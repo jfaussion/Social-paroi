@@ -7,6 +7,7 @@ import prisma from '@/prisma';
 import { getUserLocations } from '@/lib/locations/actions/getUserLocations';
 import { joinLocation } from '@/lib/locations/actions/joinLocation';
 import { LocationStatus } from '@/domain/LocationStatus.enum';
+import { Button } from '@/components/ui/Button';
 
 export default async function LocationsPage() {
   const session = await auth();
@@ -21,14 +22,12 @@ export default async function LocationsPage() {
   const locationsToJoin = publishedLocations.filter((l) => !joinedLocationIds.has(l.id));
 
   return (
-    <main className="flex flex-col items-center p-4 sm:p-24 sm:pt-8">
+    <main className="flex flex-col items-center justify-between p-4 sm:p-24 sm:pt-4 sm:pb-4">
       <h1 className="text-3xl font-bold mb-8">Locations</h1>
 
       {userMemberships.length > 0 && (
-        <section className="w-full max-w-2xl mb-10">
-          <h2 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-300">
-            Your Locations
-          </h2>
+        <section className="w-full max-w-3xl mb-10">
+          <span className="text-xl font-semibold w-full p-4 pt-0 block">Your Locations</span>
           <div className="grid gap-4 sm:grid-cols-2">
             {userMemberships.map((membership) => {
               const loc = membership.location;
@@ -36,7 +35,7 @@ export default async function LocationsPage() {
                 <Link
                   key={loc.id}
                   href={`/${loc.slug}/tracks`}
-                  className="block rounded-lg border border-gray-300 dark:border-neutral-700 bg-gray-100 dark:bg-neutral-800 p-5 hover:border-gray-400 dark:hover:border-neutral-500 transition-colors"
+                  className="block bg-gradient-to-r from-slate-300 to-slate-200 dark:from-gray-700 dark:to-gray-900 border border-gray-600 rounded-lg shadow-lg p-5 hover:from-slate-200 hover:to-slate-100 dark:hover:from-gray-600 dark:hover:to-gray-800 transition-colors"
                 >
                   <h3 className="text-lg font-semibold mb-1">{loc.name}</h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400 capitalize mb-1">
@@ -52,12 +51,10 @@ export default async function LocationsPage() {
         </section>
       )}
 
-      <section className="w-full max-w-2xl">
-        <h2 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-300">
-          Join a Location
-        </h2>
+      <section className="w-full max-w-3xl">
+        <span className="text-xl font-semibold w-full p-4 pt-0 block">Join a Location</span>
         {locationsToJoin.length === 0 ? (
-          <p className="text-gray-500 dark:text-gray-400 text-sm">
+          <p className="text-gray-500 dark:text-gray-400 text-sm px-4">
             You have joined all available locations.
           </p>
         ) : (
@@ -65,7 +62,7 @@ export default async function LocationsPage() {
             {locationsToJoin.map((loc) => (
               <div
                 key={loc.id}
-                className="rounded-lg border border-gray-300 dark:border-neutral-700 bg-gray-100 dark:bg-neutral-800 p-5"
+                className="bg-gradient-to-r from-slate-300 to-slate-200 dark:from-gray-700 dark:to-gray-900 border border-gray-600 rounded-lg shadow-lg p-5"
               >
                 <h3 className="text-lg font-semibold mb-1">{loc.name}</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400 capitalize mb-1">
@@ -80,12 +77,9 @@ export default async function LocationsPage() {
                     await joinLocation(loc.id, loc.slug!);
                   }}
                 >
-                  <button
-                    type="submit"
-                    className="mt-2 px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors"
-                  >
+                  <Button type="submit" btnType="secondary" className="mt-2 w-full">
                     Join
-                  </button>
+                  </Button>
                 </form>
               </div>
             ))}

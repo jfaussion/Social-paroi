@@ -17,17 +17,17 @@ export function EarlyAccessSection() {
   }, [state.succeeded]);
 
   const inputClass =
-    "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-aurora-violet focus:ring-1 focus:ring-aurora-violet";
+    "w-full rounded-xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 px-4 py-3 text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-white/40 outline-none focus:border-aurora-violet focus:ring-1 focus:ring-aurora-violet";
 
   return (
     <section id="early-access" className="min-h-screen md:h-screen md:snap-start flex flex-col pt-16 overflow-y-auto">
       <div className="flex flex-1 items-center justify-center px-6">
       <SectionContent>
         <div className="mx-auto max-w-2xl">
-          <h2 className="mb-4 text-center text-3xl font-bold text-white sm:text-4xl">
+          <h2 className="mb-4 text-center text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
             Bring your gym to Social Paroi
           </h2>
-          <p className="mb-8 text-center text-white/60">
+          <p className="mb-8 text-center text-gray-500 dark:text-white/60">
             Free during early access. We onboard you personally.
           </p>
 
@@ -38,7 +38,7 @@ export function EarlyAccessSection() {
               width={80}
               height={24}
             />
-            <p className="text-sm text-white/60">Already trusted by Pic &amp; Paroi</p>
+            <p className="text-sm text-gray-500 dark:text-white/60">Already trusted by Pic &amp; Paroi</p>
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">

@@ -7,7 +7,7 @@ export function ClimbersSection() {
     <section className="min-h-screen md:h-screen md:snap-start flex items-center justify-center px-6 py-20 pt-24 md:pt-16">
       <div className="mx-auto max-w-6xl w-full">
         <SectionContent delay={0}>
-          <h2 className="mb-12 text-center text-3xl font-bold text-white sm:text-4xl md:pt-10">
+          <h2 className="mb-12 text-center text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl md:pt-10">
             For Climbers
           </h2>
         </SectionContent>
