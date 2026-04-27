@@ -22,3 +22,5 @@ This file contains the key architectural decisions made during the project, alon
 | 2026-04-23 | DEC-014 | [Per-location DB-backed enum pattern](./decisions/DEC-014-per-location-db-backed-enum-pattern.md) | Static enums replaced by location-scoped model + admin CRUD; hex stored in DB, not code |
 | 2026-04-23 | DEC-015 | [Admin list inline edit pattern](./decisions/DEC-015-admin-list-inline-edit-pattern.md) | Consistent click-to-edit with Save/Cancel; reusable pattern for all admin components |
 | 2026-04-23 | DEC-016 | [Server-side form data fetching](./decisions/DEC-016-server-side-form-data.md) | Form lookup data fetched in page.tsx via Promise.all; components receive as props |
+| 2026-04-27 | DEC-017 | [Landing & auth dark mode theming](./decisions/DEC-017-landing-auth-dark-mode-theming.md) | `dark:` prefix pattern + color mapping table for all landing/auth components |
+| 2026-04-27 | DEC-018 | [feature-card-border border-only rule](./decisions/DEC-018-feature-card-border-vs-btn-gradient.md) | `bg-feature-card-border` = p-px wrapper only; CTAs use `bg-landing-btn-gradient` |
